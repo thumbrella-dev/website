@@ -1,0 +1,36 @@
+---
+import FeatureCards from '../components/FeatureCards.astro';
+import MainLayout from '../layouts/MainLayout.astro';
+import Section from '../components/Section.astro';
+---
+
+<MainLayout
+  title="Thumbrella features"
+  description="Feature overview for the Thumbrella site and why the developer-first shape is different."
+>
+  <Section
+    eyebrow="features"
+    title="Built around the evaluation path"
+    lede="The core feature is that the site behaves like an engineering entry point: overview, inspectable example, and docs close together."
+  >
+    <FeatureCards
+      features={[
+        {
+          title: 'Direct evaluation',
+          description: 'People can move from marketing copy into the media browser and docs without losing the thread.',
+          detail: 'That keeps the promise and the proof close together.',
+        },
+        {
+          title: 'Content-first structure',
+          description: 'Astro pages can later hand off to markdown content without changing the shell of the site.',
+          detail: 'Useful if docs become the majority of the repo.',
+        },
+        {
+          title: 'Warm terminal-like tone',
+          description: 'The visual language leans brown, caramel, and monospace accents rather than a generic startup palette.',
+          detail: 'Closer to an old Ubuntu-era developer desktop than a venture landing page.',
+        },
+      ]}
+    />
+  </Section>
+</MainLayout>

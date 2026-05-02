@@ -1,0 +1,50 @@
+---
+import FeatureCards from '../components/FeatureCards.astro';
+import Hero from '../components/Hero.astro';
+import Section from '../components/Section.astro';
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout
+  title="Thumbrella for developers"
+  description="Thumbrella developer docs, product overview, media browser example, and hosting guidance."
+>
+  <Hero
+    title="A calmer front door for the media stack"
+    subtitle="Thumbrella puts the product shape, docs, and live browser example ahead of the usual oversized marketing headline."
+    primaryHref="/media-lib-browser"
+    primaryLabel="Open the media browser"
+  />
+
+  <Section
+    eyebrow="what is thumbrella"
+    title="Developer information comes first"
+    lede="Thumbrella is a media-focused platform site where the fastest path is understanding what it is, how it behaves, and how to host it."
+  >
+    <p>
+      The site is intentionally closer to a product notebook than a polished sales page. Visitors can move from the overview into features, the live media browser, and implementation docs without crossing a wall of generic marketing copy.
+    </p>
+  </Section>
+
+  <Section
+    eyebrow="features and why it is better"
+    title="Useful before flashy"
+    lede="The main differentiator is not a visual gimmick. It is the order of information and the ability to inspect the product directly."
+  >
+    <FeatureCards />
+  </Section>
+
+  <Section
+    eyebrow="documentation"
+    title="Core paths"
+    lede="Every major section maps to a concrete next step instead of another landing page flourish."
+  >
+    <ul>
+      <li><a href="/what-is-thumbrella">What is Thumbrella</a></li>
+      <li><a href="/features">Features and tradeoffs</a></li>
+      <li><a href="/media-lib-browser">Live media-lib browser example</a></li>
+      <li><a href="/docs/web-client">Web client docs</a></li>
+      <li><a href="/docs/hosting">Hosting docs</a></li>
+    </ul>
+  </Section>
+</MainLayout>

@@ -1,0 +1,27 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import Section from '../components/Section.astro';
+---
+
+<MainLayout
+  title="Media library browser"
+  description="Preview page for a live Thumbrella media library browser example."
+>
+  <Section
+    eyebrow="live example"
+    title="Media-lib browser"
+    lede="This page is reserved for the real browser integration. For now it shows the intended frame and the kind of detail the example should surface."
+  >
+    <div class="demo-frame">
+      <div class="demo-frame__bar">
+        <span>media-lib://thumbrella-demo</span>
+        <span>read-only preview</span>
+      </div>
+      <div class="demo-frame__body">
+        <p>Collection: featured-assets</p>
+        <p>Items: 128</p>
+        <p>Status: placeholder until the live browser is wired in</p>
+      </div>
+    </div>
+  </Section>
+</MainLayout>

@@ -1,0 +1,271 @@
+:root {
+    --bg: #2a1c16;
+    --bg-elevated: #3a281f;
+    --panel: #4a3327;
+    --panel-soft: #5a3f30;
+    --text: #f4e5cc;
+    --text-muted: #d4bfa2;
+    --accent: #d79b5b;
+    --accent-strong: #e8b36f;
+    --border: rgba(244, 229, 204, 0.12);
+    --shadow: rgba(0, 0, 0, 0.25);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background:
+        radial-gradient(circle at top, rgba(215, 155, 91, 0.16), transparent 30%),
+        linear-gradient(180deg, #241813 0%, var(--bg) 45%, #1d1410 100%);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', 'JetBrains Mono', 'Fira Code', monospace;
+    line-height: 1.6;
+}
+
+a {
+    color: var(--accent-strong);
+    text-decoration: none;
+}
+
+a:hover {
+    color: #ffd2a1;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    color: #fff2df;
+    line-height: 1.1;
+}
+
+p,
+li,
+code,
+pre {
+    color: var(--text-muted);
+}
+
+code,
+pre {
+    font-family: inherit;
+}
+
+pre {
+    overflow-x: auto;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.container {
+    width: min(1120px, calc(100% - 2rem));
+    margin: 0 auto;
+}
+
+.site-shell {
+    padding-bottom: 4rem;
+}
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: blur(18px);
+    background: rgba(42, 28, 22, 0.82);
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.brand {
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nav-link {
+    display: inline-block;
+    padding: 0.45rem 0.7rem;
+    color: var(--text-muted);
+    border-radius: 999px;
+}
+
+.nav-link.is-active,
+.nav-link:hover {
+    color: #fff;
+    background: rgba(215, 155, 91, 0.16);
+}
+
+.hero {
+    padding: 5rem 0 2rem;
+}
+
+.hero__inner {
+    display: grid;
+    gap: 1rem;
+}
+
+.hero h1 {
+    max-width: 12ch;
+    font-size: clamp(3rem, 8vw, 6.6rem);
+}
+
+.hero__lede {
+    max-width: 55rem;
+    font-size: 1.05rem;
+}
+
+.hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.section {
+    padding: 1.4rem 0;
+}
+
+.section__inner {
+    padding: 1.4rem 0 1.8rem;
+    border-top: 1px solid var(--border);
+}
+
+.section__body {
+    display: grid;
+    gap: 1rem;
+}
+
+.eyebrow {
+    margin-bottom: 0.5rem;
+    color: var(--accent-strong);
+    text-transform: lowercase;
+    letter-spacing: 0.08em;
+}
+
+.lede {
+    max-width: 56rem;
+    margin: 0.75rem 0 0;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1rem;
+    color: #1d1410;
+    background: var(--accent);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.button:hover {
+    color: #1d1410;
+    background: var(--accent-strong);
+}
+
+.button--ghost {
+    color: var(--text);
+    background: transparent;
+    border-color: var(--border);
+}
+
+.button--ghost:hover {
+    color: #fff;
+    background: rgba(215, 155, 91, 0.12);
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.feature-card,
+.demo-frame {
+    background: linear-gradient(180deg, rgba(90, 63, 48, 0.72), rgba(58, 40, 31, 0.92));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 18px 50px var(--shadow);
+}
+
+.feature-card {
+    padding: 1.15rem;
+}
+
+.feature-card h3 {
+    margin-bottom: 0.7rem;
+}
+
+.feature-card__detail {
+    color: var(--accent-strong);
+}
+
+.demo-frame {
+    overflow: hidden;
+}
+
+.demo-frame__bar,
+.demo-frame__body {
+    padding: 1rem 1.15rem;
+}
+
+.demo-frame__bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.18);
+}
+
+.footer {
+    border-top: 1px solid var(--border);
+}
+
+.footer__inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem 0 3rem;
+}
+
+@media (max-width: 720px) {
+    .navbar__inner,
+    .footer__inner,
+    .demo-frame__bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero {
+        padding-top: 3.5rem;
+    }
+}

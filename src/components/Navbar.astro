@@ -1,0 +1,28 @@
+---
+const links = [
+  { href: '/what-is-thumbrella', text: 'What Is' },
+  { href: '/features', text: 'Features' },
+  { href: '/media-lib-browser', text: 'Media Browser' },
+  { href: '/docs/web-client', text: 'Web Client' },
+  { href: '/docs/hosting', text: 'Hosting' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="navbar">
+  <div class="container navbar__inner">
+    <a class="brand" href="/">thumbrella.dev</a>
+    <nav aria-label="Primary">
+      <ul class="nav-list">
+        {links.map((link) => (
+          <li>
+            <a class:list={['nav-link', currentPath === link.href && 'is-active']} href={link.href}>
+              {link.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,27 @@
+---
+interface Props {
+  title: string;
+  subtitle: string;
+  primaryHref?: string;
+  primaryLabel?: string;
+}
+
+const {
+  title,
+  subtitle,
+  primaryHref = '/what-is-thumbrella',
+  primaryLabel = 'Read the overview',
+} = Astro.props;
+---
+
+<section class="hero">
+  <div class="container hero__inner">
+    <p class="eyebrow">developer-first media stack</p>
+    <h1>{title}</h1>
+    <p class="hero__lede">{subtitle}</p>
+    <div class="hero__actions">
+      <a href={primaryHref} class="button">{primaryLabel}</a>
+      <a href="/docs/web-client" class="button button--ghost">Open docs</a>
+    </div>
+  </div>
+</section>
