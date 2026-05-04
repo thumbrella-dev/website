@@ -1,50 +1,499 @@
 ---
-import FeatureCards from '../components/FeatureCards.astro';
-import Hero from '../components/Hero.astro';
-import Section from '../components/Section.astro';
 import MainLayout from '../layouts/MainLayout.astro';
+import MediaBrowser from '../components/MediaBrowser.astro';
+
+const runModes = [
+  {
+    id: 'online-service',
+    label: 'Online',
+    content: `
+      <p>The fastest and easiest way to run Thumbrella. Get your <u>free</u> API_KEY
+      with one click to register with your Github account.
+      <pre><code>curl \\
+  -H Authorization: Bearer &lt;API_TOKEN&gt; \\
+  https://go.thumbrella.dev/thumb#https://example.com/media.jpg</code></pre>
+      <p>This gets you immediate access to the worldwide caching network,
+      all the media and document renderers, and access to media from the
+      entire internet.</p>
+      <p>Like how it's going? Star us on Github to triple your caching and
+      processing quotas!</p>
+      <p><a href="/docs/aiplatform">Read the AI platform docs</a></p>
+    `,
+  },
+  {
+    id: 'self-hosted',
+    label: 'Self Hosted',
+    content: `
+      <p>Download the standalone executable and run for yourself. Set this up
+      for your private libraries and local needs, no internet resources needed.</p>
+      <pre><code>thumbrella thumb ./sample.mov --output ./sample.webp
+TBR_PORT=8001 thumbrella serve</code></pre>
+      <p>Set up your own caching to SQLite with a single configuration argument.</p>
+      <p>Advanced renders will require access to external commands and subprocesses.
+      Use the internal diagnostics reports to help setting up your environment
+      for the optional dependencies.</p>
+      <p>Want more control? Grab the Rust source from 
+      <a href="http://crates.io">crates.io</a> and build for yourself with <b>cargo</b>.
+      <p><a href="/docs/self-hosted">Read the self-hosted docs</a></p>
+    `,
+  },
+  {
+    id: 'ai-platforms',
+    label: 'AI Platforms',
+    content: `
+      <p>Many media tools are already running on AI platforms like 
+      <a href="http://replicate.com">Replicate</a> and 
+      <a href="http://fal.ai">Fal.ai</a>, and so is Thumbrella.
+      Add these lightweight operations alongside your existing computation tools 
+      at no extra cost.</p>
+      <pre><code>replicate run thumb/rella input=https://example.com/media.mp4</code></pre>
+      <p>(These platforms require their own accounts and will bill for processing,
+      but Thumbrella will not charge anything for running here)<p>
+      <p>Ready to integrate worldwide distributed caching on these platforms?
+      Activate a free Thumbrella account with one click using your Github login.
+      <p><a href="/docs/aiplatform">Read the AI platform docs</a></p>
+    `,
+  },
+  {
+    id: 'dedicated',
+    label: 'Online',
+    content: `
+      <p>Move beyond the free hosting tiers with greatly increased cache
+      storage and concurrency limits.</p>
+      <p>With less runtime restrictions your thumbnails will be generated with fewer
+      IO operations and improved performance.</p>
+      <p>Read the <a href="/pricing">pricing pages</a> for options and details.</p>
+    `,
+  },
+  {
+    id: 'sponsor',
+    label: 'Sponsor',
+    content: `
+      <p>Looking to improve browsing for your own vast media libraries? Building
+      a new product that integrates the Thumbrella platform? Becoming a sponsor
+      has valuable benefits.</p>
+      <p>Sponsors get a Docker-first distrubution enabling all of Thumbrella's
+      renderers and media support running out of the box. Get a perpetual
+      license that allows a year of upgrades and new releases. The Docker
+      image runs completely offline and requires no internet support.</p>
+      <p>The sponsored Docker image supports custom caching layers, like writing
+      directly to Redis or Postgres</p>.
+      <p>This is the cleanest route when you want a containerized deployment, extra standalone capabilities, and a support relationship behind the runtime.</p>
+      <p><a href="/docs/sponsor">Read the sponsor docs</a></p>
+    `,
+  },
+];
+
+const freeGroup = runModes.filter((m) => ['online-service', 'self-hosted', 'ai-platforms'].includes(m.id));
+const paidGroup = runModes.filter((m) => ['dedicated', 'sponsor'].includes(m.id));
 ---
 
 <MainLayout
-  title="Thumbrella for developers"
-  description="Thumbrella developer docs, product overview, media browser example, and hosting guidance."
+  title="Thumbrella — fast media stack"
+  description="Thumbrella is a fast, all-in-one media processing, storage, and delivery toolkit."
 >
-  <Hero
-    title="A calmer front door for the media stack"
-    subtitle="Thumbrella puts the product shape, docs, and live browser example ahead of the usual oversized marketing headline."
-    primaryHref="/media-lib-browser"
-    primaryLabel="Open the media browser"
-  />
 
-  <Section
-    eyebrow="what is thumbrella"
-    title="Developer information comes first"
-    lede="Thumbrella is a media-focused platform site where the fastest path is understanding what it is, how it behaves, and how to host it."
-  >
-    <p>
-      The site is intentionally closer to a product notebook than a polished sales page. Visitors can move from the overview into features, the live media browser, and implementation docs without crossing a wall of generic marketing copy.
-    </p>
-  </Section>
+  <!-- ═══════════════════════════════════════════════════ HERO -->
+  <section class="hero">
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <a class="hero__announce" href="/blog/thumbrella-v2">Thumbrella is coming soon →</a>
+        <h1>Thumbrella is the <br/><span class="hero__fast" id="hero-typewriter">fast</span><br/>thumbnail platform.</h1>
+        <span id="hero-typewriter-words" hidden>fast|open source|online|developer|secure|elegent</span>
+        <p class="hero__sub">
+          Generate fast and powerful thumbnails online. Check out the flexible
+          environments and client libraries you can run for yourself.
+        </p>
+      </div>
+      <div class="hero__art">
+        <img src="/logotemp.png" alt="Thumbrella logo" class="hero__logo-img" />
+      </div>
+    </div>
+  </section>
 
-  <Section
-    eyebrow="features and why it is better"
-    title="Useful before flashy"
-    lede="The main differentiator is not a visual gimmick. It is the order of information and the ability to inspect the product directly."
-  >
-    <FeatureCards />
-  </Section>
+  <!-- ══════════════════════════════════════════ RUN MODES -->
+  <section class="run-modes-section">
+    <div class="container">
+      <div class="run-modes" aria-label="Run Thumbrella">
+        <div class="run-modes__tabs" role="tablist" aria-label="Run modes">
+          <div class="run-modes__group">
+            <span class="run-modes__group-label">Run for free</span>
+            <div class="run-modes__group-tabs">
+              {freeGroup.map((mode) => (
+                <button
+                  type="button"
+                  class:list={['run-modes__tab', mode.id === 'online-service' && 'is-active']}
+                  role="tab"
+                  aria-selected={mode.id === 'online-service' ? 'true' : 'false'}
+                  aria-controls={`${mode.id}-panel`}
+                  id={`${mode.id}-tab`}
+                  data-panel={`${mode.id}-panel`}
+                  tabindex={mode.id === 'online-service' ? '0' : '-1'}
+                >
+                  {mode.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div class="run-modes__group-sep" aria-hidden="true"></div>
+          <div class="run-modes__group">
+            <span class="run-modes__group-label">Powerful paid options</span>
+            <div class="run-modes__group-tabs">
+              {paidGroup.map((mode) => (
+                <button
+                  type="button"
+                  class="run-modes__tab"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls={`${mode.id}-panel`}
+                  id={`${mode.id}-tab`}
+                  data-panel={`${mode.id}-panel`}
+                  tabindex="-1"
+                >
+                  {mode.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
 
-  <Section
-    eyebrow="documentation"
-    title="Core paths"
-    lede="Every major section maps to a concrete next step instead of another landing page flourish."
-  >
-    <ul>
-      <li><a href="/what-is-thumbrella">What is Thumbrella</a></li>
-      <li><a href="/features">Features and tradeoffs</a></li>
-      <li><a href="/media-lib-browser">Live media-lib browser example</a></li>
-      <li><a href="/docs/web-client">Web client docs</a></li>
-      <li><a href="/docs/hosting">Hosting docs</a></li>
-    </ul>
-  </Section>
+        <div class="run-modes__panels">
+          {runModes.map((mode, index) => (
+            <article
+              id={`${mode.id}-panel`}
+              class:list={['run-mode-card', index === 0 && 'is-active']}
+              role="tabpanel"
+              aria-labelledby={`${mode.id}-tab`}
+              tabindex={index === 0 ? '0' : '-1'}
+              hidden={index !== 0}
+            >
+              <div class="run-mode-card__content" set:html={mode.content} />
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ DEMO -->
+  <section class="hp-section">
+    <div class="container">
+      <h2>Try it</h2>
+      <p class="hp-lede">A sample media library. Thumbnails generate on demand — watch them arrive as the service processes each file.</p>
+      <MediaBrowser />
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════ FEATURES -->
+  <section class="hp-section">
+    <div class="container">
+      <h2>What makes Thumbrella Great?</h2>
+      <p>Generating fast and high quality thumbnails online is
+        a challenging problem. To make Thumbrella production ready for your website
+        and tools it provides.
+      <div class="toolkit-grid">
+        <div class="toolkit-card">
+          <h3>Hybrid Caching</h3>
+          <p>Caches are the most crucial element for speed. Thumbrella makes
+            client side caching simple and trouble free. Go even farther with
+            server side caches. Our hosted plans use over 300 global regions to
+            get thumbnails to your users immediately.
+        </div>
+        <div class="toolkit-card">
+          <h3>Media Types</h3>
+          <p>Handle the common formats quickly. Handle the complicated formats efficiently.</p>
+          <ul class="check-list">
+            <li>Common image formats</li>
+            <li>Professional image formats</li>
+            <li>Videos</li>
+            <li>Vector graphics</li>
+            <li>3D Geometry</li>
+            <li>Documents</li>
+          </ul>
+        </div>
+        <div class="toolkit-card">
+          <h3>Self Hosted and Open</h3>
+          <p>Access the source and build for your own. Prebuilt versions
+            are ready to self hosted with no setup or registration needed.
+          </p>
+          <code class="toolkit-card__cmd">$ TBR_PORT=8001 thumbrella serve</code>
+          <a href="http://github.com">Github</a>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════ EVERYTHING YOU NEED -->
+   <!--
+  <section class="hp-section">
+    <div class="container">
+      <h2>Everything you need to build & ship</h2>
+      <p class="hp-lede">Production-ready APIs and tools, built into Thumbrella</p>
+      <div class="api-grid">
+        <div class="api-group">
+          <h3>Media Processing</h3>
+          <ul>
+            <li><code>thumbrella.transcode()</code><span>Video & image transcoding</span></li>
+            <li><code>thumbrella.thumbnail()</code><span>Thumbnail extraction</span></li>
+            <li><code>thumbrella.optimize()</code><span>Format optimization</span></li>
+          </ul>
+        </div>
+        <div class="api-group">
+          <h3>Storage</h3>
+          <ul>
+            <li><code>thumbrella.store()</code><span>Upload to S3 / R2 / local</span></li>
+            <li><code>thumbrella.presign()</code><span>Presigned URL generation</span></li>
+            <li><code>thumbrella.delete()</code><span>Delete with CDN purge</span></li>
+          </ul>
+        </div>
+        <div class="api-group">
+          <h3>Delivery</h3>
+          <ul>
+            <li><code>thumbrella.serve()</code><span>HTTP media server</span></li>
+            <li><code>thumbrella.stream()</code><span>Adaptive streaming</span></li>
+            <li><code>thumbrella.cdn()</code><span>CDN integration</span></li>
+          </ul>
+        </div>
+        <div class="api-group">
+          <h3>Metadata</h3>
+          <ul>
+            <li><code>thumbrella.tag()</code><span>Auto-tagging & labeling</span></li>
+            <li><code>thumbrella.search()</code><span>Full-text metadata search</span></li>
+            <li><code>thumbrella.exif()</code><span>EXIF extraction</span></li>
+          </ul>
+        </div>
+        <div class="api-group">
+          <h3>Events</h3>
+          <ul>
+            <li><code>thumbrella.on()</code><span>Lifecycle event hooks</span></li>
+            <li><code>thumbrella.webhook()</code><span>Outbound webhooks</span></li>
+            <li><code>thumbrella.queue()</code><span>Job queue management</span></li>
+          </ul>
+        </div>
+        <div class="api-group">
+          <h3>Developer Experience</h3>
+          <ul>
+            <li><code>thumbrella dev</code><span>Local dev server</span></li>
+            <li><code>thumbrella browse</code><span>Media browser UI</span></li>
+            <li><code>thumbrella test</code><span>Pipeline testing</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+   -->
+
+
+  <!-- ════════════════════════════════════ CODE TESTIMONIAL -->
+  <!--
+  <section class="hp-section">
+    <div class="container">
+      <h2>Thumbrella works with your stack</h2>
+      <div class="testimonial-card">
+        <div class="testimonial-card__left">
+          <div class="testimonial-card__avatar">AC</div>
+          <div>
+            <strong>Alex Chen</strong>
+            <span class="testimonial-card__role">Lead Engineer at Pixel Studio</span>
+          </div>
+          <blockquote>
+            "Dropping Thumbrella in replaced three separate services. The unified API cut
+            our pipeline to a quarter of the original code."
+          </blockquote>
+        </div>
+        <div class="testimonial-card__right">
+          <div class="code-tab-bar">app/upload/route.ts</div>
+          <pre><code>{`import { store, transcode, webhook } from "thumbrella";
+
+export async function POST(req: Request) {
+  const file = await req.formData().get("file");
+
+  const [optimized] = await transcode(file, {
+    formats: ["webp", "avif"],
+    thumbnail: true,
+  });
+
+  const url = await store(optimized, {
+    bucket: process.env.MEDIA_BUCKET,
+  });
+
+  await webhook.emit("media.uploaded", { url });
+
+  return Response.json({ url });
+}`}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+    -->
+
+  <!-- ═══════════════════════════════════ STORAGE SPEED COMPARE -->
+  <!-- <section class="hp-section">
+    <div class="container">
+      <code class="section-cmd">$ thumbrella store</code>
+      <h2>Thumbrella is a fast storage driver.</h2>
+      <div class="speed-compare">
+        <div class="speed-compare__row">
+          <span class="speed-compare__label">Thumbrella</span>
+          <div class="speed-compare__bar speed-compare__bar--accent" style="width:8%"></div>
+          <span class="speed-compare__time">0.41s</span>
+        </div>
+        <div class="speed-compare__row">
+          <span class="speed-compare__label">aws-sdk v3</span>
+          <div class="speed-compare__bar" style="width:48%"></div>
+          <span class="speed-compare__time">2.4s</span>
+          <span class="speed-compare__slower">6x slower</span>
+        </div>
+        <div class="speed-compare__row">
+          <span class="speed-compare__label">multer + S3</span>
+          <div class="speed-compare__bar" style="width:72%"></div>
+          <span class="speed-compare__time">3.6s</span>
+          <span class="speed-compare__slower">9x slower</span>
+        </div>
+        <div class="speed-compare__row">
+          <span class="speed-compare__label">formidable</span>
+          <div class="speed-compare__bar" style="width:100%"></div>
+          <span class="speed-compare__time">5.0s</span>
+          <span class="speed-compare__slower">12x slower</span>
+        </div>
+      </div>
+      <p class="speed-compare__caption">
+        Replace your upload handler with <code>thumbrella store</code> to get 6–12x faster uploads.
+      </p>
+      <a href="/docs/hosting" class="button button--small">Try it →</a>
+    </div>
+  </section>
+   -->
+
+  <!-- ═══════════════════════════════════════════ SOCIAL PROOF -->
+   <!-- <section class="hp-section">
+    <div class="container">
+      <h2>Developers love Thumbrella.</h2>
+      <div class="tweet-grid">
+        {[
+          { handle: '@dev_alice',      text: 'Just replaced our entire media pipeline with Thumbrella. 10/10.' },
+          { handle: '@mediabuilder',   text: 'thumbrella store is so fast it feels wrong. Love it.' },
+          { handle: '@janedoe_codes',  text: 'The media browser alone is worth it. Our content team is obsessed.' },
+          { handle: '@backendpete',    text: 'Single binary deploy for the media layer. Finally.' },
+          { handle: '@fullstackfinn',  text: 'thumbrella transcode replaced 300 lines of FFmpeg glue code.' },
+          { handle: '@productionops',  text: 'Webhooks with HMAC signing built in. No more rolling our own.' },
+          { handle: '@react_dev_99',   text: 'Dropped Thumbrella into our Next.js app in an afternoon.' },
+          { handle: '@cloudnative_k',  text: "Edge-deployed, fast cold starts, built-in CDN hooks. Chef's kiss." },
+          { handle: '@opencreator',    text: 'Open source media stack that actually works in production.' },
+        ].map((t) => (
+          <div class="tweet">
+            <span class="tweet__handle">{t.handle}</span>
+            <p>{t.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+  -->
+
+  <!-- ══════════════════════════════════════════ LEARN MORE CTA -->
+  <section class="hp-section">
+    <div class="container learn-cta">
+      <a class="learn-card" href="/docs/web-client">
+        <h3>Documentation</h3>
+        <p>Get started with Thumbrella and learn how to use all of its features</p>
+      </a>
+      <a class="learn-card" href="/media-lib-browser">
+        <h3>Media Browser</h3>
+        <p>Explore the live media library browser example directly in your browser</p>
+      </a>
+    </div>
+  </section>
+
 </MainLayout>
+
+<script>
+  const el = document.getElementById('hero-typewriter');
+  const sourceEl = document.getElementById('hero-typewriter-words');
+  if (el) {
+    const typewriterEl = el;
+    const sourceWords = sourceEl?.textContent
+      ?.split('|')
+      .map((word) => word.trim())
+      .filter(Boolean) ?? [];
+    const words = sourceWords.length ? sourceWords : [el.textContent?.trim() || 'best'];
+    let wordIndex = 0;
+    let charIndex = words[0].length;
+    let isDeleting = false;
+
+    typewriterEl.textContent = words[0];
+
+    function tick() {
+      const current = words[wordIndex];
+
+      if (!isDeleting && charIndex === current.length) {
+        setTimeout(() => { isDeleting = true; tick(); }, 2000);
+        return;
+      }
+
+      if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        wordIndex = (wordIndex + 1) % words.length;
+        setTimeout(tick, 300);
+        return;
+      }
+
+      charIndex += isDeleting ? -1 : 1;
+      typewriterEl.textContent = words[wordIndex].slice(0, charIndex);
+      setTimeout(tick, isDeleting ? 40 : 80);
+    }
+
+    setTimeout(tick, 2000);
+  }
+
+  const tabButtons = Array.from(document.querySelectorAll('.run-modes__tab'));
+  const tabPanels = Array.from(document.querySelectorAll('.run-mode-card'));
+
+  if (tabButtons.length && tabPanels.length) {
+    function selectTab(nextTab) {
+      const targetPanelId = nextTab.getAttribute('data-panel');
+
+      tabButtons.forEach((tab) => {
+        const isActive = tab === nextTab;
+        tab.classList.toggle('is-active', isActive);
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        tab.setAttribute('tabindex', isActive ? '0' : '-1');
+      });
+
+      tabPanels.forEach((panel) => {
+        const isActive = panel.id === targetPanelId;
+        panel.classList.toggle('is-active', isActive);
+        panel.hidden = !isActive;
+        panel.setAttribute('tabindex', isActive ? '0' : '-1');
+      });
+    }
+
+    tabButtons.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectTab(tab));
+
+      tab.addEventListener('keydown', (event) => {
+        if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft' && event.key !== 'Home' && event.key !== 'End') {
+          return;
+        }
+
+        event.preventDefault();
+
+        let nextIndex = index;
+        if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabButtons.length;
+        if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabButtons.length) % tabButtons.length;
+        if (event.key === 'Home') nextIndex = 0;
+        if (event.key === 'End') nextIndex = tabButtons.length - 1;
+
+        const nextTab = tabButtons[nextIndex];
+        selectTab(nextTab);
+        nextTab.focus();
+      });
+    });
+
+    const initiallySelected = tabButtons.find((tab) => tab.getAttribute('aria-selected') === 'true') ?? tabButtons[0];
+    selectTab(initiallySelected);
+  }
+</script>

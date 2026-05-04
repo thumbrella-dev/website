@@ -1,0 +1,26 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import Section from '../../components/Section.astro';
+---
+
+<MainLayout
+  title="Online service docs"
+  description="Start with the hosted Thumbrella service in a few minutes."
+>
+  <Section
+    eyebrow="online service"
+    title="Start free on the hosted service"
+    lede="Use the hosted endpoint when you want the shortest path from a media URL to a production-quality thumbnail response."
+  >
+    <ol>
+      <li>Create an account and get your hosted endpoint.</li>
+      <li>Send a public media URL to the thumb endpoint.</li>
+      <li>Swap in signed requests and app-level integration after the first successful response.</li>
+    </ol>
+    <pre><code>curl https://thumbrella.dev/thumb#https://example.com/media.jpg</code></pre>
+    <p>
+      The hosted service is the best starting point when you want to evaluate quality, latency,
+      and integration shape before deciding whether to self host or move to a sponsor deployment.
+    </p>
+  </Section>
+</MainLayout>

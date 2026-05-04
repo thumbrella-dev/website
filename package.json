@@ -1,7 +1,7 @@
 {
   "name": "thumbrella-web",
   "version": "1.0.0",
-  "description": "A SaaS-style marketing website for Thumbrella, focused on developer information.",
+  "description": "Home page and documentation for Thumbrella.",
   "main": "index.astro",
   "scripts": {
     "dev": "astro dev",
@@ -9,7 +9,7 @@
     "preview": "astro preview"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "keywords": [
     "Thumbrella",
@@ -18,12 +18,12 @@
     "developer",
     "documentation"
   ],
-  "author": "Your Name",
+  "author": "pete@thumbrella.dev",
   "license": "MIT",
   "dependencies": {
-    "astro": "^2.0.0"
+    "astro": "^6.0.0"
   },
   "devDependencies": {
-    "typescript": "^4.0.0"
+    "typescript": "^6.0.0"
   }
 }

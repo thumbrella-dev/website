@@ -1,0 +1,108 @@
+---
+import MediaItem from './MediaItem.astro';
+
+interface MediaEntry {
+  name: string;
+  src: string;
+  resolution: string;
+  codec: string;
+  type: 'video' | 'photo' | 'raw';
+  duration?: string;
+  delay?: number;
+}
+
+const media: MediaEntry[] = [
+  { name: 'aerial-city.mp4',        src: 'https://picsum.photos/seed/aerial9/800/600',    resolution: '3840×2160', codec: 'MP4',  type: 'video', duration: '0:47', delay: 820  },
+  { name: 'portrait-session.jpg',   src: 'https://picsum.photos/seed/portrait2/800/600',  resolution: '4000×3000', codec: 'JPEG', type: 'photo',                  delay: 340  },
+  { name: 'product-360.mp4',        src: 'https://picsum.photos/seed/product9/800/600',   resolution: '1920×1080', codec: 'MP4',  type: 'video', duration: '2:14', delay: 1240 },
+  { name: 'landscape-raw.cr3',      src: 'https://picsum.photos/seed/mountain7/800/600',  resolution: '6720×4480', codec: 'CR3',  type: 'raw',                    delay: 1850 },
+  { name: 'interview-b-roll.mov',   src: 'https://picsum.photos/seed/office3/800/600',    resolution: '1920×1080', codec: 'MOV',  type: 'video', duration: '8:32', delay: 960  },
+  { name: 'concert-crowd.jpg',      src: 'https://picsum.photos/seed/concert4/800/600',   resolution: '5472×3648', codec: 'JPEG', type: 'photo',                  delay: 280  },
+  { name: 'timelapse-stars.mp4',    src: 'https://picsum.photos/seed/stars88/800/600',    resolution: '4096×2160', codec: 'MP4',  type: 'video', duration: '1:03', delay: 1100 },
+  { name: 'product-flat-lay.png',   src: 'https://picsum.photos/seed/flatlay5/800/600',   resolution: '3000×2000', codec: 'PNG',  type: 'photo',                  delay: 410  },
+  { name: 'drone-coastline.mp4',    src: 'https://picsum.photos/seed/coast11/800/600',    resolution: '4096×2160', codec: 'MP4',  type: 'video', duration: '3:21', delay: 740  },
+  { name: 'fashion-editorial.jpg',  src: 'https://picsum.photos/seed/fashion6/800/600',   resolution: '5000×3333', codec: 'JPEG', type: 'photo',                  delay: 390  },
+  { name: 'astrophoto-deep.tiff',   src: 'https://picsum.photos/seed/astro22/800/600',    resolution: '7360×4912', codec: 'TIFF', type: 'raw',                    delay: 2100 },
+  { name: 'event-highlight.mp4',    src: 'https://picsum.photos/seed/event33/800/600',    resolution: '1920×1080', codec: 'MP4',  type: 'video', duration: '4:55', delay: 1500 },
+];
+---
+
+<div class="mbrowser">
+  <div class="mbrowser__toolbar">
+    <div class="mbrowser__path">
+      <!-- folder icon -->
+      <svg class="mbrowser__folder-icon" width="13" height="13" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+        <path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h2.086a1.5 1.5 0 0 1 1.06.44l.708.707H11.5A1.5 1.5 0 0 1 13 4.647V11.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 1 11.5v-8Z"/>
+      </svg>
+      <span class="mbrowser__crumb">media</span>
+      <span class="mbrowser__sep">›</span>
+      <span class="mbrowser__crumb mbrowser__crumb--active">all</span>
+    </div>
+    <span class="mbrowser__count">{media.length} items</span>
+    <div class="mbrowser__view-toggle" role="group" aria-label="View mode">
+      <button class="mbrowser__view-btn is-active" data-view="grid" aria-label="Grid view" title="Grid">
+        <!-- 2×2 grid icon -->
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+          <rect x="1" y="1" width="5.5" height="5.5" rx="1"/>
+          <rect x="7.5" y="1" width="5.5" height="5.5" rx="1"/>
+          <rect x="1" y="7.5" width="5.5" height="5.5" rx="1"/>
+          <rect x="7.5" y="7.5" width="5.5" height="5.5" rx="1"/>
+        </svg>
+      </button>
+      <button class="mbrowser__view-btn" data-view="list" aria-label="List view" title="List">
+        <!-- list icon -->
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+          <rect x="1" y="1.5" width="12" height="2" rx="1"/>
+          <rect x="1" y="6" width="12" height="2" rx="1"/>
+          <rect x="1" y="10.5" width="12" height="2" rx="1"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="mbrowser__body">
+    <div class="mbrowser__section-label">All Media</div>
+    <div class="mbrowser__grid" id="mbrowser-grid" data-view="grid">
+      {media.map(item => <MediaItem {...item} />)}
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── view toggle ──────────────────────────────────────────
+  const grid = document.getElementById('mbrowser-grid');
+  document.querySelectorAll<HTMLButtonElement>('.mbrowser__view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mbrowser__view-btn').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      if (grid) grid.dataset.view = btn.dataset.view ?? 'grid';
+    });
+  });
+
+  // ── thumbnail reveal with simulated generation delay ─────
+  const items = document.querySelectorAll<HTMLElement>('.mitem');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      observer.unobserve(entry.target);
+
+      const el = entry.target as HTMLElement;
+      const src = el.dataset.thumbSrc ?? '';
+      const delay = parseInt(el.dataset.thumbDelay ?? '0', 10);
+
+      // shimmer starts immediately on enter
+      el.classList.add('is-pending');
+
+      setTimeout(() => {
+        const img = el.querySelector<HTMLImageElement>('.mitem__img');
+        if (!img || !src) return;
+        img.addEventListener('load',  () => el.classList.add('is-loaded'), { once: true });
+        img.addEventListener('error', () => el.classList.add('is-error'),  { once: true });
+        img.src = src;
+      }, delay);
+    });
+  }, { rootMargin: '80px', threshold: 0.05 });
+
+  items.forEach(item => observer.observe(item));
+</script>

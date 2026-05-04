@@ -1,0 +1,27 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import Section from '../../components/Section.astro';
+---
+
+<MainLayout
+  title="Replicate docs"
+  description="Run Thumbrella through Replicate when that matches your deployment model."
+>
+  <Section
+    eyebrow="replicate"
+    title="Use Thumbrella from Replicate"
+    lede="Choose this path when your team already distributes workloads through Replicate and wants Thumbrella available in the same place."
+  >
+    <ol>
+      <li>Use your Replicate account and standard workflow.</li>
+      <li>Run the published Thumbrella model with a media input.</li>
+      <li>Account for Replicate usage fees in your deployment model.</li>
+    </ol>
+    <pre><code>replicate run peter/thumbrella input=https://example.com/media.mp4</code></pre>
+    <p>
+      Thumbrella does not add an extra charge in this mode, but Replicate billing still applies.
+      This is the right option when marketplace distribution and familiar provisioning matter more
+      than running the binary directly.
+    </p>
+  </Section>
+</MainLayout>
