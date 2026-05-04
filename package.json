@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "npm run build && wrangler dev",
+    "generate-types": "wrangler types",
+    "deploy": "npm run build && wrangler deploy"
   },
   "engines": {
     "node": ">=22"
@@ -21,9 +23,14 @@
   "author": "pete@thumbrella.dev",
   "license": "MIT",
   "dependencies": {
+    "@astrojs/cloudflare": "^13.3.0",
     "astro": "^6.0.0"
   },
   "devDependencies": {
-    "typescript": "^6.0.0"
+    "typescript": "^6.0.0",
+    "wrangler": "^4.87.0"
+  },
+  "overrides": {
+    "vite": "^7"
   }
 }
