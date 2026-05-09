@@ -1,0 +1,15 @@
+---
+import ClerkMinimalLayout from '../layouts/ClerkMinimalLayout.astro';
+import { Show } from '@clerk/astro/components';
+
+export const prerender = false;
+---
+
+<ClerkMinimalLayout title="Clerk Minimal Sandbox">
+  <Show when="signed-out">
+    <p>Signed out: use the header buttons to open Clerk modals.</p>
+  </Show>
+  <Show when="signed-in">
+    <p>Signed in: this confirms Clerk + Astro components are wired correctly.</p>
+  </Show>
+</ClerkMinimalLayout>

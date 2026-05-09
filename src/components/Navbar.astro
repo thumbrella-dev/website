@@ -1,13 +1,17 @@
 ---
+import { SignInButton, UserButton } from '@clerk/astro/components';
+
 const links = [
   { href: '/doc/api', text: 'API Docs' },
   { href: '/doc/host', text: 'Hosting' },
   { href: '/doc/price', text: 'Pricing and Plans' },
   { href: 'http://github.com', text: 'Github' },
-  { href: '/user', text: 'Customer Dashboard' },
 ];
 
 const currentPath = Astro.url.pathname;
+const currentUser =
+  typeof Astro.locals.currentUser === 'function' ? await Astro.locals.currentUser() : null;
+const primaryEmail = currentUser?.primaryEmailAddress?.emailAddress ?? 'account';
 ---
 
 <header class="navbar">
@@ -22,7 +26,136 @@ const currentPath = Astro.url.pathname;
             </a>
           </li>
         ))}
+        <li>
+          <SignInButton
+            mode="modal"
+            asChild
+          >
+            <button type="button" id="nav-sign-in" class="nav-auth-btn">Sign in</button>
+          </SignInButton>
+          <button type="button" id="open-manage-account-nav" class="nav-auth-btn nav-auth-btn--email" hidden>{primaryEmail}</button>
+        </li>
+        <li>
+          <button type="button" id="nav-sign-out" class="nav-auth-btn" hidden>Log out</button>
+          <UserButton>
+            <UserButton.UserProfilePage label="Thumbrella" url="thumbrella">
+              <h2>Thumbrella</h2>
+              <p>Welcome to your Thumbrella account area.</p>
+              <p>Plan: Free Preview</p>
+              <p>Account email: {primaryEmail}</p>
+            </UserButton.UserProfilePage>
+            <UserButton.UserProfilePage label="Tokens and Usage" url="tokens-usage">
+              <h2>Tokens and Usage</h2>
+              <p>Default token: tr_test_EXAMPLE_TOKEN</p>
+              <p>Requests today: 2,140</p>
+              <p>Cached media: 2.7 GB</p>
+            </UserButton.UserProfilePage>
+          </UserButton>
+        </li>
       </ul>
     </nav>
   </div>
 </header>
+
+<script is:inline>
+  const signInButton = document.getElementById('nav-sign-in');
+  const manageAccount = document.getElementById('open-manage-account-nav');
+  const signOutButton = document.getElementById('nav-sign-out');
+  let previousUserId = null;
+
+  const getUserButtonConfig = () => {
+    const userButtonMap = window.__astro_clerk_component_props?.get('user-button');
+    return userButtonMap ? Array.from(userButtonMap.values())[0] : undefined;
+  };
+
+  const updateAuthButtons = () => {
+    const user = window.Clerk?.user;
+
+    if (signInButton) {
+      signInButton.hidden = !!user;
+    }
+    if (manageAccount) {
+      manageAccount.hidden = !user;
+      if (user?.primaryEmailAddress?.emailAddress) {
+        manageAccount.textContent = user.primaryEmailAddress.emailAddress;
+      }
+    }
+    if (signOutButton) {
+      signOutButton.hidden = !user;
+    }
+  };
+
+  const openManageAccount = () => {
+    if (!window.Clerk?.user) {
+      return;
+    }
+
+    const userButtonConfig = getUserButtonConfig();
+    window.Clerk.openUserProfile(userButtonConfig?.userProfileProps);
+  };
+
+  // Manual button event listeners
+  if (manageAccount) {
+    manageAccount.addEventListener('click', () => {
+      void openManageAccount();
+    });
+  }
+
+  if (signOutButton) {
+    signOutButton.addEventListener('click', () => {
+      void window.Clerk?.signOut({ redirectUrl: '/' });
+    });
+  }
+
+  // Wait for Clerk to load, then set up listener
+  const waitForClerk = window.setInterval(() => {
+    if (!window.Clerk) return;
+
+    window.clearInterval(waitForClerk);
+    updateAuthButtons();
+
+    // Listen for auth state changes
+    window.Clerk.addListener(() => {
+      const currentUserId = window.Clerk?.user?.id;
+      const wasSignedOut = previousUserId === null;
+      const isNowSignedIn = currentUserId !== null && currentUserId !== undefined;
+
+      updateAuthButtons();
+
+      // Auto-open account modal when user just signed in
+      if (wasSignedOut && isNowSignedIn) {
+        openManageAccount();
+      }
+
+      previousUserId = currentUserId;
+    });
+  }, 100);
+</script>
+
+<style>
+  .nav-auth-btn {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-muted);
+    border-radius: 999px;
+    padding: 0.45rem 0.7rem;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .nav-auth-btn:hover {
+    color: #fff;
+    background: rgba(215, 155, 91, 0.16);
+  }
+
+  .nav-auth-btn--email {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :global([data-clerk-id^='clerk-user-button']) {
+    display: none;
+  }
+</style>

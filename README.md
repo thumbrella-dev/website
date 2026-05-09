@@ -68,6 +68,25 @@ To get started with the Thumbrella Web project, follow these steps:
 
 5. Open your browser and visit `http://localhost:3000` to see the site in action.
 
+## Clerk Prototype Customer Area
+
+This repo now includes a static-first prototype customer dashboard using Clerk.
+
+- Logout route: `/logout`
+- Route: `/user`
+
+Set your Clerk publishable key before running the client-only first pass:
+
+```bash
+# .dev.vars
+PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+```
+
+If you later move to Clerk middleware or server-verified sessions, add a secret key at that point.
+
+The prototype currently stores demo token data in browser local storage and uses
+placeholder usage metrics to model the UX for API token management.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any enhancements or bug fixes.
