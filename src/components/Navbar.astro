@@ -1,5 +1,6 @@
 ---
 import { SignInButton, UserButton } from '@clerk/astro/components';
+import { env } from 'cloudflare:workers';
 
 const links = [
   { href: '/doc/api', text: 'API Docs' },
@@ -12,6 +13,26 @@ const currentPath = Astro.url.pathname;
 const currentUser =
   typeof Astro.locals.currentUser === 'function' ? await Astro.locals.currentUser() : null;
 const primaryEmail = currentUser?.primaryEmailAddress?.emailAddress ?? 'account';
+const clerkUserId = currentUser?.id;
+
+const adminWorker = env.ADMIN_WORKER;
+
+let adminDashboardHtml = '';
+
+if (clerkUserId && adminWorker) {
+  try {
+    const url = new URL(
+      `/api/customer/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`,
+      'http://admin.internal'
+    );
+    const resp = await adminWorker.fetch(url.toString());
+    if (resp.ok) {
+      adminDashboardHtml = await resp.text();
+    }
+  } catch {
+    // Ignore worker fetch failures inside nav; dashboard page has full error handling.
+  }
+}
 ---
 
 <header class="navbar">
@@ -38,17 +59,12 @@ const primaryEmail = currentUser?.primaryEmailAddress?.emailAddress ?? 'account'
         <li>
           <button type="button" id="nav-sign-out" class="nav-auth-btn" hidden>Log out</button>
           <UserButton>
-            <UserButton.UserProfilePage label="Thumbrella" url="thumbrella">
-              <h2>Thumbrella</h2>
-              <p>Welcome to your Thumbrella account area.</p>
-              <p>Plan: Free Preview</p>
-              <p>Account email: {primaryEmail}</p>
-            </UserButton.UserProfilePage>
-            <UserButton.UserProfilePage label="Tokens and Usage" url="tokens-usage">
-              <h2>Tokens and Usage</h2>
-              <p>Default token: tr_test_EXAMPLE_TOKEN</p>
-              <p>Requests today: 2,140</p>
-              <p>Cached media: 2.7 GB</p>
+            <UserButton.UserProfilePage label="Thumbrella" url="manage-account">
+              {adminDashboardHtml ? (
+                <div class="nav-admin-dashboard" set:html={adminDashboardHtml} />
+              ) : (
+                <p>Dashboard data is currently unavailable.</p>
+              )}
             </UserButton.UserProfilePage>
           </UserButton>
         </li>
@@ -76,9 +92,7 @@ const primaryEmail = currentUser?.primaryEmailAddress?.emailAddress ?? 'account'
     }
     if (manageAccount) {
       manageAccount.hidden = !user;
-      if (user?.primaryEmailAddress?.emailAddress) {
-        manageAccount.textContent = user.primaryEmailAddress.emailAddress;
-      }
+      manageAccount.textContent = "Manage Account";
     }
     if (signOutButton) {
       signOutButton.hidden = !user;
@@ -91,7 +105,10 @@ const primaryEmail = currentUser?.primaryEmailAddress?.emailAddress ?? 'account'
     }
 
     const userButtonConfig = getUserButtonConfig();
-    window.Clerk.openUserProfile(userButtonConfig?.userProfileProps);
+    window.Clerk.openUserProfile({
+      ...(userButtonConfig?.userProfileProps ?? {}),
+      __experimental_startPath: '/manage-account',
+    });
   };
 
   // Manual button event listeners

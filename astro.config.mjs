@@ -7,7 +7,23 @@ import clerk from '@clerk/astro';
 
 export default defineConfig({
   site: 'https://thumbrella.dev',
-  integrations: [react(), clerk()],
+  integrations: [react(), clerk({
+    appearance: {
+      variables: {
+        colorBackground: '#212126',
+        colorNeutral: 'white',
+        colorPrimary: '#ffffff',
+        colorPrimaryForeground: 'black',
+        colorForeground: 'white',
+        colorInputForeground: 'white',
+        colorInput: '#26262B',
+      },
+      elements: {
+        providerIcon__apple: { filter: 'invert(1)' },
+        providerIcon__github: { filter: 'invert(1)' },
+      },
+    },
+  })],
   output: 'server',
 
   markdown: {
@@ -16,5 +32,8 @@ export default defineConfig({
     },
   },
 
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    sessionKVBindingName: 'CLERK_SESSION',
+    imageService: 'passthrough',
+  }),
 });

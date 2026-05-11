@@ -1,0 +1,293 @@
+---
+/**
+ * /user/dashboard — Customer account dashboard.
+ *
+ * Fetches a pre-rendered HTML fragment from the thumbrella-admin worker via
+ * the ADMIN_WORKER service binding (no external HTTP, no secrets needed).
+ * The fragment contains usage stats, token status and notifications.
+ * This page dresses it with site chrome and CSS.
+ */
+import MainLayout from '../../layouts/MainLayout.astro';
+import { SignInButton } from '@clerk/astro/components';
+import { env } from 'cloudflare:workers';
+
+export const prerender = false;
+
+const currentUser =
+  typeof Astro.locals.currentUser === 'function' ? await Astro.locals.currentUser() : null;
+
+// Redirect unauthenticated visitors to sign-in modal.
+if (!currentUser) {
+  return Astro.redirect('/?signin=dashboard');
+}
+
+const clerkUserId = currentUser.id;
+const adminWorker = env.ADMIN_WORKER;
+
+let dashboardHtml = '';
+let fetchError = '';
+
+if (adminWorker) {
+  try {
+    const url = new URL(`/api/customer/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`, 'http://admin.internal');
+    const resp = await adminWorker.fetch(url.toString());
+    if (resp.ok) {
+      dashboardHtml = await resp.text();
+    } else {
+      fetchError = `Admin returned ${resp.status}`;
+    }
+  } catch (err) {
+    fetchError = err instanceof Error ? err.message : String(err);
+  }
+} else {
+  // Local dev without service binding — show a placeholder.
+  fetchError = 'ADMIN_WORKER service binding not available in local dev (configure wrangler dev --service).';
+}
+---
+
+<MainLayout title="My Dashboard — Thumbrella">
+  <div class="dashboard-shell">
+    <header class="dashboard-header">
+      <h1>My Dashboard</h1>
+      <p class="dashboard-user">
+        Signed in as <strong>{currentUser.primaryEmailAddress?.emailAddress ?? currentUser.id}</strong>
+      </p>
+    </header>
+
+    {fetchError ? (
+      <div class="dashboard-error">
+        <p>Could not load dashboard data.</p>
+        {import.meta.env.DEV && <pre class="dashboard-error-detail">{fetchError}</pre>}
+      </div>
+    ) : (
+      <div class="dashboard-content" set:html={dashboardHtml} />
+    )}
+  </div>
+</MainLayout>
+
+<style>
+  .dashboard-shell {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .dashboard-header {
+    margin-bottom: 2rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+  }
+
+  .dashboard-user {
+    color: var(--color-muted, #666);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .dashboard-error {
+    border: 1px solid var(--color-error, #e55);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    background: color-mix(in srgb, var(--color-error, #e55) 8%, transparent);
+    color: var(--color-error, #c00);
+  }
+
+  .dashboard-error-detail {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* ── Fragment styles (scope the admin-emitted HTML) ─────────────────── */
+  .dashboard-content :global(.tbr-summary) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .dashboard-content :global(.tbr-stat) {
+    background: var(--color-surface, #f5f5f5);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .dashboard-content :global(.tbr-stat-value) {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .dashboard-content :global(.tbr-stat-label) {
+    font-size: 0.75rem;
+    color: var(--color-muted, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .dashboard-content :global(.tbr-section) {
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+  }
+
+  .dashboard-content :global(.tbr-section > summary) {
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface, #f5f5f5);
+    user-select: none;
+    list-style: none;
+  }
+
+  .dashboard-content :global(.tbr-section > summary h2) {
+    display: inline;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .dashboard-content :global(.tbr-table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  .dashboard-content :global(.tbr-table th),
+  .dashboard-content :global(.tbr-table td) {
+    padding: 0.5rem 1rem;
+    text-align: right;
+    border-bottom: 1px solid var(--color-border, #eee);
+  }
+
+  .dashboard-content :global(.tbr-table th:first-child),
+  .dashboard-content :global(.tbr-table td:first-child) {
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dashboard-content :global(.tbr-table thead th) {
+    background: var(--color-surface, #f5f5f5);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-muted, #666);
+  }
+
+  .dashboard-content :global(.tbr-tokens) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .dashboard-content :global(.tbr-token) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--color-border, #eee);
+    flex-wrap: wrap;
+  }
+
+  .dashboard-content :global(.tbr-token-prefix) {
+    font-family: monospace;
+    font-size: 0.8rem;
+    background: var(--color-surface, #f0f0f0);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .dashboard-content :global(.tbr-token-label) {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-content :global(.tbr-badge) {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1em 0.5em;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--color-surface, #e0e0e0);
+    color: var(--color-muted, #555);
+  }
+
+  .dashboard-content :global(.tbr-badge-active) {
+    background: #d4f0d4;
+    color: #2a6a2a;
+  }
+
+  .dashboard-content :global(.tbr-badge-revoked),
+  .dashboard-content :global(.tbr-badge-suspended) {
+    background: #fce4e4;
+    color: #8a1515;
+  }
+
+  .dashboard-content :global(.tbr-badge-alert) {
+    background: #fff0c0;
+    color: #7a5a00;
+  }
+
+  .dashboard-content :global(.tbr-revoked) {
+    opacity: 0.55;
+  }
+
+  .dashboard-content :global(.tbr-notifs) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .dashboard-content :global(.tbr-notif) {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border, #eee);
+  }
+
+  .dashboard-content :global(.tbr-unseen) {
+    border-left: 3px solid var(--color-accent, #4a90d9);
+  }
+
+  .dashboard-content :global(.tbr-notif-title) {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .dashboard-content :global(.tbr-notif-msg) {
+    font-size: 0.85rem;
+    color: var(--color-muted, #555);
+    margin: 0 0 0.25rem;
+  }
+
+  .dashboard-content :global(.tbr-notif-time) {
+    font-size: 0.75rem;
+    color: var(--color-muted, #888);
+  }
+
+  .dashboard-content :global(.tbr-empty) {
+    padding: 1rem;
+    color: var(--color-muted, #888);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .dashboard-content :global(.tbr-no-account) {
+    padding: 2rem;
+    text-align: center;
+  }
+</style>

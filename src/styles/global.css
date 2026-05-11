@@ -10,7 +10,9 @@
     --accent-strong: #e8b36f;
     --border: rgba(244, 229, 204, 0.12);
     --shadow: rgba(0, 0, 0, 0.25);
+
 }
+
 
 * {
     box-sizing: border-box;

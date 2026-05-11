@@ -11,5 +11,13 @@
 	},
 	"observability": {
 		"enabled": true
-	}
+	},
+	"services": [
+		// Internal service binding — calls thumbrella-admin directly without
+		// going through the public hostname or CF Access.
+		{
+			"binding": "ADMIN_WORKER",
+			"service": "thumbrella-admin"
+		}
+	]
 }
