@@ -57,14 +57,18 @@ if (clerkUserId && adminWorker) {
           <button type="button" id="open-manage-account-nav" class="nav-auth-btn nav-auth-btn--email" hidden>{primaryEmail}</button>
         </li>
         <li>
-          <button type="button" id="nav-sign-out" class="nav-auth-btn" hidden>Log out</button>
           <UserButton>
             <UserButton.UserProfilePage label="Thumbrella" url="manage-account">
-              {adminDashboardHtml ? (
-                <div class="nav-admin-dashboard" set:html={adminDashboardHtml} />
-              ) : (
-                <p>Dashboard data is currently unavailable.</p>
-              )}
+              <div class="nav-admin-dashboard-shell">
+                <button type="button" class="nav-dashboard-sign-out" data-manage-account-sign-out>
+                  Sign out
+                </button>
+                {adminDashboardHtml ? (
+                  <div class="nav-admin-dashboard" set:html={adminDashboardHtml} />
+                ) : (
+                  <p>Dashboard data is currently unavailable.</p>
+                )}
+              </div>
             </UserButton.UserProfilePage>
           </UserButton>
         </li>
@@ -76,7 +80,6 @@ if (clerkUserId && adminWorker) {
 <script is:inline>
   const signInButton = document.getElementById('nav-sign-in');
   const manageAccount = document.getElementById('open-manage-account-nav');
-  const signOutButton = document.getElementById('nav-sign-out');
   let previousUserId = null;
 
   const getUserButtonConfig = () => {
@@ -93,9 +96,6 @@ if (clerkUserId && adminWorker) {
     if (manageAccount) {
       manageAccount.hidden = !user;
       manageAccount.textContent = "Manage Account";
-    }
-    if (signOutButton) {
-      signOutButton.hidden = !user;
     }
   };
 
@@ -118,11 +118,16 @@ if (clerkUserId && adminWorker) {
     });
   }
 
-  if (signOutButton) {
-    signOutButton.addEventListener('click', () => {
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    if (target.closest('[data-manage-account-sign-out]')) {
       void window.Clerk?.signOut({ redirectUrl: '/' });
-    });
-  }
+    }
+  });
 
   // Wait for Clerk to load, then set up listener
   const waitForClerk = window.setInterval(() => {
@@ -170,6 +175,26 @@ if (clerkUserId && adminWorker) {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  :global(.nav-admin-dashboard-shell) {
+    display: grid;
+    gap: 1rem;
+  }
+
+  :global(.nav-dashboard-sign-out) {
+    justify-self: start;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.45rem 0.8rem;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  :global(.nav-dashboard-sign-out:hover) {
+    background: rgba(255, 255, 255, 0.12);
   }
 
   :global([data-clerk-id^='clerk-user-button']) {

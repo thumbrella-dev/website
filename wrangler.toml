@@ -1,0 +1,18 @@
+account_id = "85baa48d266056fb7d4d06fc8f5e465c" # thumbrella
+compatibility_date = "2026-05-04"
+compatibility_flags = ["global_fetch_strictly_public", "nodejs_compat"]
+name = "thumbrella-web"
+main = "@astrojs/cloudflare/entrypoints/server"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[observability]
+enabled = true
+
+[[services]]
+# Internal service binding — calls thumbrella-admin directly without
+# going through the public hostname or CF Access.
+binding = "ADMIN_WORKER"
+service = "thumbrella-admin"
