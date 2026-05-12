@@ -25,6 +25,7 @@
   "dependencies": {
     "@astrojs/cloudflare": "^13.3.0",
     "@astrojs/react": "^5.0.4",
+    "@astrojs/starlight": "^0.39.2",
     "@clerk/astro": "^3.2.2",
     "@clerk/clerk-js": "^6.10.1",
     "@clerk/themes": "^2.4.57",

@@ -1,0 +1,46 @@
+/* Override Starlight CSS variables to match the Thumbrella theme */
+
+:root {
+  --sl-color-accent-low: #2e2318;
+  --sl-color-accent: #c08840;
+  --sl-color-accent-high: #dba95e;
+  --sl-color-white: #f2e8d8;
+  --sl-color-gray-1: #ede0c8;
+  --sl-color-gray-2: #cfc0a2;
+  --sl-color-gray-3: #8a7a65;
+  --sl-color-gray-4: #4a3d30;
+  --sl-color-gray-5: #322a22;
+  --sl-color-gray-6: #252018;
+  --sl-color-black: #1b1610;
+
+  --sl-color-bg: #201c18;
+  --sl-color-bg-nav: rgba(30, 25, 20, 0.92);
+  --sl-color-bg-sidebar: #1c1814;
+  --sl-color-hairline-light: rgba(244, 228, 200, 0.1);
+  --sl-color-hairline-shade: rgba(244, 228, 200, 0.06);
+
+  --sl-font: 'IBM Plex Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --sl-font-system: 'Inter', system-ui, sans-serif;
+  --sl-font-system-mono: 'IBM Plex Mono', monospace;
+}
+
+/* Backdrop blur for nav */
+starlight-theme-select { display: none; }
+
+.sl-container {
+  max-width: 1200px;
+}
+
+/* Tighten the sidebar font */
+.sidebar-content {
+  font-size: 0.88rem;
+}
+
+/* Inline code styling */
+:not(pre) > code {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(244, 228, 200, 0.12);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  color: #dba95e;
+}

@@ -1,124 +1,250 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
-import MediaBrowser from '../components/MediaBrowser.astro';
 
 const runModes = [
   {
     id: 'online-service',
-    label: 'Online',
+    label: 'Online Service',
+    icon: '🌐',
     content: `
-      <p>The fastest and easiest way to run Thumbrella. Get your <u>free</u> API_KEY
-      with one click to register with your Github account.
+      <p>The fastest and easiest way to run Thumbrella. Register once to get your free API token.</p>
       <pre><code>curl \\
-  -H Authorization: Bearer &lt;API_TOKEN&gt; \\
+  -H "Authorization: Bearer &lt;API_TOKEN&gt;" \\
   https://go.thumbrella.dev/thumb#https://example.com/media.jpg</code></pre>
-      <p>This gets you immediate access to the worldwide caching network,
-      all the media and document renderers, and access to media from the
-      entire internet.</p>
-      <p>Like how it's going? Star us on Github to triple your caching and
-      processing quotas!</p>
-      <p><a href="/docs/aiplatform">Read the AI platform docs</a></p>
+      <p>You get immediate access to the worldwide caching network, all media renderers, and
+      thumbnails for media from anywhere on the internet.</p>
+      <a href="/docs/getting-started/online-service">Online service docs →</a>
     `,
   },
   {
     id: 'self-hosted',
-    label: 'Self Hosted',
+    label: 'Self-Hosted',
+    icon: '📦',
     content: `
-      <p>Download the standalone executable and run for yourself. Set this up
-      for your private libraries and local needs, no internet resources needed.</p>
+      <p>Download the standalone binary and run it yourself — no account, no internet required.</p>
       <pre><code>thumbrella thumb ./sample.mov --output ./sample.webp
 TBR_PORT=8001 thumbrella serve</code></pre>
-      <p>Set up your own caching to SQLite with a single configuration argument.</p>
-      <p>Advanced renders will require access to external commands and subprocesses.
-      Use the internal diagnostics reports to help setting up your environment
-      for the optional dependencies.</p>
-      <p>Want more control? Grab the Rust source from 
-      <a href="http://crates.io">crates.io</a> and build for yourself with <b>cargo</b>.
-      <p><a href="/docs/self-hosted">Read the self-hosted docs</a></p>
+      <p>Works on Linux, macOS, and Windows. Add a one-argument cache path to get SQLite-backed
+      thumbnail caching out of the box.</p>
+      <a href="/docs/getting-started/self-hosted">Self-hosted docs →</a>
     `,
   },
   {
     id: 'ai-platforms',
     label: 'AI Platforms',
+    icon: '🤖',
     content: `
-      <p>Many media tools are already running on AI platforms like 
-      <a href="http://replicate.com">Replicate</a> and 
-      <a href="http://fal.ai">Fal.ai</a>, and so is Thumbrella.
-      Add these lightweight operations alongside your existing computation tools 
-      at no extra cost.</p>
-      <pre><code>replicate run thumb/rella input=https://example.com/media.mp4</code></pre>
-      <p>(These platforms require their own accounts and will bill for processing,
-      but Thumbrella will not charge anything for running here)<p>
-      <p>Ready to integrate worldwide distributed caching on these platforms?
-      Activate a free Thumbrella account with one click using your Github login.
-      <p><a href="/docs/aiplatform">Read the AI platform docs</a></p>
+      <p>Thumbrella is published on Replicate and Fal.ai. Add it to existing AI workloads at no
+      extra Thumbrella cost — the platform bills for compute.</p>
+      <pre><code>replicate run thumbrella/thumb input=https://example.com/media.mp4</code></pre>
+      <a href="/docs/getting-started/ai-platforms">AI platform docs →</a>
     `,
   },
   {
-    id: 'dedicated',
-    label: 'Online',
+    id: 'advanced-online',
+    label: 'Advanced Online',
+    icon: '⬆️',
     content: `
-      <p>Move beyond the free hosting tiers with greatly increased cache
-      storage and concurrency limits.</p>
-      <p>With less runtime restrictions your thumbnails will be generated with fewer
-      IO operations and improved performance.</p>
-      <p>Read the <a href="/pricing">pricing pages</a> for options and details.</p>
+      <p>Upgrade from the free tier to get 300+ global PoPs, 500+ req/s rate limits, SLA
+      guarantees, and priority support. Your existing integration needs no changes.</p>
+      <a href="/docs/deployment/advanced-online">Advanced online docs →</a>
     `,
   },
   {
     id: 'sponsor',
-    label: 'Sponsor',
-    // follow somewhat https://marijnhaverbeke.nl/fund/
+    label: 'Sponsor Edition',
+    icon: '🐳',
     content: `
-      <p>Looking to improve browsing for your own vast media libraries? Building
-      a new product that integrates the Thumbrella platform? Becoming a sponsor
-      has valuable benefits.</p>
-      <p>Sponsors get a Docker-first distrubution enabling all of Thumbrella's
-      renderers and media support running out of the box. Get a perpetual
-      license that allows a year of upgrades and new releases. The Docker
-      image runs completely offline and requires no internet support.</p>
-      <p>The sponsored Docker image supports custom caching layers, like writing
-      directly to Redis or Postgres</p>.
-      <p>This is the cleanest route when you want a containerized deployment, extra standalone capabilities, and a support relationship behind the runtime.</p>
-      <p><a href="/docs/sponsor">Read the sponsor docs</a></p>
+      <p>A Docker-first distribution with every renderer bundled in, fully offline capable,
+      and custom caching backends (Redis, Postgres). Includes a support relationship and
+      a perpetual license.</p>
+      <pre><code>docker run --rm -p 8000:8000 ghcr.io/thumbrella/thumbrella-sponsor:latest serve</code></pre>
+      <a href="/docs/deployment/sponsor">Sponsor edition docs →</a>
     `,
   },
 ];
 
 const freeGroup = runModes.filter((m) => ['online-service', 'self-hosted', 'ai-platforms'].includes(m.id));
-const paidGroup = runModes.filter((m) => ['dedicated', 'sponsor'].includes(m.id));
+const paidGroup = runModes.filter((m) => ['advanced-online', 'sponsor'].includes(m.id));
+
+const carouselItems = [
+  { name: 'aerial-city.mp4',       src: 'https://picsum.photos/seed/aerial9/800/600',    resolution: '3840×2160', codec: 'MP4',  type: 'video', duration: '0:47',  size: '1.2 GB',  procMs: 820  },
+  { name: 'portrait-session.jpg',  src: 'https://picsum.photos/seed/portrait2/800/600',  resolution: '4000×3000', codec: 'JPEG', type: 'photo', duration: '',      size: '18 MB',   procMs: 340  },
+  { name: 'product-360.mp4',       src: 'https://picsum.photos/seed/product9/800/600',   resolution: '1920×1080', codec: 'MP4',  type: 'video', duration: '2:14',  size: '340 MB',  procMs: 1240 },
+  { name: 'landscape-raw.cr3',     src: 'https://picsum.photos/seed/mountain7/800/600',  resolution: '6720×4480', codec: 'CR3',  type: 'raw',   duration: '',      size: '52 MB',   procMs: 1850 },
+  { name: 'interview-b-roll.mov',  src: 'https://picsum.photos/seed/office3/800/600',    resolution: '1920×1080', codec: 'MOV',  type: 'video', duration: '8:32',  size: '4.1 GB',  procMs: 960  },
+  { name: 'concert-crowd.jpg',     src: 'https://picsum.photos/seed/concert4/800/600',   resolution: '5472×3648', codec: 'JPEG', type: 'photo', duration: '',      size: '22 MB',   procMs: 280  },
+  { name: 'timelapse-stars.mp4',   src: 'https://picsum.photos/seed/stars88/800/600',    resolution: '4096×2160', codec: 'MP4',  type: 'video', duration: '1:03',  size: '890 MB',  procMs: 1100 },
+  { name: 'product-flat-lay.png',  src: 'https://picsum.photos/seed/flatlay5/800/600',   resolution: '3000×2000', codec: 'PNG',  type: 'photo', duration: '',      size: '11 MB',   procMs: 410  },
+  { name: 'drone-coastline.mp4',   src: 'https://picsum.photos/seed/coast11/800/600',    resolution: '4096×2160', codec: 'MP4',  type: 'video', duration: '3:21',  size: '2.2 GB',  procMs: 740  },
+  { name: 'fashion-editorial.jpg', src: 'https://picsum.photos/seed/fashion6/800/600',   resolution: '5000×3333', codec: 'JPEG', type: 'photo', duration: '',      size: '31 MB',   procMs: 390  },
+  { name: 'astrophoto-deep.tiff',  src: 'https://picsum.photos/seed/astro22/800/600',    resolution: '7360×4912', codec: 'TIFF', type: 'raw',   duration: '',      size: '140 MB',  procMs: 2100 },
+  { name: 'event-highlight.mp4',   src: 'https://picsum.photos/seed/event33/800/600',    resolution: '1920×1080', codec: 'MP4',  type: 'video', duration: '4:55',  size: '1.8 GB',  procMs: 1500 },
+];
 ---
 
 <MainLayout
-  title="Thumbrella — fast media stack"
-  description="Thumbrella is a fast, all-in-one media processing, storage, and delivery toolkit."
+  title="Thumbrella — fast thumbnails for any media"
+  description="Thumbrella generates fast thumbnails for any online media: video, camera photos, documents, 3D models, and more. Open source, free to self-host, with client libraries for most languages."
 >
 
   <!-- ═══════════════════════════════════════════════════ HERO -->
-  <section class="hero">
+  <section class="hero" id="hero">
     <div class="container hero__inner">
-      <div class="hero__copy">
-        <a class="hero__announce" href="/blog/thumbrella-v2">Thumbrella is coming soon →</a>
-        <h1>Thumbrella is the <br/><span class="hero__fast" id="hero-typewriter">fast</span><br/>thumbnail platform.</h1>
-        <span id="hero-typewriter-words" hidden>fast|open source|online|developer|secure|elegent</span>
-        <p class="hero__sub">
-          Generate fast and powerful thumbnails online. Check out the flexible
-          environments and client libraries you can run for yourself.
-        </p>
-      </div>
-      <div class="hero__art">
-        <img src="/logotemp.png" alt="Thumbrella logo" class="hero__logo-img" />
+      <img src="/thumbrella.png" alt="Thumbrella" class="hero__logo" />
+      <h1>Fast thumbnails for<br /><span class="hero__any">online</span> media.</h1>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ CAROUSEL -->
+  <section class="carousel-section">
+    <div class="carousel-track-wrap" aria-label="Sample media thumbnails">
+      <ul class="carousel-track" id="carousel-track" role="list">
+        {carouselItems.map((item) => {
+          const rx = ((Math.random() - 0.5) * 20).toFixed(1);
+          const ry = ((Math.random() - 0.5) * 28).toFixed(1);
+          return (
+          <li class="ctile"
+            style={`--ctile-rx: ${rx}deg; --ctile-ry: ${ry}deg`}
+            data-thumb-src={item.src}
+            data-thumb-delay={item.procMs}
+            data-name={item.name}
+            data-resolution={item.resolution}
+            data-codec={item.codec}
+            data-type={item.type}
+            data-duration={item.duration}
+            data-size={item.size}
+            data-proc={item.procMs}
+          >
+            <div class="ctile__thumb">
+              <div class="ctile__shimmer" aria-hidden="true"></div>
+              <img class="ctile__img" alt={item.name} />
+              <div class="ctile__badges" aria-hidden="true">
+                <span class={`ctile__badge ctile__badge--${item.type}`}>{item.codec}</span>
+                {item.duration && <span class="ctile__badge ctile__badge--dur">{item.duration}</span>}
+              </div>
+            </div>
+            <p class="ctile__name">{item.name}</p>
+          </li>
+          );
+        })}
+      </ul>
+    </div>
+
+    <!-- popup -->
+    <div class="cpopup" id="cpopup" hidden role="dialog" aria-modal="true" aria-label="Media details">
+      <button class="cpopup__close" id="cpopup-close" aria-label="Close">✕</button>
+      <p class="cpopup__filename" id="cpopup-name"></p>
+      <dl class="cpopup__dl">
+        <div><dt>Format</dt><dd id="cpopup-codec"></dd></div>
+        <div><dt>Resolution</dt><dd id="cpopup-res"></dd></div>
+        <div id="cpopup-dur-row"><dt>Duration</dt><dd id="cpopup-dur"></dd></div>
+        <div><dt>File size</dt><dd id="cpopup-size"></dd></div>
+        <div><dt>Thumb time</dt><dd id="cpopup-proc"></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ WHAT IT DOES -->
+  <section class="hp-section hp-section--no-border">
+    <div class="container">
+      <div class="caps-grid">
+
+        <div class="caps-col">
+          <h3 class="caps-col__heading">Media formats</h3>
+          <ul class="caps-list">
+            <li class="caps-item" data-popover="info-video" role="button" tabindex="0" aria-expanded="false" aria-controls="info-video">
+              <span class="caps-item__icon" aria-hidden="true">🎬</span>
+              <span class="caps-item__label"><strong>Video</strong></span>
+              <div class="info-popover" id="info-video" hidden>MP4, MOV, MKV, WebM, AVI, and more. Extracts frames at any timestamp.</div>
+            </li>
+            <li class="caps-item" data-popover="info-images" role="button" tabindex="0" aria-expanded="false" aria-controls="info-images">
+              <span class="caps-item__icon" aria-hidden="true">🖼️</span>
+              <span class="caps-item__label"><strong>Images</strong></span>
+              <div class="info-popover" id="info-images" hidden>JPEG, PNG, WebP, AVIF, GIF, TIFF, and common formats. Also handles camera RAW: CR2, NEF, ARW, DNG, and dozens of formats from major manufacturers.</div>
+            </li>
+            <li class="caps-item" data-popover="info-docs" role="button" tabindex="0" aria-expanded="false" aria-controls="info-docs">
+              <span class="caps-item__icon" aria-hidden="true">📄</span>
+              <span class="caps-item__label"><strong>Documents</strong></span>
+              <div class="info-popover" id="info-docs" hidden>PDF, DOCX, PPTX — generates a preview image of any page.</div>
+            </li>
+            <li class="caps-item" data-popover="info-3d" role="button" tabindex="0" aria-expanded="false" aria-controls="info-3d">
+              <span class="caps-item__icon" aria-hidden="true">🧊</span>
+              <span class="caps-item__label"><strong>3D geometry</strong></span>
+              <div class="info-popover" id="info-3d" hidden>OBJ, GLTF, STL — renders an isometric preview of 3D models.</div>
+            </li>
+            <li class="caps-item" data-popover="info-vector" role="button" tabindex="0" aria-expanded="false" aria-controls="info-vector">
+              <span class="caps-item__icon" aria-hidden="true">✏️</span>
+              <span class="caps-item__label"><strong>Vector graphics</strong></span>
+              <div class="info-popover" id="info-vector" hidden>SVG, EPS, AI — rendered at any resolution without quality loss.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="caps-col">
+          <h3 class="caps-col__heading">How it runs</h3>
+          <ul class="caps-list">
+            <li class="caps-item" data-popover="info-online" role="button" tabindex="0" aria-expanded="false" aria-controls="info-online">
+              <span class="caps-item__icon" aria-hidden="true">🌐</span>
+              <span class="caps-item__label"><strong>Free online service</strong></span>
+              <div class="info-popover" id="info-online" hidden>One API call to the hosted endpoint. Worldwide CDN caching. No setup needed. <a href="/docs/getting-started/online-service">Docs →</a></div>
+            </li>
+            <li class="caps-item" data-popover="info-selfhost" role="button" tabindex="0" aria-expanded="false" aria-controls="info-selfhost">
+              <span class="caps-item__icon" aria-hidden="true">📦</span>
+              <span class="caps-item__label"><strong>Self-host for free</strong></span>
+              <div class="info-popover" id="info-selfhost" hidden>Single binary for Linux, macOS, and Windows. No registration, no internet required. <a href="/docs/getting-started/self-hosted">Docs →</a></div>
+            </li>
+            <li class="caps-item" data-popover="info-docker" role="button" tabindex="0" aria-expanded="false" aria-controls="info-docker">
+              <span class="caps-item__icon" aria-hidden="true">🐳</span>
+              <span class="caps-item__label"><strong>Docker sponsor edition</strong></span>
+              <div class="info-popover" id="info-docker" hidden>All codecs bundled, fully offline-capable. Custom caching backends and a support relationship. <a href="/docs/deployment/sponsor">Docs →</a></div>
+            </li>
+            <li class="caps-item" data-popover="info-ai" role="button" tabindex="0" aria-expanded="false" aria-controls="info-ai">
+              <span class="caps-item__icon" aria-hidden="true">🤖</span>
+              <span class="caps-item__label"><strong>Replicate &amp; Fal.ai</strong></span>
+              <div class="info-popover" id="info-ai" hidden>Available as a published model on hosted AI compute platforms. Thumbrella adds no charge — the platform bills for compute. <a href="/docs/getting-started/ai-platforms">Docs →</a></div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="caps-col">
+          <h3 class="caps-col__heading">Developer experience</h3>
+          <ul class="caps-list">
+            <li class="caps-item" data-popover="info-oss" role="button" tabindex="0" aria-expanded="false" aria-controls="info-oss">
+              <span class="caps-item__icon" aria-hidden="true">⚖️</span>
+              <span class="caps-item__label"><strong>Open source</strong> — Apache 2</span>
+              <div class="info-popover" id="info-oss" hidden>Use it commercially, modify it, redistribute it. No strings attached. Source on GitHub.</div>
+            </li>
+            <li class="caps-item" data-popover="info-clients" role="button" tabindex="0" aria-expanded="false" aria-controls="info-clients">
+              <span class="caps-item__icon" aria-hidden="true">📦</span>
+              <span class="caps-item__label"><strong>JS/TS &amp; Python</strong> clients</span>
+              <div class="info-popover" id="info-clients" hidden>npm install @thumbrella/client &mdash; or pip install thumbrella. Same URL-based interface, both runtimes. <a href="/docs/clients/web-client">Docs →</a></div>
+            </li>
+            <li class="caps-item" data-popover="info-api" role="button" tabindex="0" aria-expanded="false" aria-controls="info-api">
+              <span class="caps-item__icon" aria-hidden="true">🔗</span>
+              <span class="caps-item__label"><strong>URL-based API</strong></span>
+              <div class="info-popover" id="info-api" hidden>Pass a media URL in the request path. Get a thumbnail back. No SDK required — curl works fine to start.</div>
+            </li>
+            <li class="caps-item" data-popover="info-cache" role="button" tabindex="0" aria-expanded="false" aria-controls="info-cache">
+              <span class="caps-item__icon" aria-hidden="true">⚡</span>
+              <span class="caps-item__label"><strong>Built-in caching</strong></span>
+              <div class="info-popover" id="info-cache" hidden>Every response includes cache headers. Enable on-disk SQLite caching with one config argument for the self-hosted server.</div>
+            </li>
+          </ul>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════ RUN MODES -->
+  <!-- ══════════════════════════════════════════ HOW TO RUN -->
   <section class="run-modes-section">
     <div class="container">
+      <h2 class="run-modes-heading">Get Started</h2>
       <div class="run-modes" aria-label="Run Thumbrella">
         <div class="run-modes__tabs" role="tablist" aria-label="Run modes">
           <div class="run-modes__group">
-            <span class="run-modes__group-label">Run for free</span>
+            <span class="run-modes__group-label">Free</span>
             <div class="run-modes__group-tabs">
               {freeGroup.map((mode) => (
                 <button
@@ -138,7 +264,7 @@ const paidGroup = runModes.filter((m) => ['dedicated', 'sponsor'].includes(m.id)
           </div>
           <div class="run-modes__group-sep" aria-hidden="true"></div>
           <div class="run-modes__group">
-            <span class="run-modes__group-label">Powerful paid options</span>
+            <span class="run-modes__group-label">Paid options</span>
             <div class="run-modes__group-tabs">
               {paidGroup.map((mode) => (
                 <button
@@ -176,286 +302,233 @@ const paidGroup = runModes.filter((m) => ['dedicated', 'sponsor'].includes(m.id)
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════ DEMO -->
+  <!-- ══════════════════════════════════════════ DOCS / ABOUT -->
   <section class="hp-section">
-    <div class="container">
-      <h2>Try it</h2>
-      <p class="hp-lede">A sample media library. Thumbnails generate on demand — watch them arrive as the service processes each file.</p>
-      <MediaBrowser />
-    </div>
-  </section>
+    <div class="container hp-prose">
 
+      <h2>Why thumbnails matter</h2>
+      <p>Previews load before users decide to click. A well-placed thumbnail can be the difference
+      between a media library that feels alive and one that feels like a wall of filenames.
+      Thumbrella turns that decision from an infrastructure project into a single API call.</p>
 
-  <!-- ═══════════════════════════════════════════ FEATURES -->
-  <section class="hp-section">
-    <div class="container">
-      <h2>What makes Thumbrella Great?</h2>
-      <p>Generating fast and high quality thumbnails online is
-        a challenging problem. To make Thumbrella production ready for your website
-        and tools it provides.
-      <div class="toolkit-grid">
-        <div class="toolkit-card">
-          <h3>Hybrid Caching</h3>
-          <p>Caches are the most crucial element for speed. Thumbrella makes
-            client side caching simple and trouble free. Go even farther with
-            server side caches. Our hosted plans use over 300 global regions to
-            get thumbnails to your users immediately.
-        </div>
-        <div class="toolkit-card">
-          <h3>Media Types</h3>
-          <p>Handle the common formats quickly. Handle the complicated formats efficiently.</p>
-          <ul class="check-list">
-            <li>Common image formats</li>
-            <li>Professional image formats</li>
-            <li>Videos</li>
-            <li>Vector graphics</li>
-            <li>3D Geometry</li>
-            <li>Documents</li>
-          </ul>
-        </div>
-        <div class="toolkit-card">
-          <h3>Self Hosted and Open</h3>
-          <p>Access the source and build for your own. Prebuilt versions
-            are ready to self hosted with no setup or registration needed.
-          </p>
-          <code class="toolkit-card__cmd">$ TBR_PORT=8001 thumbrella serve</code>
-          <a href="http://github.com">Github</a>
+      <h2>One URL, any media</h2>
+      <p>Pass the source URL in the request path. Get a thumbnail back. No SDK required — a plain
+      <code>curl</code> or an <code>&lt;img src&gt;</code> tag is enough to start. The client
+      libraries for JavaScript, TypeScript, and Python add type safety and convenience but are
+      entirely optional.</p>
 
-        </div>
-      </div>
-    </div>
-  </section>
+      <h2>Caching built in</h2>
+      <p>Every response includes standard HTTP cache headers. The hosted service uses a global CDN.
+      Self-hosted binaries support optional on-disk SQLite caching with one extra config argument.
+      Re-requesting the same thumbnail is nearly free.</p>
 
+      <h2>Open source, no lock-in</h2>
+      <p>Thumbrella is Apache 2 licensed. Read the code, fork it, self-host it permanently, or move
+      to the hosted service whenever it makes sense. The API is identical in every deployment mode.</p>
 
-  <!-- ═══════════════════════════════════════ EVERYTHING YOU NEED -->
-   <!--
-  <section class="hp-section">
-    <div class="container">
-      <h2>Everything you need to build & ship</h2>
-      <p class="hp-lede">Production-ready APIs and tools, built into Thumbrella</p>
-      <div class="api-grid">
-        <div class="api-group">
-          <h3>Media Processing</h3>
-          <ul>
-            <li><code>thumbrella.transcode()</code><span>Video & image transcoding</span></li>
-            <li><code>thumbrella.thumbnail()</code><span>Thumbnail extraction</span></li>
-            <li><code>thumbrella.optimize()</code><span>Format optimization</span></li>
-          </ul>
-        </div>
-        <div class="api-group">
-          <h3>Storage</h3>
-          <ul>
-            <li><code>thumbrella.store()</code><span>Upload to S3 / R2 / local</span></li>
-            <li><code>thumbrella.presign()</code><span>Presigned URL generation</span></li>
-            <li><code>thumbrella.delete()</code><span>Delete with CDN purge</span></li>
-          </ul>
-        </div>
-        <div class="api-group">
-          <h3>Delivery</h3>
-          <ul>
-            <li><code>thumbrella.serve()</code><span>HTTP media server</span></li>
-            <li><code>thumbrella.stream()</code><span>Adaptive streaming</span></li>
-            <li><code>thumbrella.cdn()</code><span>CDN integration</span></li>
-          </ul>
-        </div>
-        <div class="api-group">
-          <h3>Metadata</h3>
-          <ul>
-            <li><code>thumbrella.tag()</code><span>Auto-tagging & labeling</span></li>
-            <li><code>thumbrella.search()</code><span>Full-text metadata search</span></li>
-            <li><code>thumbrella.exif()</code><span>EXIF extraction</span></li>
-          </ul>
-        </div>
-        <div class="api-group">
-          <h3>Events</h3>
-          <ul>
-            <li><code>thumbrella.on()</code><span>Lifecycle event hooks</span></li>
-            <li><code>thumbrella.webhook()</code><span>Outbound webhooks</span></li>
-            <li><code>thumbrella.queue()</code><span>Job queue management</span></li>
-          </ul>
-        </div>
-        <div class="api-group">
-          <h3>Developer Experience</h3>
-          <ul>
-            <li><code>thumbrella dev</code><span>Local dev server</span></li>
-            <li><code>thumbrella browse</code><span>Media browser UI</span></li>
-            <li><code>thumbrella test</code><span>Pipeline testing</span></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-   -->
-
-
-  <!-- ════════════════════════════════════ CODE TESTIMONIAL -->
-  <!--
-  <section class="hp-section">
-    <div class="container">
-      <h2>Thumbrella works with your stack</h2>
-      <div class="testimonial-card">
-        <div class="testimonial-card__left">
-          <div class="testimonial-card__avatar">AC</div>
-          <div>
-            <strong>Alex Chen</strong>
-            <span class="testimonial-card__role">Lead Engineer at Pixel Studio</span>
-          </div>
-          <blockquote>
-            "Dropping Thumbrella in replaced three separate services. The unified API cut
-            our pipeline to a quarter of the original code."
-          </blockquote>
-        </div>
-        <div class="testimonial-card__right">
-          <div class="code-tab-bar">app/upload/route.ts</div>
-          <pre><code>{`import { store, transcode, webhook } from "thumbrella";
-
-export async function POST(req: Request) {
-  const file = await req.formData().get("file");
-
-  const [optimized] = await transcode(file, {
-    formats: ["webp", "avif"],
-    thumbnail: true,
-  });
-
-  const url = await store(optimized, {
-    bucket: process.env.MEDIA_BUCKET,
-  });
-
-  await webhook.emit("media.uploaded", { url });
-
-  return Response.json({ url });
-}`}</code></pre>
-        </div>
-      </div>
-    </div>
-  </section>
-    -->
-
-  <!-- ═══════════════════════════════════ STORAGE SPEED COMPARE -->
-  <!-- <section class="hp-section">
-    <div class="container">
-      <code class="section-cmd">$ thumbrella store</code>
-      <h2>Thumbrella is a fast storage driver.</h2>
-      <div class="speed-compare">
-        <div class="speed-compare__row">
-          <span class="speed-compare__label">Thumbrella</span>
-          <div class="speed-compare__bar speed-compare__bar--accent" style="width:8%"></div>
-          <span class="speed-compare__time">0.41s</span>
-        </div>
-        <div class="speed-compare__row">
-          <span class="speed-compare__label">aws-sdk v3</span>
-          <div class="speed-compare__bar" style="width:48%"></div>
-          <span class="speed-compare__time">2.4s</span>
-          <span class="speed-compare__slower">6x slower</span>
-        </div>
-        <div class="speed-compare__row">
-          <span class="speed-compare__label">multer + S3</span>
-          <div class="speed-compare__bar" style="width:72%"></div>
-          <span class="speed-compare__time">3.6s</span>
-          <span class="speed-compare__slower">9x slower</span>
-        </div>
-        <div class="speed-compare__row">
-          <span class="speed-compare__label">formidable</span>
-          <div class="speed-compare__bar" style="width:100%"></div>
-          <span class="speed-compare__time">5.0s</span>
-          <span class="speed-compare__slower">12x slower</span>
-        </div>
-      </div>
-      <p class="speed-compare__caption">
-        Replace your upload handler with <code>thumbrella store</code> to get 6–12x faster uploads.
-      </p>
-      <a href="/docs/hosting" class="button button--small">Try it →</a>
-    </div>
-  </section>
-   -->
-
-  <!-- ═══════════════════════════════════════════ SOCIAL PROOF -->
-   <!-- <section class="hp-section">
-    <div class="container">
-      <h2>Developers love Thumbrella.</h2>
-      <div class="tweet-grid">
-        {[
-          { handle: '@dev_alice',      text: 'Just replaced our entire media pipeline with Thumbrella. 10/10.' },
-          { handle: '@mediabuilder',   text: 'thumbrella store is so fast it feels wrong. Love it.' },
-          { handle: '@janedoe_codes',  text: 'The media browser alone is worth it. Our content team is obsessed.' },
-          { handle: '@backendpete',    text: 'Single binary deploy for the media layer. Finally.' },
-          { handle: '@fullstackfinn',  text: 'thumbrella transcode replaced 300 lines of FFmpeg glue code.' },
-          { handle: '@productionops',  text: 'Webhooks with HMAC signing built in. No more rolling our own.' },
-          { handle: '@react_dev_99',   text: 'Dropped Thumbrella into our Next.js app in an afternoon.' },
-          { handle: '@cloudnative_k',  text: "Edge-deployed, fast cold starts, built-in CDN hooks. Chef's kiss." },
-          { handle: '@opencreator',    text: 'Open source media stack that actually works in production.' },
-        ].map((t) => (
-          <div class="tweet">
-            <span class="tweet__handle">{t.handle}</span>
-            <p>{t.text}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-  -->
-
-  <!-- ══════════════════════════════════════════ LEARN MORE CTA -->
-  <section class="hp-section">
-    <div class="container learn-cta">
-      <a class="learn-card" href="/docs/web-client">
-        <h3>Documentation</h3>
-        <p>Get started with Thumbrella and learn how to use all of its features</p>
-      </a>
-      <a class="learn-card" href="/media-lib-browser">
-        <h3>Media Browser</h3>
-        <p>Explore the live media library browser example directly in your browser</p>
-      </a>
     </div>
   </section>
 
 </MainLayout>
 
 <script>
-  const el = document.getElementById('hero-typewriter');
-  const sourceEl = document.getElementById('hero-typewriter-words');
-  if (el) {
-    const typewriterEl = el;
-    const sourceWords = sourceEl?.textContent
-      ?.split('|')
-      .map((word) => word.trim())
-      .filter(Boolean) ?? [];
-    const words = sourceWords.length ? sourceWords : [el.textContent?.trim() || 'best'];
-    let wordIndex = 0;
-    let charIndex = words[0].length;
-    let isDeleting = false;
+  // ── Info popover toggle (feature boxes) ────────────────────────────────────
+  document.addEventListener('click', (e) => {
+    const item = (e.target as Element).closest('.caps-item[data-popover]') as HTMLElement | null;
 
-    typewriterEl.textContent = words[0];
-
-    function tick() {
-      const current = words[wordIndex];
-
-      if (!isDeleting && charIndex === current.length) {
-        setTimeout(() => { isDeleting = true; tick(); }, 2000);
-        return;
+    // Close any open popover that isn't this one
+    document.querySelectorAll('.caps-item[aria-expanded="true"]').forEach((el) => {
+      if (el !== item) {
+        el.setAttribute('aria-expanded', 'false');
+        const id = el.getAttribute('aria-controls');
+        if (id) document.getElementById(id)?.setAttribute('hidden', '');
       }
+    });
 
-      if (isDeleting && charIndex === 0) {
-        isDeleting = false;
-        wordIndex = (wordIndex + 1) % words.length;
-        setTimeout(tick, 300);
-        return;
+    if (item) {
+      // Don't toggle if the click was on a link inside the popover
+      if ((e.target as Element).closest('.info-popover a')) return;
+      const isOpen = item.getAttribute('aria-expanded') === 'true';
+      item.setAttribute('aria-expanded', String(!isOpen));
+      const id = item.getAttribute('aria-controls');
+      const popover = id ? document.getElementById(id) : null;
+      if (popover) {
+        if (isOpen) {
+          popover.setAttribute('hidden', '');
+          popover.style.left = '';
+          popover.style.right = '';
+        } else {
+          // Reset position, show, then nudge into viewport
+          popover.style.left = '';
+          popover.style.right = '';
+          popover.removeAttribute('hidden');
+          requestAnimationFrame(() => {
+            const r = popover.getBoundingClientRect();
+            const margin = 12;
+            if (r.right > window.innerWidth - margin) {
+              popover.style.right = '0';
+              popover.style.left = 'auto';
+            } else if (r.left < margin) {
+              popover.style.left = '0';
+              popover.style.right = 'auto';
+            }
+          });
+        }
       }
-
-      charIndex += isDeleting ? -1 : 1;
-      typewriterEl.textContent = words[wordIndex].slice(0, charIndex);
-      setTimeout(tick, isDeleting ? 40 : 80);
     }
+  });
 
-    setTimeout(tick, 2000);
+  // Close open popovers on outside click
+  document.addEventListener('click', (e) => {
+    if (!(e.target as Element).closest('.caps-item[data-popover]')) {
+      document.querySelectorAll('.caps-item[aria-expanded="true"]').forEach((el) => {
+        el.setAttribute('aria-expanded', 'false');
+        const id = el.getAttribute('aria-controls');
+        if (id) document.getElementById(id)?.setAttribute('hidden', '');
+      });
+    }
+  });
+
+  // Keyboard support
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const item = (e.target as Element).closest('.caps-item[data-popover]') as HTMLElement | null;
+    if (!item) return;
+    e.preventDefault();
+    item.click();
+  });
+
+  // ── Carousel ───────────────────────────────────────────────────────────────
+  const track = document.getElementById('carousel-track') as HTMLElement | null;
+  const popup = document.getElementById('cpopup') as HTMLElement | null;
+  const closeBtn = document.getElementById('cpopup-close');
+
+  if (track) {
+    // Duplicate tiles for seamless loop
+    const origItems = Array.from(track.children) as HTMLElement[];
+    origItems.forEach((item) => {
+      const clone = item.cloneNode(true) as HTMLElement;
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    });
+
+    // Reveal thumbnails via IntersectionObserver (only real tiles, not clones)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        const el = entry.target as HTMLElement;
+        const src = el.dataset.thumbSrc ?? '';
+        const delay = parseInt(el.dataset.thumbDelay ?? '0', 10);
+        el.classList.add('is-pending');
+        setTimeout(() => {
+          const img = el.querySelector<HTMLImageElement>('.ctile__img');
+          if (!img || !src) return;
+          img.addEventListener('load',  () => el.classList.add('is-loaded'), { once: true });
+          img.addEventListener('error', () => el.classList.add('is-error'),  { once: true });
+          img.src = src;
+        }, delay);
+      });
+    }, { rootMargin: '120px', threshold: 0.01 });
+
+    origItems.forEach((item) => observer.observe(item));
+
+    // Scroll animation with smooth ease-in/out
+    const TARGET_SPEED = 52; // px/s at full speed
+    const EASE_K = 3.5;      // higher = snappier ease
+    let speed = TARGET_SPEED;
+    let targetSpeed = TARGET_SPEED;
+    let pos = 0;
+    let lastTime: number | null = null;
+
+    function step(ts: number) {
+      const dt = lastTime !== null ? Math.min((ts - lastTime) / 1000, 0.1) : 0;
+      lastTime = ts;
+
+      // Exponential ease — smooth, no overshoot
+      speed += (targetSpeed - speed) * (1 - Math.exp(-EASE_K * dt));
+
+      if (speed > 0.3 && track) {
+        pos += speed * dt;
+        const half = track.scrollWidth / 2;
+        if (pos >= half) pos -= half;
+        track.style.transform = `translateX(${-pos}px)`;
+      }
+
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+
+    // Pause on hover
+    track.parentElement?.addEventListener('mouseenter', () => { targetSpeed = 0; });
+    track.parentElement?.addEventListener('mouseleave', () => {
+      if (!popup || popup.hidden) targetSpeed = TARGET_SPEED;
+    });
+
+    // Tile click → open popup
+    track.addEventListener('click', (e) => {
+      const tile = (e.target as Element).closest('.ctile[data-name]') as HTMLElement | null;
+      if (!tile || !popup) return;
+
+      targetSpeed = 0;
+
+      const set = (id: string, val: string) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+
+      set('cpopup-name',  tile.dataset.name ?? '');
+      set('cpopup-codec', tile.dataset.codec ?? '');
+      set('cpopup-res',   tile.dataset.resolution ?? '');
+      set('cpopup-dur',   tile.dataset.duration ?? '');
+      set('cpopup-size',  tile.dataset.size ?? '');
+      set('cpopup-proc',  tile.dataset.proc ? `${tile.dataset.proc} ms` : '');
+
+      const durRow = document.getElementById('cpopup-dur-row');
+      if (durRow) durRow.hidden = !tile.dataset.duration;
+
+      const tileRect = tile.getBoundingClientRect();
+      const sectionRect = track.closest('.carousel-section')!.getBoundingClientRect();
+      const POPUP_W = 240;
+      const POPUP_H = 190;
+      const GAP = 14;
+
+      // Center horizontally on the tile, section-relative (popup is position:absolute inside section)
+      let left = tileRect.left - sectionRect.left + tileRect.width / 2 - POPUP_W / 2;
+      left = Math.max(8, Math.min(left, sectionRect.width - POPUP_W - 8));
+
+      // Prefer above the tile; fall back to below if near top of section
+      let top = tileRect.top - sectionRect.top - POPUP_H - GAP;
+      if (top < 8) top = tileRect.bottom - sectionRect.top + GAP;
+
+      popup.style.left = `${left}px`;
+      popup.style.top = `${top}px`;
+      popup.removeAttribute('hidden');
+    });
+
+    // Close popup
+    const closePopup = () => {
+      popup?.setAttribute('hidden', '');
+      targetSpeed = TARGET_SPEED;
+    };
+    closeBtn?.addEventListener('click', closePopup);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePopup(); });
+    document.addEventListener('click', (e) => {
+      if (!popup?.hidden &&
+          !(e.target as Element).closest('.cpopup') &&
+          !(e.target as Element).closest('.ctile')) {
+        closePopup();
+      }
+    });
   }
 
+  // ── Run-mode tabs ──────────────────────────────────────────────────────────
   const tabButtons = Array.from(document.querySelectorAll('.run-modes__tab'));
   const tabPanels = Array.from(document.querySelectorAll('.run-mode-card'));
 
   if (tabButtons.length && tabPanels.length) {
-    function selectTab(nextTab) {
-      const targetPanelId = nextTab.getAttribute('data-panel');
+    function selectTab(nextTab: Element) {
+      const targetPanelId = (nextTab as HTMLElement).getAttribute('data-panel');
 
       tabButtons.forEach((tab) => {
         const isActive = tab === nextTab;
@@ -467,7 +540,7 @@ export async function POST(req: Request) {
       tabPanels.forEach((panel) => {
         const isActive = panel.id === targetPanelId;
         panel.classList.toggle('is-active', isActive);
-        panel.hidden = !isActive;
+        (panel as HTMLElement).hidden = !isActive;
         panel.setAttribute('tabindex', isActive ? '0' : '-1');
       });
     }
@@ -476,25 +549,23 @@ export async function POST(req: Request) {
       tab.addEventListener('click', () => selectTab(tab));
 
       tab.addEventListener('keydown', (event) => {
-        if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft' && event.key !== 'Home' && event.key !== 'End') {
-          return;
-        }
-
-        event.preventDefault();
+        const e = event as KeyboardEvent;
+        if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+        e.preventDefault();
 
         let nextIndex = index;
-        if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabButtons.length;
-        if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabButtons.length) % tabButtons.length;
-        if (event.key === 'Home') nextIndex = 0;
-        if (event.key === 'End') nextIndex = tabButtons.length - 1;
+        if (e.key === 'ArrowRight') nextIndex = (index + 1) % tabButtons.length;
+        if (e.key === 'ArrowLeft') nextIndex = (index - 1 + tabButtons.length) % tabButtons.length;
+        if (e.key === 'Home') nextIndex = 0;
+        if (e.key === 'End') nextIndex = tabButtons.length - 1;
 
         const nextTab = tabButtons[nextIndex];
         selectTab(nextTab);
-        nextTab.focus();
+        (nextTab as HTMLElement).focus();
       });
     });
 
-    const initiallySelected = tabButtons.find((tab) => tab.getAttribute('aria-selected') === 'true') ?? tabButtons[0];
+    const initiallySelected = tabButtons.find((t) => t.getAttribute('aria-selected') === 'true') ?? tabButtons[0];
     selectTab(initiallySelected);
   }
 </script>
