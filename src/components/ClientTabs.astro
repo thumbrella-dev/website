@@ -1,0 +1,275 @@
+---
+import ClientTabButton from './ClientTabButton.astro';
+import ClientTabPanel  from './ClientTabPanel.astro';
+
+interface TabDef {
+  id: string;
+  label: string;
+  lang: string;
+  lede: string;
+  install?: string;
+  usage: string;
+}
+
+const tabs: TabDef[] = [
+  {
+    id: 'js',
+    label: 'JavaScript',
+    lang: 'js',
+    lede: 'Works in Node.js, Deno, Bun, and the browser. TypeScript types included. The response is inline — <code>thumb.data</code> is base64 image bytes, <code>thumb.format</code> is the format string (<code>"webp"</code>). Pass your API key as <code>YOUR_KEY</code>, or a full URL for a self-hosted server.',
+    install: 'npm install @thumbrella/client',
+    usage: `\
+import { Thumbrella } from '@thumbrella/client';
+
+const tbr = new Thumbrella('YOUR_KEY');
+const thumb = await tbr.thumb('https://example.com/video.mp4');
+
+img.src = \`data:\${thumb.format};base64,\${thumb.data}\`;`,
+  },
+  {
+    id: 'python',
+    label: 'Python',
+    lang: 'python',
+    lede: 'Python 3.9+. Works in Django, FastAPI, scripts, and notebooks. <code>.to_pil()</code> and <code>.save()</code> bridge the base64 result directly to Pillow and the filesystem.',
+    install: 'pip install thumbrella',
+    usage: `\
+from thumbrella import Thumbrella
+
+tbr = Thumbrella("YOUR_KEY")
+thumb = tbr.thumb("https://example.com/video.mp4")
+
+img  = thumb.to_pil()       # PIL/Pillow Image
+thumb.save("thumb.webp")    # write decoded bytes to file`,
+  },
+  {
+    id: 'curl',
+    label: 'curl',
+    lang: 'sh',
+    lede: 'No install. The response is the raw image — pipe it wherever you need it.',
+    usage: `\
+curl https://go.thumbrella.dev/thumb/https://example.com/video.mp4 \\
+  -H "Authorization: Bearer YOUR_KEY" \\
+  -o thumb.webp`,
+  },
+  {
+    id: 'astro',
+    label: 'Astro',
+    lang: 'js',
+    lede: 'Use the JS client in any <code>.astro</code> component, server-side at build time.',
+    install: 'npm install @thumbrella/client',
+    usage: `\
+---
+import { Thumbrella } from '@thumbrella/client';
+
+const tbr = new Thumbrella(import.meta.env.THUMBRELLA_KEY);
+const thumb = await tbr.thumb(Astro.props.mediaUrl);
+---
+<img
+  src={\`data:\${thumb.format};base64,\${thumb.data}\`}
+  alt="thumbnail"
+/>`,
+  },
+  {
+    id: 'rust',
+    label: 'Rust',
+    lang: 'rust',
+    lede: 'Async-first, <code>tokio</code> runtime. Pairs with the <code>image</code> crate for further processing.',
+    install: 'cargo add thumbrella',
+    usage: `\
+let tbr = thumbrella::Client::new("YOUR_KEY");
+let thumb = tbr.thumb("https://example.com/video.mp4").await?;
+
+let img = image::load_from_memory(&thumb.data)?;`,
+  },
+  {
+    id: 'go',
+    label: 'Go',
+    lang: 'go',
+    lede: 'Idiomatic Go module. Returns decoded <code>[]byte</code> ready for the standard <code>image</code> package.',
+    install: 'go get github.com/thumbrella/thumbrella-go',
+    usage: `\
+tbr := thumbrella.New("YOUR_KEY")
+thumb, err := tbr.Thumb("https://example.com/video.mp4")
+
+img, _, err := image.Decode(bytes.NewReader(thumb.Data))`,
+  },
+  {
+    id: 'ruby',
+    label: 'Ruby',
+    lang: 'ruby',
+    lede: 'Plain Ruby gem, no runtime dependencies beyond the standard library.',
+    install: 'gem install thumbrella',
+    usage: `\
+require "thumbrella"
+
+tbr = Thumbrella.new("YOUR_KEY")
+thumb = tbr.thumb("https://example.com/video.mp4")
+
+File.write("thumb.webp", Base64.decode64(thumb.data))`,
+  },
+  {
+    id: 'php',
+    label: 'PHP',
+    lang: 'php',
+    lede: 'Composer package, PSR-18 compatible HTTP client.',
+    install: 'composer require thumbrella/thumbrella-php',
+    usage: `\
+$tbr = new \\Thumbrella\\Client('YOUR_KEY');
+$thumb = $tbr->thumb('https://example.com/video.mp4');
+
+file_put_contents('thumb.webp', base64_decode($thumb->data));`,
+  },
+  {
+    id: 'dotnet',
+    label: '.NET',
+    lang: 'csharp',
+    lede: '.NET 8+. Async throughout, returns <code>byte[]</code> ready for <code>SkiaSharp</code> or <code>ImageSharp</code>.',
+    install: 'dotnet add package Thumbrella',
+    usage: `\
+var tbr = new Thumbrella.Client("YOUR_KEY");
+var thumb = await tbr.ThumbAsync("https://example.com/video.mp4");
+
+await File.WriteAllBytesAsync("thumb.webp", thumb.Data);`,
+  },
+  {
+    id: 'swift',
+    label: 'Swift',
+    lang: 'swift',
+    lede: 'Swift Package Manager. Works on iOS, macOS, and Linux.',
+    install: '.package(url: "https://github.com/thumbrella/thumbrella-swift", from: "1.0.0")',
+    usage: `\
+let tbr = Thumbrella(key: "YOUR_KEY")
+let thumb = try await tbr.thumb("https://example.com/video.mp4")
+
+let image = UIImage(data: thumb.data)`,
+  },
+];
+---
+
+<section class="client-gs-section" id="get-started">
+  <div class="container">
+    <h2 class="client-gs__heading">Get Started</h2>
+    <p class="client-gs__lede">
+      Install a client library and point it at a media URL.
+      You'll need a free API key — <button type="button" class="client-gs__key-cta" id="client-gs-signin">create one in seconds</button>.
+    </p>
+
+    <div class="client-tabs" id="client-tabs">
+      <div class="client-tabs__bar" role="tablist" aria-label="Client environment">
+        {tabs.map((tab, i) => (
+          <ClientTabButton id={tab.id} label={tab.label} active={i === 0} prefix="cgs" />
+        ))}
+        <div class="client-tabs__more-wrap">
+          <button type="button" class="client-tabs__more-btn" id="cgs-more-btn" hidden aria-expanded="false" aria-controls="cgs-more-list">More ▾</button>
+          <ul class="client-tabs__more-list" id="cgs-more-list" hidden></ul>
+        </div>
+      </div>
+
+      <div class="client-panels">
+        {tabs.map((tab, i) => (
+          <ClientTabPanel
+            id={tab.id}
+            lede={tab.lede}
+            install={tab.install}
+            usage={tab.usage}
+            lang={tab.lang}
+            active={i === 0}
+            prefix="cgs"
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const barEl    = document.querySelector<HTMLElement>('.client-tabs__bar');
+  const barTabs  = Array.from(document.querySelectorAll<HTMLElement>('.client-tabs__bar > [data-cgs-tab]'));
+  const moreBtn  = document.getElementById('cgs-more-btn') as HTMLButtonElement | null;
+  const moreList = document.getElementById('cgs-more-list') as HTMLElement | null;
+
+  const TAB_W       = 112; // must match CSS width: 112px
+  const MORE_W      = 88;  // more button + gap reserve
+  const MAX_VISIBLE = 6;   // always tuck extras into More regardless of width
+
+  const activateClientTab = (tab: HTMLElement) => {
+    const targetId = tab.dataset.cgsTab as string;
+    barTabs.forEach((t) => {
+      const active = t === tab;
+      t.classList.toggle('is-active', active);
+      t.setAttribute('aria-selected', active ? 'true' : 'false');
+      t.setAttribute('tabindex', active ? '0' : '-1');
+    });
+    moreList?.querySelectorAll<HTMLElement>('[data-cgs-mirror]').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.cgsMirror === targetId);
+    });
+    document.querySelectorAll<HTMLElement>('.cgs-panel').forEach((panel) => {
+      const active = panel.id === targetId;
+      panel.classList.toggle('is-active', active);
+      panel.hidden = !active;
+    });
+    if (moreList && !moreList.hidden) {
+      moreList.hidden = true;
+      moreBtn?.setAttribute('aria-expanded', 'false');
+    }
+  };
+
+  barTabs.forEach((tab) => tab.addEventListener('click', () => activateClientTab(tab)));
+
+  const recalcTabs = () => {
+    if (!barEl) return;
+    const barWidth = barEl.offsetWidth;
+    const fitsAll  = barWidth >= barTabs.length * TAB_W + MORE_W;
+    const allFit   = fitsAll && barTabs.length <= MAX_VISIBLE;
+
+    if (allFit) {
+      barTabs.forEach((t) => { t.hidden = false; });
+      if (moreBtn) moreBtn.hidden = true;
+      if (moreList) moreList.innerHTML = '';
+      return;
+    }
+
+    const byWidth      = Math.max(1, Math.floor((barWidth - MORE_W) / TAB_W));
+    const visibleCount = Math.min(byWidth, MAX_VISIBLE);
+    if (moreBtn) moreBtn.hidden = false;
+    barTabs.forEach((t, i) => { t.hidden = i >= visibleCount; });
+
+    if (moreList) {
+      moreList.innerHTML = '';
+      barTabs.filter((t) => t.hidden).forEach((tab) => {
+        const li  = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'client-tab';
+        if (tab.classList.contains('is-active')) btn.classList.add('is-active');
+        btn.dataset.cgsMirror = tab.dataset.cgsTab;
+        btn.textContent = tab.textContent?.trim() ?? '';
+        btn.addEventListener('click', () => activateClientTab(tab));
+        li.appendChild(btn);
+        moreList.appendChild(li);
+      });
+    }
+  };
+
+  if (barEl) new ResizeObserver(recalcTabs).observe(barEl);
+  recalcTabs();
+
+  if (moreBtn && moreList) {
+    moreBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = !moreList.hidden;
+      moreList.hidden = open;
+      moreBtn.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+    document.addEventListener('click', (e) => {
+      if (!moreList.hidden && !(e.target as Element).closest('.client-tabs__more-wrap')) {
+        moreList.hidden = true;
+        moreBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  document.getElementById('client-gs-signin')?.addEventListener('click', () => {
+    document.getElementById('nav-sign-in')?.click();
+  });
+</script>

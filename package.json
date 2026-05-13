@@ -29,6 +29,7 @@
     "@clerk/astro": "^3.2.2",
     "@clerk/clerk-js": "^6.10.1",
     "@clerk/themes": "^2.4.57",
+    "@floating-ui/dom": "^1.7.6",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "astro": "^6.0.0",

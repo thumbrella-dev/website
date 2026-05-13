@@ -1,0 +1,127 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+
+const sections = [
+  {
+    label: 'Getting Started',
+    items: [
+      {
+        title: 'Online Service',
+        href: '/docs/getting-started/online-service',
+        desc: 'Use the hosted endpoint — no setup required.',
+      },
+      {
+        title: 'Self-Hosted',
+        href: '/docs/getting-started/self-hosted',
+        desc: 'Run Thumbrella on your own infrastructure.',
+      },
+      {
+        title: 'AI Platforms',
+        href: '/docs/getting-started/ai-platforms',
+        desc: 'Integrate as an MCP tool in AI agent workflows.',
+      },
+    ],
+  },
+  {
+    label: 'Client Libraries',
+    items: [
+      {
+        title: 'Web Client (JS/TS)',
+        href: '/docs/clients/web-client',
+        desc: 'TypeScript client for browser and server environments.',
+      },
+    ],
+  },
+  {
+    label: 'Deployment',
+    items: [
+      {
+        title: 'Advanced Online',
+        href: '/docs/deployment/advanced-online',
+        desc: 'Custom domains, auth config, and rate limit controls.',
+      },
+      {
+        title: 'Sponsor Edition',
+        href: '/docs/deployment/sponsor',
+        desc: 'Full self-hosted deployment with enterprise features.',
+      },
+    ],
+  },
+];
+---
+
+<StarlightPage frontmatter={{ title: 'Documentation', description: 'Guides for every way to run Thumbrella — from a single curl to a self-hosted cluster.' }}>
+  <p class="docs-hub__lede">Guides for every way to run Thumbrella — from a single <code>curl</code> to a self-hosted cluster.</p>
+  {sections.map((section) => (
+    <div class="docs-section">
+      <h2>{section.label}</h2>
+      <div class="docs-grid">
+        {section.items.map((item) => (
+          <a href={item.href} class="doc-card">
+            <strong>{item.title}</strong>
+            <span>{item.desc}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  ))}
+</StarlightPage>
+
+<style>
+  .docs-hub__lede {
+    color: var(--sl-color-gray-2);
+    margin-bottom: 2rem;
+  }
+
+  .docs-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .docs-section h2 {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.85rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+
+  .docs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .doc-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .doc-card:hover {
+    border-color: var(--accent);
+    background: var(--panel);
+  }
+
+  .doc-card strong {
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .doc-card span {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+</style>

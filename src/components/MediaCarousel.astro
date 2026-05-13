@@ -1,0 +1,395 @@
+---
+interface CarouselItem {
+  name: string;
+  src: string;
+  resolution: string;
+  codec: string;
+  type: string;
+  duration: string;
+  size: string;
+  procMs: number;
+}
+
+interface Props {
+  items: CarouselItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="carousel-section">
+  <div class="carousel-track-wrap" aria-label="Sample media thumbnails">
+    <ul class="carousel-track" id="carousel-track" role="list">
+      {items.map((item) => {
+        const rx = ((Math.random() - 0.5) * 20).toFixed(1);
+        const ry = ((Math.random() - 0.5) * 28).toFixed(1);
+        const tx = ((Math.random() - 0.5) * 4).toFixed(1);
+        const ty = ((Math.random() - 0.5) * 2).toFixed(1);
+        return (
+          <li
+            class="ctile"
+            style={`--ctile-rx: ${rx}deg; --ctile-ry: ${ry}deg; --ctile-tx: ${tx}rem; --ctile-ty: ${ty}rem`}
+            data-thumb-src={item.src}
+            data-thumb-delay={item.procMs}
+            data-name={item.name}
+            data-resolution={item.resolution}
+            data-codec={item.codec}
+            data-type={item.type}
+            data-duration={item.duration}
+            data-size={item.size}
+            data-proc={item.procMs}
+          >
+            <div class="ctile__thumb">
+              <div class="ctile__shimmer" aria-hidden="true"></div>
+              <img class="ctile__img" alt={item.name} />
+              <div class="ctile__badges" aria-hidden="true">
+                <span class={`ctile__badge ctile__badge--${item.type}`}>{item.codec}</span>
+                {item.duration && <span class="ctile__badge ctile__badge--dur">{item.duration}</span>}
+              </div>
+            </div>
+            <p class="ctile__name">{item.name}</p>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+
+  <div class="cpopup" id="cpopup" popover="manual" role="dialog" aria-modal="true" aria-label="Media details">
+    <p class="cpopup__filename" id="cpopup-name"></p>
+    <dl class="cpopup__dl">
+      <div><dt>Format</dt><dd id="cpopup-codec"></dd></div>
+      <div><dt>Resolution</dt><dd id="cpopup-res"></dd></div>
+      <div id="cpopup-dur-row"><dt>Duration</dt><dd id="cpopup-dur"></dd></div>
+      <div><dt>File size</dt><dd id="cpopup-size"></dd></div>
+      <div><dt>Thumb time</dt><dd id="cpopup-proc"></dd></div>
+    </dl>
+  </div>
+</section>
+
+<style is:global>
+  /* ──────────────────────────────── CAROUSEL */
+  .carousel-section {
+      position: relative;
+      padding: 2rem 0 3rem;
+      background: rgba(25, 45, 120, 0.10);
+      /* overflow handled by .carousel-track-wrap so the popup can escape */
+  }
+
+  /* fade edges */
+  .carousel-section::before,
+  .carousel-section::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 80px;
+      z-index: 2;
+      pointer-events: none;
+  }
+
+  .carousel-section::before {
+      left: 0;
+      background: linear-gradient(to right, rgba(25, 45, 120, 0.10), transparent);
+  }
+
+  .carousel-section::after {
+      right: 0;
+      background: linear-gradient(to left, rgba(25, 45, 120, 0.10), transparent);
+  }
+
+  .carousel-track-wrap {
+      overflow: hidden;
+      cursor: default;
+  }
+
+  .carousel-track {
+      display: flex;
+      gap: 120px;
+      list-style: none;
+      padding: 0.5rem 0;
+      margin: 0;
+      will-change: transform;
+      width: max-content;
+  }
+
+  /* ── tile ── */
+  .ctile {
+      flex-shrink: 0;
+      width: 190px;
+      display: grid;
+      gap: 0.4rem;
+      cursor: pointer;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      padding: 6px;
+      transform-style: preserve-3d;
+      transform: perspective(350px) translate(var(--ctile-tx, 0px), var(--ctile-ty, 0px)) rotateX(var(--ctile-rx, 0deg)) rotateY(var(--ctile-ry, 0deg));
+      transition: border-color 0.2s, background 0.2s, transform 0.45s ease;
+  }
+
+  .ctile:hover {
+      border-color: rgba(200, 149, 78, 0.35);
+      background: rgba(200, 149, 78, 0.06);
+      transform: perspective(350px) translate(var(--ctile-tx, 0px), var(--ctile-ty, 0px)) rotateX(0deg) rotateY(0deg) scale(1.06);
+  }
+
+  .ctile__thumb {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 6px;
+      overflow: hidden;
+  }
+
+  /* shimmer */
+  .ctile__shimmer {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+          100deg,
+          rgba(255,255,255,0.02) 0%,
+          rgba(255,255,255,0.07) 40%,
+          rgba(255,255,255,0.02) 80%
+      );
+      background-size: 250% 100%;
+      transition: opacity 0.45s ease;
+  }
+
+  .ctile.is-pending .ctile__shimmer {
+      animation: ctile-shimmer 1.6s ease-in-out infinite;
+  }
+
+  .ctile.is-loaded .ctile__shimmer {
+      opacity: 0;
+      animation: none;
+  }
+
+  @keyframes ctile-shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+  }
+
+  .ctile__img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+  }
+
+  .ctile.is-loaded .ctile__img { opacity: 1; }
+
+  .ctile__badges {
+      position: absolute;
+      inset: auto 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0.3rem;
+      pointer-events: none;
+  }
+
+  .ctile__badge {
+      padding: 0.1rem 0.38rem;
+      background: rgba(0,0,0,0.68);
+      border-radius: 3px;
+      font-size: 0.6rem;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: rgba(255,255,255,0.75);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+  }
+
+  .ctile.is-loaded .ctile__badge { opacity: 1; }
+
+  .ctile__badge--video { color: var(--accent-strong); }
+  .ctile__badge--raw   { color: #c9b4f0; }
+  .ctile__badge--photo { color: #a0d4b0; }
+  .ctile__badge--dur   { font-weight: 400; color: rgba(255,255,255,0.65); }
+
+  .ctile__name {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+      padding: 0 2px;
+  }
+
+  /* ── popup ── */
+  .cpopup {
+      position: fixed;
+      margin: 0;
+      width: 228px;
+      background: #21193a;
+      border: 1px solid rgba(200, 149, 78, 0.3);
+      border-radius: 12px;
+      padding: 0.9rem 1rem;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+      font-family: var(--font-sans);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.18s ease, transform 0.18s ease,
+                  display 0.18s allow-discrete,
+                  overlay 0.18s allow-discrete;
+  }
+
+  .cpopup:popover-open {
+      opacity: 1;
+      transform: translateY(0);
+  }
+
+  @starting-style {
+      .cpopup:popover-open {
+          opacity: 0;
+          transform: translateY(6px);
+      }
+  }
+
+  .cpopup__filename {
+      margin: 0 0 0.65rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #fff2df;
+      word-break: break-all;
+  }
+
+  .cpopup__dl {
+      margin: 0;
+      display: grid;
+      gap: 0.3rem;
+  }
+
+  .cpopup__dl > div {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+  }
+
+  .cpopup__dl dt {
+      color: var(--text-muted);
+  }
+
+  .cpopup__dl dd {
+      margin: 0;
+      color: var(--text);
+      font-weight: 500;
+      text-align: right;
+  }
+</style>
+
+<script>
+  import { computePosition, flip, shift, offset } from '@floating-ui/dom';
+
+  const track = document.getElementById('carousel-track') as HTMLElement | null;
+  const popup = document.getElementById('cpopup') as HTMLElement | null;
+  if (track) {
+    // Duplicate tiles for seamless loop
+    const origItems = Array.from(track.children) as HTMLElement[];
+    origItems.forEach((item) => {
+      const clone = item.cloneNode(true) as HTMLElement;
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    });
+
+    // Reveal thumbnails via IntersectionObserver (only real tiles, not clones)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        const el = entry.target as HTMLElement;
+        const src = el.dataset.thumbSrc ?? '';
+        const delay = parseInt(el.dataset.thumbDelay ?? '0', 10);
+        el.classList.add('is-pending');
+        setTimeout(() => {
+          const img = el.querySelector<HTMLImageElement>('.ctile__img');
+          if (!img || !src) return;
+          img.addEventListener('load',  () => el.classList.add('is-loaded'), { once: true });
+          img.addEventListener('error', () => el.classList.add('is-error'),  { once: true });
+          img.src = src;
+        }, delay);
+      });
+    }, { rootMargin: '120px', threshold: 0.01 });
+
+    origItems.forEach((item) => observer.observe(item));
+
+    // Scroll animation with smooth ease-in/out
+    const TARGET_SPEED = 52; // px/s at full speed
+    const EASE_K = 3.5;      // higher = snappier ease
+    let speed = TARGET_SPEED;
+    let targetSpeed = TARGET_SPEED;
+    let pos = 0;
+    let lastTime: number | null = null;
+
+    function step(ts: number) {
+      const dt = lastTime !== null ? Math.min((ts - lastTime) / 1000, 0.1) : 0;
+      lastTime = ts;
+      speed += (targetSpeed - speed) * (1 - Math.exp(-EASE_K * dt));
+      if (speed > 0.3 && track) {
+        pos += speed * dt;
+        const half = track.scrollWidth / 2;
+        if (pos >= half) pos -= half;
+        track.style.transform = `translateX(${-pos}px)`;
+      }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+
+    // Pause on hover
+    track.parentElement?.addEventListener('mouseenter', () => { targetSpeed = 0; });
+    track.parentElement?.addEventListener('mouseleave', () => {
+      if (!popup || !popup.matches(':popover-open')) targetSpeed = TARGET_SPEED;
+    });
+
+    // Tile click → open popup
+    track.addEventListener('click', async (e) => {
+      const tile = (e.target as Element).closest('.ctile[data-name]') as HTMLElement | null;
+      if (!tile || !popup) return;
+
+      targetSpeed = 0;
+
+      const set = (id: string, val: string) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+
+      set('cpopup-name',  tile.dataset.name ?? '');
+      set('cpopup-codec', tile.dataset.codec ?? '');
+      set('cpopup-res',   tile.dataset.resolution ?? '');
+      set('cpopup-dur',   tile.dataset.duration ?? '');
+      set('cpopup-size',  tile.dataset.size ?? '');
+      set('cpopup-proc',  tile.dataset.proc ? `${tile.dataset.proc} ms` : '');
+
+      const durRow = document.getElementById('cpopup-dur-row');
+      if (durRow) durRow.hidden = !tile.dataset.duration;
+
+      popup.showPopover();
+      const { x, y } = await computePosition(tile, popup, {
+        strategy: 'fixed',
+        placement: 'top',
+        middleware: [offset(14), flip(), shift({ padding: 8 })],
+      });
+      Object.assign(popup.style, { left: `${x}px`, top: `${y}px` });
+    });
+
+    // Close popup
+    const closePopup = () => {
+      popup?.hidePopover();
+      targetSpeed = TARGET_SPEED;
+    };
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePopup(); });
+    document.addEventListener('click', (e) => {
+      if (popup?.matches(':popover-open') &&
+          !(e.target as Element).closest('.cpopup') &&
+          !(e.target as Element).closest('.ctile')) {
+        closePopup();
+      }
+    });
+  }
+</script>

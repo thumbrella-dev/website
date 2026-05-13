@@ -1,0 +1,26 @@
+---
+interface Props {
+  /** Short id like 'js', 'python' */
+  id: string;
+  label: string;
+  active?: boolean;
+  /** Namespace prefix — panel id becomes '{prefix}-{id}'. Defaults to 'cgs'. */
+  prefix?: string;
+}
+const { id, label, active = false, prefix = 'cgs' } = Astro.props;
+const panelId = `${prefix}-${id}`;
+const tabId   = `${prefix}-tab-${id}`;
+const dataAttr = { [`data-${prefix}-tab`]: panelId };
+---
+<button
+  type="button"
+  role="tab"
+  class:list={['client-tab', active && 'is-active']}
+  aria-selected={active ? 'true' : 'false'}
+  aria-controls={panelId}
+  id={tabId}
+  tabindex={active ? '0' : '-1'}
+  {...dataAttr}
+>
+  {label}
+</button>

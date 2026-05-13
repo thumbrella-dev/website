@@ -1,0 +1,194 @@
+---
+import ClientTabButton from './ClientTabButton.astro';
+import ClientTabPanel  from './ClientTabPanel.astro';
+
+interface TabDef {
+  id: string;
+  label: string;
+  lede: string;
+  lang?: string;
+  install?: string;
+  usage?: string;
+  comingSoon?: boolean;
+}
+
+const tabs: TabDef[] = [
+  {
+    id: 'self-host',
+    label: 'Self Host',
+    lede: 'Download the standalone binary for your platform — Linux, macOS, or Windows. No account needed, fully offline capable. One optional argument adds SQLite-backed thumbnail caching.',
+    lang: 'sh',
+    usage: `\
+# Run the thumbnail server (default port 8000)
+TBR_PORT=8000 thumbrella serve
+
+# With SQLite cache
+thumbrella serve --cache ./thumbrella-cache.db
+
+# One-shot from the command line
+thumbrella thumb ./sample.mov --output ./sample.webp`,
+  },
+  {
+    id: 'sponsor-host',
+    label: 'Sponsor Host',
+    lede: 'Docker-first distribution with every renderer pre-bundled. Fully offline, pluggable caching backends (Redis, Postgres), and a perpetual license. Requires a sponsor arrangement — <a href="/pricing">see pricing →</a>',
+    lang: 'sh',
+    usage: `\
+docker run --rm -p 8000:8000 \\
+  ghcr.io/thumbrella/thumbrella-sponsor:latest serve`,
+  },
+  {
+    id: 'replicate',
+    label: 'Replicate',
+    lede: 'Run Thumbrella as a serverless model on <a href="https://replicate.com" target="_blank" rel="noopener">Replicate</a>. No installation. The platform bills per render — there is no additional Thumbrella cost.',
+    lang: 'sh',
+    install: 'npm install replicate',
+    usage: `\
+import Replicate from 'replicate';
+const replicate = new Replicate();
+
+const output = await replicate.run(
+  "thumbrella/thumb",
+  { input: { url: "https://example.com/video.mp4" } }
+);
+// output — base64 image data`,
+  },
+  {
+    id: 'falai',
+    label: 'fal.ai',
+    lede: 'Thumbrella on <a href="https://fal.ai" target="_blank" rel="noopener">fal.ai</a> is coming soon. The fal.ai integration will follow the same pattern as Replicate — serverless, pay-per-render, no Thumbrella account required.',
+    comingSoon: true,
+  },
+];
+---
+
+<section class="client-gs-section" id="get-hosting">
+  <div class="container">
+    <h2 class="client-gs__heading">Get Hosting</h2>
+    <p class="client-gs__lede">
+      Choose where Thumbrella runs. The API is identical across every option.
+    </p>
+
+    <div class="client-tabs" id="hosting-tabs">
+      <div class="hosting-tabs__bar" role="tablist" aria-label="Hosting option">
+        {tabs.map((tab, i) => (
+          <ClientTabButton id={tab.id} label={tab.label} active={i === 0} prefix="hst" />
+        ))}
+        <div class="client-tabs__more-wrap">
+          <button type="button" class="client-tabs__more-btn" id="hst-more-btn" hidden aria-expanded="false" aria-controls="hst-more-list">More ▾</button>
+          <ul class="client-tabs__more-list" id="hst-more-list" hidden></ul>
+        </div>
+      </div>
+
+      <div class="client-panels">
+        {tabs.map((tab, i) => (
+          tab.comingSoon
+            ? (
+              <ClientTabPanel
+                id={tab.id}
+                lede={tab.lede}
+                lang="sh"
+                active={i === 0}
+                prefix="hst"
+              />
+            ) : (
+              <ClientTabPanel
+                id={tab.id}
+                lede={tab.lede}
+                install={tab.install}
+                usage={tab.usage}
+                lang={tab.lang ?? 'sh'}
+                active={i === 0}
+                prefix="hst"
+              />
+            )
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const barEl    = document.querySelector<HTMLElement>('.hosting-tabs__bar');
+  const barTabs  = Array.from(document.querySelectorAll<HTMLElement>('.hosting-tabs__bar > [data-hst-tab]'));
+  const moreBtn  = document.getElementById('hst-more-btn') as HTMLButtonElement | null;
+  const moreList = document.getElementById('hst-more-list') as HTMLElement | null;
+
+  const TAB_W  = 112;
+  const MORE_W = 88;
+
+  const activateTab = (tab: HTMLElement) => {
+    const targetId = tab.dataset.hstTab as string;
+    barTabs.forEach((t) => {
+      const active = t === tab;
+      t.classList.toggle('is-active', active);
+      t.setAttribute('aria-selected', active ? 'true' : 'false');
+      t.setAttribute('tabindex', active ? '0' : '-1');
+    });
+    moreList?.querySelectorAll<HTMLElement>('[data-hst-mirror]').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.hstMirror === targetId);
+    });
+    document.querySelectorAll<HTMLElement>('.hst-panel').forEach((panel) => {
+      const active = panel.id === targetId;
+      panel.classList.toggle('is-active', active);
+      panel.hidden = !active;
+    });
+    if (moreList && !moreList.hidden) {
+      moreList.hidden = true;
+      moreBtn?.setAttribute('aria-expanded', 'false');
+    }
+  };
+
+  barTabs.forEach((tab) => tab.addEventListener('click', () => activateTab(tab)));
+
+  const recalcTabs = () => {
+    if (!barEl) return;
+    const barWidth = barEl.offsetWidth;
+    const allFit = barWidth >= barTabs.length * TAB_W + MORE_W;
+
+    if (allFit) {
+      barTabs.forEach((t) => { t.hidden = false; });
+      if (moreBtn) moreBtn.hidden = true;
+      if (moreList) moreList.innerHTML = '';
+      return;
+    }
+
+    const visibleCount = Math.max(1, Math.floor((barWidth - MORE_W) / TAB_W));
+    if (moreBtn) moreBtn.hidden = false;
+    barTabs.forEach((t, i) => { t.hidden = i >= visibleCount; });
+
+    if (moreList) {
+      moreList.innerHTML = '';
+      barTabs.filter((t) => t.hidden).forEach((tab) => {
+        const li  = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'client-tab';
+        if (tab.classList.contains('is-active')) btn.classList.add('is-active');
+        btn.dataset.hstMirror = tab.dataset.hstTab;
+        btn.textContent = tab.textContent?.trim() ?? '';
+        btn.addEventListener('click', () => activateTab(tab));
+        li.appendChild(btn);
+        moreList.appendChild(li);
+      });
+    }
+  };
+
+  if (barEl) new ResizeObserver(recalcTabs).observe(barEl);
+  recalcTabs();
+
+  if (moreBtn && moreList) {
+    moreBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = !moreList.hidden;
+      moreList.hidden = open;
+      moreBtn.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+    document.addEventListener('click', (e) => {
+      if (!moreList.hidden && !(e.target as Element).closest('.client-tabs__more-wrap')) {
+        moreList.hidden = true;
+        moreBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+</script>

@@ -44,3 +44,15 @@ starlight-theme-select { display: none; }
   padding: 0.15em 0.4em;
   color: #dba95e;
 }
+
+/* Active sidebar link — dark purple bg instead of orange-on-orange */
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover {
+  background-color: #2e2540;
+  color: var(--sl-color-white);
+}
+
+/* Code blocks — left accent border to distinguish from monospace body prose */
+.expressive-code figure {
+  border-left: 3px solid rgba(200, 149, 78, 0.45) !important;
+}

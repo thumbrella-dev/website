@@ -13,8 +13,18 @@ export default defineConfig({
       title: 'Thumbrella Docs',
       description: 'Documentation for the Thumbrella fast media thumbnail platform.',
       logo: { src: './public/thumbrella.png', alt: 'thumbrella.dev' },
+      head: [
+        { tag: 'link', attrs: { rel: 'icon', href: '/favicon-light.png', media: '(prefers-color-scheme: light)' } },
+        { tag: 'link', attrs: { rel: 'icon', href: '/favicon-dark.png', media: '(prefers-color-scheme: dark)' } },
+      ],
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/thumbrella' }],
+      components: {
+        Header: './src/components/starlight/Header.astro',
+        Footer: './src/components/starlight/Footer.astro',
+        Sidebar: './src/components/starlight/Sidebar.astro',
+      },
       sidebar: [
+        { label: 'Overview', link: '/docs/' },
         {
           label: 'Getting Started',
           items: [
@@ -38,6 +48,32 @@ export default defineConfig({
         },
       ],
       customCss: ['./src/styles/starlight-custom.css'],
+      expressiveCode: {
+        themes: ['github-dark'],
+        styleOverrides: {
+          borderRadius: '8px',
+          uiSelectionBackground: 'rgba(200, 149, 78, 0.2)',
+          frames: {
+            terminalTitlebarBackground: '#1e1530',
+            terminalTitlebarForeground: '#c8bfaa',
+            terminalTitlebarBorderBottomColor: 'rgba(200, 149, 78, 0.18)',
+            terminalTitlebarDotsForeground: '#7c5cbf',
+            terminalTitlebarDotsOpacity: '0.8',
+            editorActiveTabBackground: '#1e1530',
+            editorTabBarBackground: '#1a1228',
+            editorTabBarBorderBottomColor: 'rgba(200, 149, 78, 0.18)',
+            frameBoxShadowCssValue: 'none',
+          },
+          copyButtonBackground: 'transparent',
+          copyButtonBorder: 'rgba(200, 149, 78, 0)',
+          copyButtonForeground: 'rgba(200, 149, 78, 0.5)',
+          copyButtonHoverBackground: '#2e2540',
+          copyButtonHoverBorder: 'rgba(200, 149, 78, 0.45)',
+          copyButtonHoverForeground: '#f0e8d8',
+          copyButtonTooltipBackground: '#2e2540',
+          copyButtonTooltipForeground: '#f0e8d8',
+        },
+      },
       disable404Route: true,
     }),
     react(),

@@ -1,0 +1,19 @@
+---
+interface Props {
+  icon: string;
+  title: string;
+  suffix?: string;
+  count?: string;
+}
+
+const { icon, title, suffix, count } = Astro.props;
+const id = `info-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+---
+
+<li class="caps-item" role="button" tabindex="0" aria-expanded="false" aria-controls={id}>
+  <span class="caps-item__icon" aria-hidden="true">{icon}</span>
+  <span class="caps-item__label"><strong>{title}</strong>{suffix && ` ${suffix}`}{count && <span class="caps-item__count" aria-label={`${count} formats`}>×{count}</span>}</span>
+  <div class="info-popover" id={id} popover="auto">
+    <slot />
+  </div>
+</li>
