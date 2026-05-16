@@ -167,6 +167,24 @@ if (clerkUserId && adminWorker) {
     }
   });
 
+  // Dashboard script re-activation shim.
+  // Clerk renders UserButton.UserProfilePage content via innerHTML, which does not
+  // execute <script> tags. This shim watches for #tbr-dashboard-script to appear
+  // and copies its content to a new <script> that the browser WILL execute.
+  (function () {
+    function activateDashboardScript() {
+      var s = document.getElementById('tbr-dashboard-script');
+      if (!s || s.dataset.tbrActivated) return;
+      s.dataset.tbrActivated = '1';
+      var n = document.createElement('script');
+      n.textContent = s.textContent;
+      document.head.appendChild(n);
+    }
+    activateDashboardScript();
+    var obs = new MutationObserver(activateDashboardScript);
+    obs.observe(document.body, { childList: true, subtree: true });
+  })();
+
   // Wait for Clerk to load, then set up listener
   const waitForClerk = window.setInterval(() => {
     if (!window.Clerk) return;

@@ -381,7 +381,7 @@ const { items } = Astro.props;
     // Close popup
     const closePopup = () => {
       popup?.hidePopover();
-      targetSpeed = TARGET_SPEED;
+      if (!document.querySelector('.cl-modalBackdrop')) targetSpeed = TARGET_SPEED;
     };
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePopup(); });
     document.addEventListener('click', (e) => {
@@ -391,5 +391,18 @@ const { items } = Astro.props;
         closePopup();
       }
     });
+
+    // Pause while any Clerk modal is open
+    let clerkModalOpen = false;
+    new MutationObserver(() => {
+      const nowOpen = !!document.querySelector('.cl-modalBackdrop');
+      if (nowOpen === clerkModalOpen) return;
+      clerkModalOpen = nowOpen;
+      if (nowOpen) {
+        targetSpeed = 0;
+      } else if (!track.parentElement?.matches(':hover')) {
+        targetSpeed = TARGET_SPEED;
+      }
+    }).observe(document.body, { childList: true, subtree: true });
   }
 </script>

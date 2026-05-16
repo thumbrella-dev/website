@@ -10,7 +10,8 @@
     --accent-strong: #dba95e;
     --border: rgba(240, 232, 216, 0.12);
     --shadow: rgba(0, 0, 0, 0.3);
-
+    /* Prevent the site's monospace body font from bleeding into Clerk modals */
+    --clerk-font-family: system-ui, ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 
