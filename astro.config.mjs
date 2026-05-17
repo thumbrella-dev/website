@@ -6,6 +6,12 @@ import react from '@astrojs/react';
 import clerk from '@clerk/astro';
 import starlight from '@astrojs/starlight';
 
+// When running `astro build --mode development` (i.e. `npm run preview`),
+// skip minification for a faster local Workers-runtime test cycle.
+const modeIndex = process.argv.indexOf('--mode');
+const buildMode = modeIndex >= 0 ? process.argv[modeIndex + 1] : 'production';
+const isDevBuild = buildMode === 'development';
+
 export default defineConfig({
   site: 'https://thumbrella.dev',
   integrations: [
@@ -106,5 +112,13 @@ export default defineConfig({
   adapter: cloudflare({
     sessionKVBindingName: 'CLERK_SESSION',
     imageService: 'passthrough',
+    platformProxy: { enabled: true },
   }),
+  vite: {
+    build: {
+      minify: isDevBuild ? false : 'esbuild',
+      cssMinify: !isDevBuild,
+      reportCompressedSize: false,
+    },
+  },
 });

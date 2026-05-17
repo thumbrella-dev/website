@@ -3,9 +3,27 @@ import { clerkMiddleware } from '@clerk/astro/server';
 const clerk = clerkMiddleware();
 
 export const onRequest: import('astro').MiddlewareHandler = async (context, next) => {
-  if (import.meta.env.CLERK_SECRET_KEY) {
-    return clerk(context, next);
+  if (context.url.pathname !== '/account') {
+    if (import.meta.env.CLERK_SECRET_KEY) {
+      return clerk(context, next);
+    }
+    return next();
   }
 
-  return next();
+  // /account: run Clerk auth first, then decide
+  const handleAccount = async () => {
+    const { userId } = context.locals.auth();
+    if (!userId) {
+      // Not signed in — redirect to homepage
+      return context.redirect('/');
+    }
+    // Signed in — render homepage content with URL staying at /account
+    return context.rewrite('/');
+  };
+
+  if (import.meta.env.CLERK_SECRET_KEY) {
+    return clerk(context, handleAccount);
+  }
+
+  return context.rewrite('/');
 };

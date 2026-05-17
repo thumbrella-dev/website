@@ -26,15 +26,17 @@ if (!currentUser) {
 const clerkUserId = currentUser.id;
 const adminWorker = env.ADMIN_WORKER;
 
-let dashboardHtml = '';
+type DashboardTab = { id: string; label: string; url: string; html: string };
+let dashboardTabs: DashboardTab[] = [];
 let fetchError = '';
 
 if (adminWorker) {
   try {
-    const url = new URL(`/api/customer/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`, 'http://admin.internal');
+    const url = new URL(`/api/user/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`, 'http://admin.internal');
     const resp = await adminWorker.fetch(url.toString());
     if (resp.ok) {
-      dashboardHtml = await resp.text();
+      const data = await resp.json<{ tabs?: DashboardTab[] }>();
+      dashboardTabs = Array.isArray(data?.tabs) ? data.tabs : [];
     } else {
       fetchError = `Admin returned ${resp.status}`;
     }
@@ -61,8 +63,14 @@ if (adminWorker) {
         <p>Could not load dashboard data.</p>
         {import.meta.env.DEV && <pre class="dashboard-error-detail">{fetchError}</pre>}
       </div>
+    ) : dashboardTabs.length > 0 ? (
+      dashboardTabs.map(tab => (
+        <section class="dashboard-tab">
+          <div class="dashboard-tab-content" set:html={tab.html} />
+        </section>
+      ))
     ) : (
-      <div class="dashboard-content" set:html={dashboardHtml} />
+      <p class="dashboard-empty">Dashboard data is unavailable.</p>
     )}
   </div>
 </MainLayout>

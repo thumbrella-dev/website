@@ -32,17 +32,23 @@ const clerkUserId = currentUser?.id;
 
 const adminWorker = env.ADMIN_WORKER;
 
-let adminDashboardHtml = '';
+type DashboardTab = { id: string; label: string; url: string; html: string };
+let dashboardTabs: DashboardTab[] = [];
+
+const SIGNOUT_BTN =
+  '<button type="button" class="tbr-btn tbr-btn-xs tbr-btn-primary" style="text-transform:none;letter-spacing:0;margin-left:auto" data-manage-account-sign-out>Sign out</button>';
+const processTabHtml = (tab: DashboardTab) => tab.html.replace('{{SIGNOUT}}', SIGNOUT_BTN);
 
 if (clerkUserId && adminWorker) {
   try {
     const url = new URL(
-      `/api/customer/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`,
+      `/api/user/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`,
       'http://admin.internal'
     );
     const resp = await adminWorker.fetch(url.toString());
     if (resp.ok) {
-      adminDashboardHtml = await resp.text();
+      const data = await resp.json<{ tabs?: DashboardTab[] }>();
+      dashboardTabs = Array.isArray(data?.tabs) ? data.tabs : [];
     }
   } catch {
     // Ignore worker fetch failures inside nav; dashboard page has full error handling.
@@ -84,18 +90,22 @@ if (clerkUserId && adminWorker) {
         </li>
         <li class="nav-auth-group">
           <UserButton>
-            <UserButton.UserProfilePage label="Thumbrella" url="manage-account">
-              <div class="nav-admin-dashboard-shell">
-                <button type="button" class="nav-dashboard-sign-out" data-manage-account-sign-out>
-                  Sign out
-                </button>
-                {adminDashboardHtml ? (
-                  <div class="nav-admin-dashboard" set:html={adminDashboardHtml} />
-                ) : (
+            {dashboardTabs.length > 0 ? dashboardTabs.map(tab => (
+              <UserButton.UserProfilePage label={tab.label} url={tab.url}>
+                <div class="nav-admin-dashboard-shell">
+                  <div class="nav-admin-dashboard" set:html={processTabHtml(tab)} />
+                </div>
+              </UserButton.UserProfilePage>
+            )) : (
+              <UserButton.UserProfilePage label="Thumbrella" url="manage-account">
+                <div class="nav-admin-dashboard-shell">
+                  <button type="button" class="nav-dashboard-sign-out" data-manage-account-sign-out>
+                    Sign out
+                  </button>
                   <p>Dashboard data is currently unavailable.</p>
-                )}
-              </div>
-            </UserButton.UserProfilePage>
+                </div>
+              </UserButton.UserProfilePage>
+            )}
           </UserButton>
         </li>
       </ul>
@@ -169,19 +179,20 @@ if (clerkUserId && adminWorker) {
 
   // Dashboard script re-activation shim.
   // Clerk renders UserButton.UserProfilePage content via innerHTML, which does not
-  // execute <script> tags. This shim watches for #tbr-dashboard-script to appear
-  // and copies its content to a new <script> that the browser WILL execute.
+  // execute <script> tags. This shim watches for [data-tbr-script] elements to appear
+  // and copies their content to new <script> tags that the browser WILL execute.
   (function () {
-    function activateDashboardScript() {
-      var s = document.getElementById('tbr-dashboard-script');
-      if (!s || s.dataset.tbrActivated) return;
-      s.dataset.tbrActivated = '1';
-      var n = document.createElement('script');
-      n.textContent = s.textContent;
-      document.head.appendChild(n);
+    function activateDashboardScripts() {
+      document.querySelectorAll('[data-tbr-script]').forEach(function (s) {
+        if (s.dataset.tbrActivated) return;
+        s.dataset.tbrActivated = '1';
+        var n = document.createElement('script');
+        n.textContent = s.textContent;
+        document.head.appendChild(n);
+      });
     }
-    activateDashboardScript();
-    var obs = new MutationObserver(activateDashboardScript);
+    activateDashboardScripts();
+    var obs = new MutationObserver(activateDashboardScripts);
     obs.observe(document.body, { childList: true, subtree: true });
   })();
 
@@ -193,7 +204,14 @@ if (clerkUserId && adminWorker) {
 
     // Seed previousUserId from current state so a page load/refresh while
     // already signed in does NOT look like a fresh sign-in transition.
+    // NOTE: user may not be populated yet even when Clerk SDK is ready —
+    // the session loads asynchronously and arrives via addListener below.
     previousUserId = window.Clerk?.user?.id ?? null;
+
+    // Fast path: session already available (cached/warm load)
+    if (window.location.pathname === '/account' && window.Clerk.user) {
+      openManageAccount();
+    }
 
     // Listen for auth state changes
     window.Clerk.addListener(() => {
@@ -201,13 +219,12 @@ if (clerkUserId && adminWorker) {
       const wasSignedOut = previousUserId === null;
       const isNowSignedIn = currentUserId !== null && currentUserId !== undefined;
 
-      // Auto-open account modal only when user just completed sign-UP.
-      // Guard: the Clerk user's createdAt must be within the last 30 seconds
-      // so that signing back in to an existing account never triggers this.
       if (wasSignedOut && isNowSignedIn) {
         const createdAt = window.Clerk?.user?.createdAt;
         const isNewSignUp = createdAt && (Date.now() - new Date(createdAt).getTime()) < 30000;
-        if (isNewSignUp) {
+        // Auto-open on /account direct navigation (session just loaded),
+        // or on a fresh sign-up anywhere on the site.
+        if (window.location.pathname === '/account' || isNewSignUp) {
           openManageAccount();
         }
       }
@@ -215,6 +232,38 @@ if (clerkUserId && adminWorker) {
       previousUserId = currentUserId;
     });
   }, 100);
+
+  // ── /account URL sync ─────────────────────────────────────────────────────
+  // Push /account when the Clerk modal opens; restore / when it closes.
+  // Also handles the browser back button while the modal is open.
+  (function () {
+    var modalOpen = false;
+
+    var urlObs = new MutationObserver(function () {
+      var nowOpen = !!document.querySelector('.cl-modalBackdrop');
+      if (nowOpen === modalOpen) return;
+      modalOpen = nowOpen;
+      if (nowOpen) {
+        if (window.location.pathname !== '/account') {
+          history.pushState({ clerkModal: true }, '', '/account');
+        }
+      } else {
+        if (window.location.pathname === '/account') {
+          history.replaceState({}, '', '/');
+        }
+      }
+    });
+    urlObs.observe(document.body, { childList: true, subtree: true });
+
+    // Back button while modal is open → close the modal, stay on /
+    window.addEventListener('popstate', function (e) {
+      if (modalOpen) {
+        document.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+        );
+      }
+    });
+  })();
 </script>
 
 <style>
@@ -250,17 +299,19 @@ if (clerkUserId && adminWorker) {
 
   :global(.nav-dashboard-sign-out) {
     justify-self: start;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(255, 255, 255, 0.06);
-    color: #fff;
-    border-radius: 999px;
-    padding: 0.45rem 0.8rem;
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    background: rgba(248, 113, 113, 0.1);
+    color: #f87171;
+    border-radius: 6px;
+    padding: 0.45rem 1rem;
     cursor: pointer;
-    font: inherit;
+    font: 500 0.825rem inherit;
+    letter-spacing: 0.01em;
   }
 
   :global(.nav-dashboard-sign-out:hover) {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(248, 113, 113, 0.18);
+    border-color: rgba(248, 113, 113, 0.55);
   }
 
   :global([data-clerk-id^='clerk-user-button']) {

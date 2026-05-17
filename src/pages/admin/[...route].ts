@@ -7,16 +7,17 @@ export const prerender = false;
 const BODY_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 /**
- * Admin proxy — `/admin/{route}` → admin worker at `/api/customer/{route}`.
+ * User API proxy — `/admin/{route}` → admin worker at `/api/user/{route}`.
  *
  * Every request must be authenticated via a live Clerk API verification
  * (`currentUser()`, not just JWT inspection). The verified user ID is the
  * only way `clerkUserId` is set on the upstream call; the client cannot
  * supply or override it.
  *
- * The admin worker receives calls under its `/api/customer/` namespace, which
- * is already marked public (service-binding path, not behind CF Access headers).
- * Ownership validation happens on the admin side for every mutating operation.
+ * The admin worker receives calls under its `/api/user/` namespace, which
+ * is marked public (service-binding path, not behind CF Access headers).
+ * The `/api/admin/` namespace on the admin worker is never reachable from
+ * here — it is protected by Cloudflare Access and has no proxy path.
  */
 export const ALL: APIRoute = async (context) => {
 	// --- Authentication --------------------------------------------------
@@ -50,7 +51,7 @@ export const ALL: APIRoute = async (context) => {
 
 	// --- Build upstream URL ----------------------------------------------
 	const originalUrl = new URL(context.request.url);
-	const upstreamUrl = new URL(`/api/customer/${route}`, 'http://admin.internal');
+	const upstreamUrl = new URL(`/api/user/${route}`, 'http://admin.internal');
 
 	// Forward query params from the client, but never let the client set
 	// clerkUserId — that comes exclusively from the verified session above.

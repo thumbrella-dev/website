@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "npm run build && wrangler dev",
+    "build:quiet": "astro build --logLevel warn",
+    "preview": "astro build --mode development && wrangler dev",
     "generate-types": "wrangler types",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "astro build --logLevel warn && wrangler deploy"
   },
   "engines": {
     "node": ">=22"

@@ -58,12 +58,12 @@ curl https://go.thumbrella.dev/thumb/https://example.com/video.mp4 \\
     lede: 'Use the JS client in any <code>.astro</code> component, server-side at build time.',
     install: 'npm install @thumbrella/client',
     usage: `\
----
+${'---'}
 import { Thumbrella } from '@thumbrella/client';
 
 const tbr = new Thumbrella(import.meta.env.THUMBRELLA_KEY);
 const thumb = await tbr.thumb(Astro.props.mediaUrl);
----
+${'---'}
 <img
   src={\`data:\${thumb.format};base64,\${thumb.data}\`}
   alt="thumbnail"
