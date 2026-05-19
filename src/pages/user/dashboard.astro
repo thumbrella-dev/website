@@ -32,7 +32,7 @@ let fetchError = '';
 
 if (adminWorker) {
   try {
-    const url = new URL(`/api/user/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`, 'http://admin.internal');
+    const url = new URL(`/api/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`, 'http://admin.internal');
     const resp = await adminWorker.fetch(url.toString());
     if (resp.ok) {
       const data = await resp.json<{ tabs?: DashboardTab[] }>();

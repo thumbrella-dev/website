@@ -42,16 +42,19 @@ const processTabHtml = (tab: DashboardTab) => tab.html.replace('{{SIGNOUT}}', SI
 if (clerkUserId && adminWorker) {
   try {
     const url = new URL(
-      `/api/user/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`,
+      `/api/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`,
       'http://admin.internal'
     );
     const resp = await adminWorker.fetch(url.toString());
     if (resp.ok) {
       const data = await resp.json<{ tabs?: DashboardTab[] }>();
       dashboardTabs = Array.isArray(data?.tabs) ? data.tabs : [];
+    } else {
+      const text = await resp.text();
+      console.log('[Navbar] error body:', text);
     }
-  } catch {
-    // Ignore worker fetch failures inside nav; dashboard page has full error handling.
+  } catch (err) {
+    console.log('[Navbar] fetch threw:', err);
   }
 }
 ---
