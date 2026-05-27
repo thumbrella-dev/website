@@ -1,0 +1,15 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import ErrorPageContent from '../components/ErrorPageContent.astro';
+---
+
+<MainLayout
+    title="Server error — Thumbrella"
+    description="Something went wrong while loading this page."
+>
+    <ErrorPageContent
+        code="500"
+        title="Something went wrong"
+        message="We hit an unexpected error. Try again in a moment, or head back to the homepage."
+    />
+</MainLayout>

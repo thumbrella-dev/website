@@ -1,0 +1,15 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import ErrorPageContent from '../components/ErrorPageContent.astro';
+---
+
+<MainLayout
+    title="Page not found — Thumbrella"
+    description="The page you're looking for doesn't exist."
+>
+    <ErrorPageContent
+        code="404"
+        title="Page not found"
+        message="That URL doesn't match anything on this site. It may have moved or been removed."
+    />
+</MainLayout>

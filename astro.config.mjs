@@ -14,6 +14,11 @@ const isDevBuild = buildMode === 'development';
 
 export default defineConfig({
   site: 'https://thumbrella.dev',
+  redirects: {
+    '/getting-started/[...slug]': '/docs/getting-started/[...slug]',
+    '/deployment/[...slug]': '/docs/deployment/[...slug]',
+    '/clients/[...slug]': '/docs/clients/[...slug]',
+  },
   integrations: [
     starlight({
       title: 'Thumbrella Docs',
@@ -34,22 +39,22 @@ export default defineConfig({
         {
           label: 'Getting Started',
           items: [
-            { label: 'Online Service', slug: 'getting-started/online-service' },
-            { label: 'Self-Hosted', slug: 'getting-started/self-hosted' },
-            { label: 'AI Platforms', slug: 'getting-started/ai-platforms' },
+            { label: 'Online Service', slug: 'docs/getting-started/online-service' },
+            { label: 'Self-Hosted', slug: 'docs/getting-started/self-hosted' },
+            { label: 'AI Platforms', slug: 'docs/getting-started/ai-platforms' },
           ],
         },
         {
           label: 'Client Libraries',
           items: [
-            { label: 'Web Client (JS/TS)', slug: 'clients/web-client' },
+            { label: 'Web Client (JS/TS)', slug: 'docs/clients/web-client' },
           ],
         },
         {
           label: 'Deployment',
           items: [
-            { label: 'Advanced Online', slug: 'deployment/advanced-online' },
-            { label: 'Sponsor Edition', slug: 'deployment/sponsor' },
+            { label: 'Advanced Online', slug: 'docs/deployment/advanced-online' },
+            { label: 'Sponsor Edition', slug: 'docs/deployment/sponsor' },
           ],
         },
       ],
