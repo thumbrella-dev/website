@@ -14,10 +14,8 @@ const isDevBuild = buildMode === 'development';
 
 export default defineConfig({
   site: 'https://thumbrella.dev',
-  redirects: {
-    '/getting-started/[...slug]': '/docs/getting-started/[...slug]',
-    '/deployment/[...slug]': '/docs/deployment/[...slug]',
-    '/clients/[...slug]': '/docs/clients/[...slug]',
+  server: {
+    host: '0.0.0.0',
   },
   integrations: [
     starlight({

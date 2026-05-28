@@ -5,10 +5,7 @@
   "main": "index.astro",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
-    "build:quiet": "astro build --logLevel warn",
-    "preview": "astro build --mode development && wrangler dev",
-    "generate-types": "wrangler types",
+    "preview": "bash scripts/preview.sh",
     "deploy": "astro build --logLevel warn && wrangler deploy"
   },
   "engines": {
@@ -38,8 +35,7 @@
     "react-dom": "^19.2.6"
   },
   "devDependencies": {
-    "typescript": "^6.0.0",
-    "wrangler": "^4.87.0"
+    "typescript": "^6.0.0"
   },
   "overrides": {
     "vite": "^7"

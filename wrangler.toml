@@ -4,6 +4,9 @@ compatibility_flags = ["global_fetch_strictly_public", "nodejs_compat"]
 name = "thumbrella-web"
 main = "@astrojs/cloudflare/entrypoints/server"
 
+[dev]
+ip = "0.0.0.0"
+
 [assets]
 directory = "./dist"
 binding = "ASSETS"
