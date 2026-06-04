@@ -23,8 +23,7 @@ export default defineConfig({
       description: 'Documentation for the Thumbrella fast media thumbnail platform.',
       logo: { src: './public/thumbrella.png', alt: 'thumbrella.dev' },
       head: [
-        { tag: 'link', attrs: { rel: 'icon', href: '/favicon-light.png', media: '(prefers-color-scheme: light)' } },
-        { tag: 'link', attrs: { rel: 'icon', href: '/favicon-dark.png', media: '(prefers-color-scheme: dark)' } },
+        { tag: 'link', attrs: { rel: 'icon', href: '/favicon.png'} },
       ],
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/thumbrella' }],
       components: {

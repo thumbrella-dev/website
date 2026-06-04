@@ -62,8 +62,8 @@ if (clerkUserId && adminWorker) {
 <header class="navbar">
   <div class="container navbar__inner">
     <a class="brand" href="/">
-      <img src="/thumbrella.png" alt="Thumbrella" class="brand__logo" id="nav-logo" data-logo-hidden />
-      thumbrella.dev
+      <img src="/navbar.png" alt="Thumbrella" class="brand__logo" id="nav-logo" data-logo-hidden />
+      &nbsp;thumbrella.dev&nbsp;
     </a>
     <nav aria-label="Primary">
       <ul class="nav-list">
@@ -71,7 +71,7 @@ if (clerkUserId && adminWorker) {
           <li>
             <a class:list={['nav-link', ('activePrefix' in link ? currentPath.startsWith(link.activePrefix) : currentPath === link.href) && 'is-active']} href={link.href}>
               <Fragment set:html={link.icon} />
-              {link.text}
+              &nbsp;{link.text}&nbsp;
             </a>
           </li>
         ))}
@@ -274,17 +274,19 @@ if (clerkUserId && adminWorker) {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.25);
     background: rgba(255, 255, 255, 0.04);
     color: var(--text-muted);
     border-radius: 999px;
-    padding: 0.45rem 0.7rem;
+    padding: 0.45rem 0.9rem;
     cursor: pointer;
     font: inherit;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
   }
 
   .nav-auth-btn:hover {
     color: #fff;
+    border-color: rgba(255, 255, 255, 0.45);
     background: rgba(215, 155, 91, 0.16);
   }
 

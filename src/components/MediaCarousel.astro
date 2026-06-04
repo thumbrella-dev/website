@@ -54,7 +54,7 @@ const { items } = Astro.props;
     </ul>
   </div>
 
-  <div class="cpopup" id="cpopup" popover="manual" role="dialog" aria-modal="true" aria-label="Media details">
+  <div class="cpopup" id="cpopup" role="dialog" aria-modal="true" aria-label="Media details" aria-hidden="true">
     <p class="cpopup__filename" id="cpopup-name"></p>
     <dl class="cpopup__dl">
       <div><dt>Format</dt><dd id="cpopup-codec"></dd></div>
@@ -223,7 +223,8 @@ const { items } = Astro.props;
 
   /* ── popup ── */
   .cpopup {
-      position: fixed;
+      position: absolute;
+      z-index: 10;
       margin: 0;
       width: 228px;
       background: #21193a;
@@ -233,22 +234,15 @@ const { items } = Astro.props;
       box-shadow: 0 12px 40px rgba(0,0,0,0.55);
       font-family: var(--font-sans);
       opacity: 0;
+      pointer-events: none;
       transform: translateY(6px);
-      transition: opacity 0.18s ease, transform 0.18s ease,
-                  display 0.18s allow-discrete,
-                  overlay 0.18s allow-discrete;
+      transition: opacity 0.18s ease, transform 0.18s ease;
   }
 
-  .cpopup:popover-open {
+  .cpopup.is-open {
       opacity: 1;
+      pointer-events: auto;
       transform: translateY(0);
-  }
-
-  @starting-style {
-      .cpopup:popover-open {
-          opacity: 0;
-          transform: translateY(6px);
-      }
   }
 
   .cpopup__filename {
@@ -344,7 +338,7 @@ const { items } = Astro.props;
     // Pause on hover
     track.parentElement?.addEventListener('mouseenter', () => { targetSpeed = 0; });
     track.parentElement?.addEventListener('mouseleave', () => {
-      if (!popup || !popup.matches(':popover-open')) targetSpeed = TARGET_SPEED;
+      if (!popup || !popup.classList.contains('is-open')) targetSpeed = TARGET_SPEED;
     });
 
     // Tile click → open popup
@@ -369,9 +363,10 @@ const { items } = Astro.props;
       const durRow = document.getElementById('cpopup-dur-row');
       if (durRow) durRow.hidden = !tile.dataset.duration;
 
-      popup.showPopover();
+      popup.classList.add('is-open');
+      popup.setAttribute('aria-hidden', 'false');
       const { x, y } = await computePosition(tile, popup, {
-        strategy: 'fixed',
+        strategy: 'absolute',
         placement: 'top',
         middleware: [offset(14), flip(), shift({ padding: 8 })],
       });
@@ -380,17 +375,32 @@ const { items } = Astro.props;
 
     // Close popup
     const closePopup = () => {
-      popup?.hidePopover();
+      if (!popup) return;
+      popup.classList.remove('is-open');
+      popup.setAttribute('aria-hidden', 'true');
       if (!document.querySelector('.cl-modalBackdrop')) targetSpeed = TARGET_SPEED;
     };
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePopup(); });
     document.addEventListener('click', (e) => {
-      if (popup?.matches(':popover-open') &&
+      if (popup?.classList.contains('is-open') &&
           !(e.target as Element).closest('.cpopup') &&
           !(e.target as Element).closest('.ctile')) {
         closePopup();
       }
     });
+
+    // Auto-close popup when carousel section scrolls off-screen
+    const carouselSection = track.closest('.carousel-section');
+    if (carouselSection) {
+      const visibilityObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting && popup?.classList.contains('is-open')) {
+            closePopup();
+          }
+        }
+      }, { threshold: 0 });
+      visibilityObserver.observe(carouselSection);
+    }
 
     // Pause while any Clerk modal is open
     let clerkModalOpen = false;
