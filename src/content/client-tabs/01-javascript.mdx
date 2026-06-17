@@ -1,0 +1,23 @@
+---
+label: JavaScript
+---
+
+The Typescript client is ready to run in Noe, Bin, and Deno. It provides caching and 
+data buffers idea for converting into images with persistent caching.
+
+These libraries are also 
+
+Works in Node.js, Deno, Bun, and the browser. TypeScript types included. The response is inline — `thumb.data` is base64 image bytes, `thumb.format` is the format string (`"webp"`). Pass your API key as `YOUR_KEY`, or a full URL for a self-hosted server.
+
+```sh
+npm install @thumbrella/client
+```
+
+```js
+import { Thumbrella } from '@thumbrella/client';
+
+const tbr = new Thumbrella('YOUR_KEY');
+const thumb = await tbr.thumb('https://example.com/video.mp4');
+
+img.src = `data:${thumb.format};base64,${thumb.data}`;
+```

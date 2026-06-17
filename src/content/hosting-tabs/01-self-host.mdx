@@ -1,0 +1,16 @@
+---
+label: Self Host
+---
+
+Download the standalone binary for your platform — Linux, macOS, or Windows. No account needed, fully offline capable. One optional argument adds SQLite-backed thumbnail caching.
+
+```sh
+# Run the thumbnail server (default port 8000)
+TBR_PORT=8000 thumbrella serve
+
+# With SQLite cache
+thumbrella serve --cache ./thumbrella-cache.db
+
+# One-shot from the command line
+thumbrella thumb ./sample.mov --output ./sample.webp
+```

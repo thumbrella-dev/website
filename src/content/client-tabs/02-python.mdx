@@ -1,0 +1,38 @@
+---
+label: Python
+---
+
+The Python client makes both async and regular method calls convenient.
+Optionally caching allows managing a local, persistent cache. Image can
+be efficiently decoded through image libraries like Pillow, or written
+to disk directly as jpeg encoded images.
+
+The client will automatically connect the the service defined in ``$TBR_CONNECT``.
+Or a custom string can be provided as the ``Client`` argument.
+
+The regular methods use blocking calls rely on ``requests`` to fetch the data,
+which allows high level customization of the http requests to Thumbrella.
+
+The ``async`` method ``stream()`` returns a series of incremental updates as
+thumbnails and placeholders are available.
+
+The server configuration and results are resilient in the batch and stream methods
+always provide a thumbnail, even placeholders where necessary.
+
+```sh
+pip install thumbrella
+```
+
+```python
+import thumbrella
+
+tbr = thumbrella.Client()
+result = tbr.thumb("https://example.com/video.mp4")
+
+print(f"Media type: {result.kind}")
+Path("thumbnail.jpeg").write_bytes(result.thumbnail)
+
+from PIL import Image
+img = Image.open(result.thumbnail.io)
+
+```

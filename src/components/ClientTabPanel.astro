@@ -1,19 +1,14 @@
 ---
-import { Code } from 'astro:components';
-
 interface Props {
   /** Short id like 'js', 'python' */
   id: string;
-  /** HTML string — may contain inline <code> tags */
-  lede: string;
-  install?: string;
-  usage?: string;
-  lang?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Content: any;
   active?: boolean;
   /** Namespace prefix — must match the paired ClientTabButton. Defaults to 'cgs'. */
   prefix?: string;
 }
-const { id, lede, install, usage, lang = 'sh', active = false, prefix = 'cgs' } = Astro.props;
+const { id, Content, active = false, prefix = 'cgs' } = Astro.props;
 const panelId = `${prefix}-${id}`;
 const tabId   = `${prefix}-tab-${id}`;
 ---
@@ -24,7 +19,7 @@ const tabId   = `${prefix}-tab-${id}`;
   class:list={[`${prefix}-panel`, active && 'is-active']}
   hidden={!active}
 >
-  <p class="client-panel__lede" set:html={lede} />
-  {install && <Code code={install} lang="sh" theme="github-dark" />}
-  {usage   && <Code code={usage}   lang={lang} theme="github-dark" />}
+  <div class="client-panel__body">
+    <Content />
+  </div>
 </div>

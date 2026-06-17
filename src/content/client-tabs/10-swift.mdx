@@ -1,0 +1,16 @@
+---
+label: Swift
+---
+
+Swift Package Manager. Works on iOS, macOS, and Linux.
+
+```sh
+.package(url: "https://github.com/thumbrella/thumbrella-swift", from: "1.0.0")
+```
+
+```swift
+let tbr = Thumbrella(key: "YOUR_KEY")
+let thumb = try await tbr.thumb("https://example.com/video.mp4")
+
+let image = UIImage(data: thumb.data)
+```

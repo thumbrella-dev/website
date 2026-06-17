@@ -1,65 +1,18 @@
 ---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import ClientTabButton from './ClientTabButton.astro';
 import ClientTabPanel  from './ClientTabPanel.astro';
 
-interface TabDef {
-  id: string;
-  label: string;
-  lede: string;
-  lang?: string;
-  install?: string;
-  usage?: string;
-  comingSoon?: boolean;
-}
-
-const tabs: TabDef[] = [
-  {
-    id: 'self-host',
-    label: 'Self Host',
-    lede: 'Download the standalone binary for your platform — Linux, macOS, or Windows. No account needed, fully offline capable. One optional argument adds SQLite-backed thumbnail caching.',
-    lang: 'sh',
-    usage: `\
-# Run the thumbnail server (default port 8000)
-TBR_PORT=8000 thumbrella serve
-
-# With SQLite cache
-thumbrella serve --cache ./thumbrella-cache.db
-
-# One-shot from the command line
-thumbrella thumb ./sample.mov --output ./sample.webp`,
-  },
-  {
-    id: 'sponsor-host',
-    label: 'Sponsor Host',
-    lede: 'Docker-first distribution with every renderer pre-bundled. Fully offline, pluggable caching backends (Redis, Postgres), and a perpetual license. Requires a sponsor arrangement — <a href="/pricing">see pricing →</a>',
-    lang: 'sh',
-    usage: `\
-docker run --rm -p 8000:8000 \\
-  ghcr.io/thumbrella/thumbrella-sponsor:latest serve`,
-  },
-  {
-    id: 'replicate',
-    label: 'Replicate',
-    lede: 'Run Thumbrella as a serverless model on <a href="https://replicate.com" target="_blank" rel="noopener">Replicate</a>. No installation. The platform bills per render — there is no additional Thumbrella cost.',
-    lang: 'sh',
-    install: 'npm install replicate',
-    usage: `\
-import Replicate from 'replicate';
-const replicate = new Replicate();
-
-const output = await replicate.run(
-  "thumbrella/thumb",
-  { input: { url: "https://example.com/video.mp4" } }
+const rawEntries = await getCollection('hosting-tabs');
+const entries = rawEntries.sort((a: CollectionEntry<'hosting-tabs'>, b: CollectionEntry<'hosting-tabs'>) => a.id.localeCompare(b.id));
+const tabs = await Promise.all(
+  entries.map(async (entry: CollectionEntry<'hosting-tabs'>) => {
+    const { Content } = await render(entry);
+    const id = entry.id.replace(/^\d+-/, '');
+    return { ...entry.data, id, Content };
+  })
 );
-// output — base64 image data`,
-  },
-  {
-    id: 'falai',
-    label: 'fal.ai',
-    lede: 'Thumbrella on <a href="https://fal.ai" target="_blank" rel="noopener">fal.ai</a> is coming soon. The fal.ai integration will follow the same pattern as Replicate — serverless, pay-per-render, no Thumbrella account required.',
-    comingSoon: true,
-  },
-];
 ---
 
 <section class="client-gs-section" id="get-hosting">
@@ -75,33 +28,19 @@ const output = await replicate.run(
           <ClientTabButton id={tab.id} label={tab.label} active={i === 0} prefix="hst" />
         ))}
         <div class="client-tabs__more-wrap">
-          <button type="button" class="client-tabs__more-btn" id="hst-more-btn" hidden aria-expanded="false" aria-controls="hst-more-list">More ▾</button>
+          <button type="button" class="client-tabs__more-btn" id="hst-more-btn" hidden aria-expanded="false" aria-controls="hst-more-list">More \u25be</button>
           <ul class="client-tabs__more-list" id="hst-more-list" hidden></ul>
         </div>
       </div>
 
       <div class="client-panels">
         {tabs.map((tab, i) => (
-          tab.comingSoon
-            ? (
-              <ClientTabPanel
-                id={tab.id}
-                lede={tab.lede}
-                lang="sh"
-                active={i === 0}
-                prefix="hst"
-              />
-            ) : (
-              <ClientTabPanel
-                id={tab.id}
-                lede={tab.lede}
-                install={tab.install}
-                usage={tab.usage}
-                lang={tab.lang ?? 'sh'}
-                active={i === 0}
-                prefix="hst"
-              />
-            )
+          <ClientTabPanel
+            id={tab.id}
+            Content={tab.Content}
+            active={i === 0}
+            prefix="hst"
+          />
         ))}
       </div>
     </div>

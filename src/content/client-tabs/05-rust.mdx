@@ -1,0 +1,16 @@
+---
+label: Rust
+---
+
+Async-first, `tokio` runtime. Pairs with the `image` crate for further processing.
+
+```sh
+cargo add thumbrella
+```
+
+```rust
+let tbr = thumbrella::Client::new("YOUR_KEY");
+let thumb = tbr.thumb("https://example.com/video.mp4").await?;
+
+let img = image::load_from_memory(&thumb.data)?;
+```

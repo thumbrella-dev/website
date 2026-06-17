@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 
 import react from '@astrojs/react';
+import mdx from '@astrojs/mdx';
 import clerk from '@clerk/astro';
 import starlight from '@astrojs/starlight';
 
@@ -85,6 +86,7 @@ export default defineConfig({
       disable404Route: true,
     }),
     react(),
+    mdx(),
     clerk({
       appearance: {
         variables: {

@@ -1,0 +1,11 @@
+---
+label: curl
+---
+
+No install. The response is the raw image — pipe it wherever you need it.
+
+```sh
+curl https://go.thumbrella.dev/thumb/https://example.com/video.mp4 \
+  -H "Authorization: Bearer YOUR_KEY" \
+  -o thumb.webp
+```

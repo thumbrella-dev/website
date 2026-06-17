@@ -1,0 +1,16 @@
+---
+label: Go
+---
+
+Idiomatic Go module. Returns decoded `[]byte` ready for the standard `image` package.
+
+```sh
+go get github.com/thumbrella/thumbrella-go
+```
+
+```go
+tbr := thumbrella.New("YOUR_KEY")
+thumb, err := tbr.Thumb("https://example.com/video.mp4")
+
+img, _, err := image.Decode(bytes.NewReader(thumb.Data))
+```

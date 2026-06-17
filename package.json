@@ -22,6 +22,7 @@
   "license": "MIT",
   "dependencies": {
     "@astrojs/cloudflare": "^13.3.0",
+    "@astrojs/mdx": "^6.0.3",
     "@astrojs/react": "^5.0.4",
     "@astrojs/starlight": "^0.39.2",
     "@clerk/astro": "^3.2.2",

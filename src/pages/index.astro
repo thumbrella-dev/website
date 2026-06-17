@@ -2,9 +2,7 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import CapsItem from '../components/CapsItem.astro';
 import MediaCarousel from '../components/MediaCarousel.astro';
-import ClientTabs from '../components/ClientTabs.astro';
-import HostingTabs from '../components/HostingTabs.astro';
-import { Content as AboutContent } from '../content/home/about.md';
+import { Content as AboutContent } from '../content/home/about.mdx';
 
 const carouselItems = [
   { name: 'aerial-city.mp4',       src: 'https://picsum.photos/seed/aerial9/800/600',    resolution: '3840×2160', codec: 'MP4',  type: 'video', duration: '0:47',  size: '1.2 GB',  procMs: 820  },
@@ -68,11 +66,6 @@ const carouselItems = [
       </div>
     </div>
   </section>
-
-  <ClientTabs />
-
-  <!-- ════════════════════════════════════════════ GET HOSTING -->
-  <HostingTabs />
 
   <!-- ══════════════════════════════════════════ DOCS / ABOUT -->
   <section class="hp-section">

@@ -790,7 +790,8 @@ pre {
 .client-panel { display: none; }
 .client-panel.is-active { display: block; }
 
-.client-panel__lede {
+.client-panel__lede,
+.client-panel__body p {
     font-size: 0.86rem;
     color: var(--text-muted);
     margin: 0 0 0.75rem;
@@ -1048,8 +1049,6 @@ pre {
 .hp-prose {
     display: grid;
     gap: 0.25rem;
-    padding-left: 10rem;
-    padding-right: 10%;
 }
 
 .hp-prose h2 {
@@ -1057,6 +1056,7 @@ pre {
     color: #fff2df;
     margin-top: 2rem;
     margin-bottom: 0.3rem;
+    max-width: 65ch;
 }
 
 .hp-prose h2:first-child {
@@ -1067,6 +1067,7 @@ pre {
     color: var(--text-muted);
     line-height: 1.75;
     margin: 0;
+    max-width: 65ch;
 }
 
 .hp-prose code {
@@ -1074,6 +1075,67 @@ pre {
     padding: 0.1em 0.35em;
     border-radius: 4px;
     font-size: 0.88em;
+}
+
+/* ── Starlight <Tabs> inside homepage prose — styled to match .client-tabs ── */
+.hp-prose starlight-tabs {
+    display: block;
+    margin-top: 0.5rem;
+}
+
+.hp-prose .tablist-wrapper {
+    overflow-x: auto;
+    background: rgba(255,255,255,0.015);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    padding: 0.35rem 0.5rem 0;
+}
+
+.hp-prose [role='tablist'] {
+    border-bottom: none;
+    padding: 0;
+    gap: 0;
+}
+
+.hp-prose .tab {
+    display: flex;
+}
+
+.hp-prose .tab > [role='tab'] {
+    background: none;
+    box-shadow: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 0.45rem 1.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 4px 4px 0 0;
+    transition: color 0.15s, border-bottom-color 0.15s;
+    white-space: nowrap;
+}
+
+.hp-prose .tab > [role='tab']:hover {
+    color: var(--text);
+}
+
+.hp-prose .tab > [role='tab'][aria-selected='true'] {
+    color: var(--text);
+    border-bottom-color: #7c5cbf;
+    font-weight: 600;
+}
+
+.hp-prose [role='tabpanel'] {
+    background: #1c182414;
+    border: 1px solid var(--border);
+    border-radius: 0 0 10px 10px;
+    padding: 1.25rem 1.5rem 1.5rem;
+    margin-top: 0 !important;
+    color: var(--text-muted);
+    line-height: 1.75;
 }
 
 .hp-section h2 {
