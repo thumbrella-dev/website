@@ -1,0 +1,23 @@
+---
+interface Props {
+  id?: string;
+}
+
+const { id } = Astro.props;
+const popoverId =
+  id ||
+  `pp-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<span
+  class="prose-popover"
+  role="button"
+  tabindex="0"
+  aria-expanded="false"
+  aria-controls={popoverId}
+>
+  <slot name="trigger" />
+  <span class="info-popover" id={popoverId} popover="auto">
+    <slot />
+  </span>
+</span>

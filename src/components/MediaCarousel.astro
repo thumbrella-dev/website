@@ -5,9 +5,11 @@ interface CarouselItem {
   resolution: string;
   codec: string;
   type: string;
+  kind: string;
   duration: string;
   size: string;
   procMs: number;
+  resultJson?: string;
 }
 
 interface Props {
@@ -18,29 +20,41 @@ const { items } = Astro.props;
 ---
 
 <section class="carousel-section">
+  <a
+    class="carousel-demo-link"
+    href="https://demo.thumbrella.dev"
+    target="_blank"
+    rel="noopener"
+  >Full gallery at demo.thumbrella.dev &rarr;</a>
   <div class="carousel-track-wrap" aria-label="Sample media thumbnails">
     <ul class="carousel-track" id="carousel-track" role="list">
-      {items.map((item) => {
+      {[0, 1, 2].flatMap(() => items).map((item) => {
         const rx = ((Math.random() - 0.5) * 20).toFixed(1);
         const ry = ((Math.random() - 0.5) * 28).toFixed(1);
         const tx = ((Math.random() - 0.5) * 4).toFixed(1);
         const ty = ((Math.random() - 0.5) * 2).toFixed(1);
+        const placeholderSrc = `https://api.thumbrella.dev/placeholder/${item.kind}.jpeg`;
         return (
           <li
             class="ctile"
             style={`--ctile-rx: ${rx}deg; --ctile-ry: ${ry}deg; --ctile-tx: ${tx}rem; --ctile-ty: ${ty}rem`}
             data-thumb-src={item.src}
-            data-thumb-delay={item.procMs}
             data-name={item.name}
             data-resolution={item.resolution}
             data-codec={item.codec}
             data-type={item.type}
+            data-kind={item.kind}
             data-duration={item.duration}
             data-size={item.size}
             data-proc={item.procMs}
+            data-result={item.resultJson}
           >
             <div class="ctile__thumb">
-              <div class="ctile__shimmer" aria-hidden="true"></div>
+              <div class="ctile__bg" aria-hidden="true"></div>
+              <div class="ctile__placeholder" aria-hidden="true">
+                <img class="ctile__ph-img" src={placeholderSrc} alt="" />
+                <span class="ctile__spinner"></span>
+              </div>
               <img class="ctile__img" alt={item.name} />
               <div class="ctile__badges" aria-hidden="true">
                 <span class={`ctile__badge ctile__badge--${item.type}`}>{item.codec}</span>
@@ -56,13 +70,7 @@ const { items } = Astro.props;
 
   <div class="cpopup" id="cpopup" role="dialog" aria-modal="true" aria-label="Media details" aria-hidden="true">
     <p class="cpopup__filename" id="cpopup-name"></p>
-    <dl class="cpopup__dl">
-      <div><dt>Format</dt><dd id="cpopup-codec"></dd></div>
-      <div><dt>Resolution</dt><dd id="cpopup-res"></dd></div>
-      <div id="cpopup-dur-row"><dt>Duration</dt><dd id="cpopup-dur"></dd></div>
-      <div><dt>File size</dt><dd id="cpopup-size"></dd></div>
-      <div><dt>Thumb time</dt><dd id="cpopup-proc"></dd></div>
-    </dl>
+    <dl class="cpopup__dl" id="cpopup-dl"></dl>
   </div>
 </section>
 
@@ -70,9 +78,22 @@ const { items } = Astro.props;
   /* ──────────────────────────────── CAROUSEL */
   .carousel-section {
       position: relative;
-      padding: 2rem 0 3rem;
-      background: rgba(25, 45, 120, 0.10);
-      /* overflow handled by .carousel-track-wrap so the popup can escape */
+  }
+
+  .carousel-demo-link {
+      position: absolute;
+      top: -2rem;
+      right: 1rem;
+      z-index: 3;
+      font-size: 0.8rem;
+      font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+      color: rgba(205, 171, 125, 0.68);
+      text-decoration: none;
+      transition: color 0.15s ease;
+  }
+
+  .carousel-demo-link:hover {
+      color: var(--accent-strong);
   }
 
   /* fade edges */
@@ -104,7 +125,7 @@ const { items } = Astro.props;
 
   .carousel-track {
       display: flex;
-      gap: 120px;
+      gap: 60px;
       list-style: none;
       padding: 0.5rem 0;
       margin: 0;
@@ -141,32 +162,62 @@ const { items } = Astro.props;
       overflow: hidden;
   }
 
-  /* shimmer */
-  .ctile__shimmer {
+  /* filled background (visible when tile has no image yet) */
+  .ctile__bg {
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-          100deg,
-          rgba(255,255,255,0.02) 0%,
-          rgba(255,255,255,0.07) 40%,
-          rgba(255,255,255,0.02) 80%
-      );
-      background-size: 250% 100%;
-      transition: opacity 0.45s ease;
+      background: linear-gradient(135deg, rgba(45,35,65,0.9), rgba(20,15,35,0.95));
+      transition: opacity 0.4s ease;
   }
 
-  .ctile.is-pending .ctile__shimmer {
-      animation: ctile-shimmer 1.6s ease-in-out infinite;
-  }
+  .ctile.is-loaded .ctile__bg { opacity: 0.3; }
 
-  .ctile.is-loaded .ctile__shimmer {
+  /* placeholder icon + spinner overlay */
+  .ctile__placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
       opacity: 0;
-      animation: none;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
   }
 
-  @keyframes ctile-shimmer {
-      0%   { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+  .ctile.is-pending .ctile__placeholder { opacity: 1; }
+  .ctile.is-loaded  .ctile__placeholder { opacity: 0; }
+
+  .ctile__ph-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      opacity: 0.7;
+      filter: grayscale(0.2);
+  }
+
+  /* spinner badge — small rotating ring in bottom-right */
+  .ctile__spinner {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(200, 149, 78, 0.2);
+      border-top-color: rgba(200, 149, 78, 0.8);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+  }
+
+  .ctile.is-pending .ctile__spinner {
+      opacity: 1;
+      animation: ctile-spin 0.9s linear infinite;
+  }
+
+  @keyframes ctile-spin {
+      to { transform: rotate(360deg); }
   }
 
   .ctile__img {
@@ -207,12 +258,15 @@ const { items } = Astro.props;
   .ctile.is-loaded .ctile__badge { opacity: 1; }
 
   .ctile__badge--video { color: var(--accent-strong); }
-  .ctile__badge--raw   { color: #c9b4f0; }
   .ctile__badge--photo { color: #a0d4b0; }
+  .ctile__badge--audio { color: #e0b0d0; }
+  .ctile__badge--3d    { color: #c9b4f0; }
+  .ctile__badge--vector { color: #f0d4a0; }
+  .ctile__badge--document { color: #a0c8e0; }
   .ctile__badge--dur   { font-weight: 400; color: rgba(255,255,255,0.65); }
 
   .ctile__name {
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
       white-space: nowrap;
       overflow: hidden;
@@ -226,7 +280,9 @@ const { items } = Astro.props;
       position: absolute;
       z-index: 10;
       margin: 0;
-      width: 228px;
+      width: 248px;
+      max-height: 80vh;
+      overflow-y: auto;
       background: #21193a;
       border: 1px solid rgba(200, 149, 78, 0.3);
       border-radius: 12px;
@@ -235,7 +291,7 @@ const { items } = Astro.props;
       font-family: var(--font-sans);
       opacity: 0;
       pointer-events: none;
-      transform: translateY(6px);
+      transform: translateY(-6px);
       transition: opacity 0.18s ease, transform 0.18s ease;
   }
 
@@ -246,31 +302,47 @@ const { items } = Astro.props;
   }
 
   .cpopup__filename {
-      margin: 0 0 0.65rem;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #fff2df;
-      word-break: break-all;
+      display: none;
   }
 
   .cpopup__dl {
       margin: 0;
       display: grid;
-      gap: 0.3rem;
+      gap: 0.35rem;
   }
 
-  .cpopup__dl > div {
+  .cpopup__sec {
+      display: grid;
+      gap: 0.15rem;
+  }
+
+  .cpopup__sec-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-strong);
+      margin-bottom: 0.05rem;
+  }
+
+  .cpopup__sec-title a {
+      color: inherit;
+      text-decoration: underline;
+  }
+
+  .cpopup__row {
       display: flex;
       justify-content: space-between;
       gap: 0.5rem;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
+      padding-left: 0.8em;
   }
 
-  .cpopup__dl dt {
+  .cpopup__row dt {
       color: var(--text-muted);
   }
 
-  .cpopup__dl dd {
+  .cpopup__row dd {
       margin: 0;
       color: var(--text);
       font-weight: 500;
@@ -284,38 +356,48 @@ const { items } = Astro.props;
   const track = document.getElementById('carousel-track') as HTMLElement | null;
   const popup = document.getElementById('cpopup') as HTMLElement | null;
   if (track) {
-    // Duplicate tiles for seamless loop
-    const origItems = Array.from(track.children) as HTMLElement[];
-    origItems.forEach((item) => {
-      const clone = item.cloneNode(true) as HTMLElement;
-      clone.setAttribute('aria-hidden', 'true');
-      track.appendChild(clone);
-    });
+    const allTiles = Array.from(track.children) as HTMLElement[];
+    // Tiles are rendered 3× server-side — one set width for modulo wrapping
+    const setCount = allTiles.length / 3;
+    const oneSetWidth = allTiles.slice(0, setCount).reduce((w, el) => w + el.offsetWidth + 120 /* gap */, 0);
 
-    // Reveal thumbnails via IntersectionObserver (only real tiles, not clones)
-    const observer = new IntersectionObserver((entries) => {
+    // Observe ALL tiles so each clone restarts its animation when entering view
+    const enterObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        observer.unobserve(entry.target);
         const el = entry.target as HTMLElement;
+        if (!entry.isIntersecting) return;
+        // Skip tiles that already started their animation
+        if (el.classList.contains('is-pending') || el.classList.contains('is-loaded')) return;
+        enterObserver.unobserve(el);
         const src = el.dataset.thumbSrc ?? '';
-        const delay = parseInt(el.dataset.thumbDelay ?? '0', 10);
-        el.classList.add('is-pending');
-        setTimeout(() => {
+        const procMs = parseInt(el.dataset.proc ?? '0', 10);
+
+        const loadThumb = () => {
           const img = el.querySelector<HTMLImageElement>('.ctile__img');
           if (!img || !src) return;
-          img.addEventListener('load',  () => el.classList.add('is-loaded'), { once: true });
-          img.addEventListener('error', () => el.classList.add('is-error'),  { once: true });
+          el.classList.remove('is-pending');
+          el.classList.add('is-loaded');
+          img.addEventListener('load',  () => {}, { once: true });
+          img.addEventListener('error', () => el.classList.add('is-error'), { once: true });
           img.src = src;
-        }, delay);
-      });
-    }, { rootMargin: '120px', threshold: 0.01 });
+        };
 
-    origItems.forEach((item) => observer.observe(item));
+        if (procMs < 20000) {
+          // Fast render — skip placeholder, go straight to thumbnail
+          loadThumb();
+        } else {
+          el.classList.add('is-pending');
+          const holdMs = Math.min(procMs, 4000);
+          setTimeout(loadThumb, holdMs);
+        }
+      });
+    }, { threshold: 0.85 });
+
+    allTiles.forEach((item) => enterObserver.observe(item));
 
     // Scroll animation with smooth ease-in/out
-    const TARGET_SPEED = 52; // px/s at full speed
-    const EASE_K = 3.5;      // higher = snappier ease
+    const TARGET_SPEED = 62;
+    const EASE_K = 3.5;
     let speed = TARGET_SPEED;
     let targetSpeed = TARGET_SPEED;
     let pos = 0;
@@ -325,10 +407,10 @@ const { items } = Astro.props;
       const dt = lastTime !== null ? Math.min((ts - lastTime) / 1000, 0.1) : 0;
       lastTime = ts;
       speed += (targetSpeed - speed) * (1 - Math.exp(-EASE_K * dt));
-      if (speed > 0.3 && track) {
+      if (speed > 0.3 && track && oneSetWidth > 0) {
         pos += speed * dt;
-        const half = track.scrollWidth / 2;
-        if (pos >= half) pos -= half;
+        // Subtract (not modulo) — no visual jump since content repeats
+        if (pos >= oneSetWidth) pos -= oneSetWidth;
         track.style.transform = `translateX(${-pos}px)`;
       }
       requestAnimationFrame(step);
@@ -341,34 +423,133 @@ const { items } = Astro.props;
       if (!popup || !popup.classList.contains('is-open')) targetSpeed = TARGET_SPEED;
     });
 
-    // Tile click → open popup
+    // ── Popup: dynamic fields from result JSON ────────────────────────────
+
+    function formatSize(bytes: number): string {
+      let unit = "kb";
+      if (bytes >= 1e9) {
+        bytes = bytes / 1e9;
+        unit = "gb";
+      }
+      else if (bytes >= 1e6) {
+        bytes = bytes / 1e6;
+        unit = "mb";
+      }
+      else {
+        bytes = bytes / 1e3;
+        unit = "kb";
+      }
+      let clean = "";
+      if (bytes < 10) {
+        clean = bytes.toFixed(1);
+      }
+      else {
+        clean = bytes.toFixed(0);
+      }
+      
+      return `${clean} ${unit}`;
+    }
+
+    function formatMs(s: number): string {
+      if (s >= 1) return `${s.toFixed(1)}s`;
+      return `${Math.round(s * 1000)} ms`;
+    }
+
+    function formatChannels(channels: number): string {
+      if (channels == 0) {
+        return "";
+      }
+      if (channels == 1) {
+        return "mono";
+      }
+      if (channels == 2) {
+        return "stereo";
+      }
+      return `${channels} channels`;
+    }
+
+    function buildPropsLine(props: Record<string, unknown>): string {
+      const parts: string[] = [];
+      const p = props as Record<string, number | string | undefined>;
+
+      if (p.width_pixels && p.height_pixels) {
+        parts.push(`${p.width_pixels}\u00D7${p.height_pixels}`);
+      }
+      if (p.bits_per_pixel != null) parts.push(`${p.bits_per_pixel}bpp`);
+      if (p.duration_seconds != null) parts.push(`${Number(p.duration_seconds).toFixed(1)} sec`);
+      if (p.channel_count != null) parts.push(formatChannels(p.channel_count));
+      if (p.up_axis) parts.push(String(p.up_axis));
+      if (p.camera_azimuth_deg != null) parts.push(`${p.camera_azimuth_deg}\u00B0`);
+      if (p.camera_elevation_deg != null) parts.push(`${p.camera_elevation_deg}\u00B0`);
+      if (p.base_color) parts.push(String(p.base_color));
+
+      return parts.join(' ∙ ');
+    }
+
     track.addEventListener('click', async (e) => {
       const tile = (e.target as Element).closest('.ctile[data-name]') as HTMLElement | null;
       if (!tile || !popup) return;
 
       targetSpeed = 0;
+      const dl = document.getElementById('cpopup-dl');
+      const nameEl = document.getElementById('cpopup-name');
+      if (nameEl) nameEl.textContent = '';
 
-      const set = (id: string, val: string) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = val;
-      };
+      if (dl) {
+        dl.innerHTML = '';
+        const raw = tile.dataset.result;
+        if (raw) {
+          try {
+            const result = JSON.parse(raw);
+            const r = result as Record<string, unknown>;
+            const media = (r.media ?? {}) as Record<string, unknown>;
+            const props = (media.properties ?? {}) as Record<string, unknown>;
+            const basename = (tile.dataset.name ?? '').replace(/\.[^.]+$/, '');
+            const resultUrl = `https://demo.thumbrella.dev/results/${encodeURIComponent(basename)}.json`;
 
-      set('cpopup-name',  tile.dataset.name ?? '');
-      set('cpopup-codec', tile.dataset.codec ?? '');
-      set('cpopup-res',   tile.dataset.resolution ?? '');
-      set('cpopup-dur',   tile.dataset.duration ?? '');
-      set('cpopup-size',  tile.dataset.size ?? '');
-      set('cpopup-proc',  tile.dataset.proc ? `${tile.dataset.proc} ms` : '');
+            // ── Thumbrella section ──
+            const tbr = document.createElement('div');
+            tbr.className = 'cpopup__sec';
+            tbr.innerHTML = `<dt class="cpopup__sec-title"><a href="${resultUrl}" target="_blank" rel="noopener">Thumbrella</a></dt>`;
+            if (r.duration != null) {
+              tbr.innerHTML += `<div class="cpopup__row"><dt>Rendered in</dt><dd>${formatMs(Number(r.duration))}</dd></div>`;
+            }
+            if (r.download_size != null) {
+              tbr.innerHTML += `<div class="cpopup__row"><dt>Network fetch</dt><dd>${formatSize(Number(r.download_size))}</dd></div>`;
+            }
+            dl.appendChild(tbr);
 
-      const durRow = document.getElementById('cpopup-dur-row');
-      if (durRow) durRow.hidden = !tile.dataset.duration;
+            // ── Media section ──
+            const msec = document.createElement('div');
+            msec.className = 'cpopup__sec';
+            const url = String(r.url ?? '');
+            const kind = String(media.kind ?? '');
+            const ext = (String(media.extension ?? '')).toLowerCase();
+            const size = media.file_size != null ? formatSize(Number(media.file_size)) : '';
+            const kindExt = [ext, kind].filter(Boolean).join(' ');
+            msec.innerHTML = `<dt class="cpopup__sec-title"><a href="${url}" target="_blank" rel="noopener">Media</a></dt>`;
+
+            if (size || kindExt) {
+              const line1 = [size, kindExt].filter(Boolean).join(' ∙ ');
+              msec.innerHTML += `<div class="cpopup__row"><dt>File</dt><dd>${line1}</dd></div>`;
+            }
+
+            const propsLine = buildPropsLine(props);
+            if (propsLine) {
+              msec.innerHTML += `<div class="cpopup__row"><dt>Properties</dt><dd>${propsLine}</dd></div>`;
+            }
+
+            dl.appendChild(msec);
+          } catch { /* ignore parse errors */ }
+        }
+      }
 
       popup.classList.add('is-open');
       popup.setAttribute('aria-hidden', 'false');
       const { x, y } = await computePosition(tile, popup, {
         strategy: 'absolute',
-        placement: 'top',
-        middleware: [offset(14), flip(), shift({ padding: 8 })],
+        placement: 'bottom',
+        middleware: [offset(10), flip(), shift({ padding: 8 })],
       });
       Object.assign(popup.style, { left: `${x}px`, top: `${y}px` });
     });

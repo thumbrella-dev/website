@@ -1,0 +1,31 @@
+---
+interface Props {
+  icon: string;
+  title: string;
+  count?: string;
+}
+
+const { icon, title, count } = Astro.props;
+const id = `info-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+---
+
+<span
+  class="fmt-chip"
+  role="button"
+  tabindex="0"
+  aria-expanded="false"
+  aria-controls={id}
+>
+  <span class="fmt-chip__icon" aria-hidden="true">{icon}</span>
+  <span class="fmt-chip__label"
+    ><strong>{title}</strong
+    >{count && (
+      <span class="fmt-chip__count" aria-label={`${count} formats`}
+        >&times;{count}</span
+      >
+    )}</span
+  >
+  <span class="info-popover" id={id} popover="auto">
+    <slot />
+  </span>
+</span>

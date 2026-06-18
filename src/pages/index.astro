@@ -1,23 +1,27 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
-import CapsItem from '../components/CapsItem.astro';
+import ProsePopover from '../components/ProsePopover.astro';
+import FormatChip from '../components/FormatChip.astro';
 import MediaCarousel from '../components/MediaCarousel.astro';
 import { Content as AboutContent } from '../content/home/about.mdx';
+import { fetchDemoGallery, shuffleGallery } from '../lib/demo-gallery';
+import ClientTabs from '../components/ClientTabs.astro';
+import HostingTabs from '../components/HostingTabs.astro';
 
-const carouselItems = [
-  { name: 'aerial-city.mp4',       src: 'https://picsum.photos/seed/aerial9/800/600',    resolution: '3840×2160', codec: 'MP4',  type: 'video', duration: '0:47',  size: '1.2 GB',  procMs: 820  },
-  { name: 'portrait-session.jpg',  src: 'https://picsum.photos/seed/portrait2/800/600',  resolution: '4000×3000', codec: 'JPEG', type: 'photo', duration: '',      size: '18 MB',   procMs: 340  },
-  { name: 'product-360.mp4',       src: 'https://picsum.photos/seed/product9/800/600',   resolution: '1920×1080', codec: 'MP4',  type: 'video', duration: '2:14',  size: '340 MB',  procMs: 1240 },
-  { name: 'landscape-raw.cr3',     src: 'https://picsum.photos/seed/mountain7/800/600',  resolution: '6720×4480', codec: 'CR3',  type: 'raw',   duration: '',      size: '52 MB',   procMs: 1850 },
-  { name: 'interview-b-roll.mov',  src: 'https://picsum.photos/seed/office3/800/600',    resolution: '1920×1080', codec: 'MOV',  type: 'video', duration: '8:32',  size: '4.1 GB',  procMs: 960  },
-  { name: 'concert-crowd.jpg',     src: 'https://picsum.photos/seed/concert4/800/600',   resolution: '5472×3648', codec: 'JPEG', type: 'photo', duration: '',      size: '22 MB',   procMs: 280  },
-  { name: 'timelapse-stars.mp4',   src: 'https://picsum.photos/seed/stars88/800/600',    resolution: '4096×2160', codec: 'MP4',  type: 'video', duration: '1:03',  size: '890 MB',  procMs: 1100 },
-  { name: 'product-flat-lay.png',  src: 'https://picsum.photos/seed/flatlay5/800/600',   resolution: '3000×2000', codec: 'PNG',  type: 'photo', duration: '',      size: '11 MB',   procMs: 410  },
-  { name: 'drone-coastline.mp4',   src: 'https://picsum.photos/seed/coast11/800/600',    resolution: '4096×2160', codec: 'MP4',  type: 'video', duration: '3:21',  size: '2.2 GB',  procMs: 740  },
-  { name: 'fashion-editorial.jpg', src: 'https://picsum.photos/seed/fashion6/800/600',   resolution: '5000×3333', codec: 'JPEG', type: 'photo', duration: '',      size: '31 MB',   procMs: 390  },
-  { name: 'astrophoto-deep.tiff',  src: 'https://picsum.photos/seed/astro22/800/600',    resolution: '7360×4912', codec: 'TIFF', type: 'raw',   duration: '',      size: '140 MB',  procMs: 2100 },
-  { name: 'event-highlight.mp4',   src: 'https://picsum.photos/seed/event33/800/600',    resolution: '1920×1080', codec: 'MP4',  type: 'video', duration: '4:55',  size: '1.8 GB',  procMs: 1500 },
+// Seed with a few items so the carousel has content before the full index loads
+const SEED_FILES = [
+  'harbor-trucks.mp4',
+  'space-colony.jpg',
+  'dudu-intro.mp3',
 ];
+
+let carouselItems = await fetchDemoGallery();
+if (carouselItems.length > 0) {
+  carouselItems = shuffleGallery(carouselItems);
+} else {
+  // Fallback: fetch just the seed items if the full index failed
+  carouselItems = await fetchDemoGallery(SEED_FILES);
+}
 ---
 
 <MainLayout
@@ -39,33 +43,78 @@ const carouselItems = [
   <!-- ═══════════════════════════════════════════ WHAT IT DOES -->
   <section class="hp-section hp-section--no-border">
     <div class="container">
-      <div class="caps-grid">
+      <h2 class="client-gs__heading">About</h2>
+      <div class="caps-panel">
 
-        <div class="caps-col">
-          <h3 class="caps-col__heading">Why Thumbrella</h3>
-          <ul class="caps-list">
-            <CapsItem icon="⚡" title="High performance">Processing written in Rust. Remote data only downloads what is needed. Render processes are sandboxed for safety and stability.</CapsItem>
-            <CapsItem icon="🌍" title="Advanced caching">Cache thumbnails across 300+ worldwide regions. Every response includes standard HTTP cache headers. Re-requesting the same thumbnail is nearly free.</CapsItem>
-            <CapsItem icon="⚖️" title="Open source" suffix="— Apache 2">Use it commercially, modify it, redistribute it. No strings attached. Source on GitHub.</CapsItem>
-            <CapsItem icon="🖥️" title="Self-host for free">Run Thumbrella on your own hardware with an SQLite cache. No account required, works offline. Single binary — runs standalone or in Docker.</CapsItem>
-            <CapsItem icon="📦" title="Client libraries">npm install @thumbrella/client — or pip install thumbrella. Same URL-based interface in both runtimes. <a href="/docs/clients/web-client">Docs →</a></CapsItem>
-          </ul>
-        </div>
+        <p class="caps-prose">
+          Thumbrella is the
+          <ProsePopover> <span slot="trigger">open source</span>
+            Apache&nbsp;2 license for the server and various client libraries.<br>
+            One of the easiest licenses to integrate into any project.
+          </ProsePopover>
+          thumbnail server. 
+          
+        </p>
+        <p class="caps-prose">
+          
+          Get
+          <ProsePopover> <span slot="trigger">fast, cached</span>
+            Processing written in Rust. Cache thumbnails across 300+ worldwide regions. Every response includes standard HTTP cache headers. Re-requesting the same thumbnail is nearly free.
+          </ProsePopover>
+          thumbnails from
+          <ProsePopover> <span slot="trigger">large files</span>
+            Remote data only downloads what is needed using byte-range requests. Process files of any size without downloading the entire thing.
+          </ProsePopover>
+          and
+          <ProsePopover> <span slot="trigger">obscure media formats</span>
+            Camera RAW, legacy video codecs, old document formats, 3D geometry, vector graphics, and more.
+          </ProsePopover>.
 
-        <div class="caps-col">
-          <h3 class="caps-col__heading">Media formats</h3>
-          <ul class="caps-list">
-            <CapsItem icon="🎬" title="Video" count="14">MP4, MOV, MKV, WebM, AVI, FLV, TS, M4V, 3GP, OGV, RM, ASF, WMV, MPEG. Extracts frames at any timestamp.</CapsItem>
-            <CapsItem icon="🖼️" title="Images" count="18">JPEG, PNG, WebP, AVIF, GIF, TIFF, BMP, HEIC, JXL, and more — plus camera RAW: CR2, CR3, NEF, ARW, DNG, RAF, ORF, RW2, and dozens of manufacturer formats.</CapsItem>
-            <CapsItem icon="📄" title="Documents" count="3">PDF, DOCX, PPTX — generates a preview image of any page.</CapsItem>
-            <CapsItem icon="🧊" title="3D geometry" count="3">OBJ, GLTF, STL — renders an isometric preview of 3D models.</CapsItem>
-            <CapsItem icon="✏️" title="Vector graphics" count="3">SVG, EPS, AI — rendered at any resolution without quality loss.</CapsItem>
-          </ul>
+        </p>
+        <p class="caps-prose">
+
+          Many
+          <ProsePopover> <span slot="trigger">client libraries</span>
+            <code>npm install @thumbrella/client</code>, <code>pip install thumbrella</code>, Go, Rust, React. Same URL-based interface everywhere. <a href="/docs/clients/web-client">Docs →</a>
+          </ProsePopover>
+          integrate your stack with
+          <ProsePopover> <span slot="trigger">streaming and batching</span>
+            Stream individual thumbnails or batch-process entire directories. Built-in concurrency control and automatic retry.
+          </ProsePopover>
+          out of the box.
+
+        </p>
+        <p class="caps-prose">
+
+          <ProsePopover> <span slot="trigger">Self-host</span>
+            Run Thumbrella on your own hardware with an SQLite cache. No account required, works offline. Single binary — runs standalone or in Docker.
+          </ProsePopover>
+          or use a
+          <ProsePopover> <span slot="trigger">public service</span>
+            Use a hosted Thumbrella instance for free. No credit card required to start.
+          </ProsePopover>
+          for free.
+        </p>
+
+        <div class="caps-formats">
+          <FormatChip icon="🎬" title="Video" count="12">Video thumbnails are efficiently extracted from encoded keyframes early in the video.<br>MP4, MOV, MKV, WebM, AVI, FLV, TS, M4V, 3GP, OGV, WMV, MPEG.</FormatChip>
+          <FormatChip icon="🖼️" title="Images" count="16">Image formats often contain simple colors pixel data for a variety of digital uses.<br>JPEG, PNG, WebP, AVIF, GIF, TIFF, BMP, HEIC, HEIF, JXL, ICO, PSD, PPM, PGM, PBM, TGA.</FormatChip>
+          <FormatChip icon="📷" title="Photographs" count="17">Camera and film formats are often heavy and high definition frame captures and often need color processing.<br>DNG, EXR, HDR, CR2, NEF, ARW, ORF, RW2, PEF, SRW, RAF, 3FR, FFF, IIQ, MEF, RWL, RAW.</FormatChip>
+          <FormatChip icon="📄" title="Documents" count="7">Documents are usually multi-page collections
+            of styled text and media.<br>PDF, DOCX, PPTX, ODT, XLSX, ODS, ODP.</FormatChip>
+          <FormatChip icon="🧊" title="3D geometry" count="37">Three dimensional models and scenes that can contain triangles, shaders, and textures.<br>OBJ, GLTF, GLB, STL, FBX, USDZ, STEP, IGES, DAE, PLY, 3DS, VRML, VTK, and 24 more.</FormatChip>
+          <FormatChip icon="✏️" title="Vector graphics" count="1">Graphical descriptions of shapes and materials.<br>SVG (more formats coming soon).</FormatChip>
         </div>
 
       </div>
     </div>
   </section>
+
+
+  <ClientTabs />
+
+  <HostingTabs />
+
 
   <!-- ══════════════════════════════════════════ DOCS / ABOUT -->
   <section class="hp-section">
@@ -79,8 +128,10 @@ const carouselItems = [
 <script>
   import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom';
 
-  // ── CapsItem popovers ──────────────────────────────────────────────────────
-  document.querySelectorAll<HTMLElement>('.caps-item[aria-controls]').forEach((item) => {
+  // ── CapsItem, ProsePopover + FormatChip popovers ──────────────────────────
+  document.querySelectorAll<HTMLElement>(
+    '.caps-item[aria-controls], .prose-popover[aria-controls], .fmt-chip[aria-controls]'
+  ).forEach((item) => {
     const id = item.getAttribute('aria-controls')!;
     const popover = document.getElementById(id) as HTMLElement | null;
     if (!popover) return;
