@@ -80,14 +80,14 @@ if (clerkUserId && adminWorker) {
             <SignInButton mode="modal" asChild>
               <button type="button" id="nav-sign-in" class="nav-auth-btn">
                 <Fragment set:html={userIconSvg} />
-                Sign in
+                Account
               </button>
             </SignInButton>
           </Show>
           <Show when="signed-in">
             <button type="button" id="open-manage-account-nav" class="nav-auth-btn">
               <Fragment set:html={userIconSvg} />
-              Manage Account
+              Account
             </button>
           </Show>
         </li>
