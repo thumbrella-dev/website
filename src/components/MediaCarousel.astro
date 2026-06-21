@@ -9,6 +9,7 @@ interface CarouselItem {
   duration: string;
   size: string;
   procMs: number;
+  resultUrl?: string;
   resultJson?: string;
 }
 
@@ -47,6 +48,7 @@ const { items } = Astro.props;
             data-duration={item.duration}
             data-size={item.size}
             data-proc={item.procMs}
+            data-result-url={item.resultUrl}
             data-result={item.resultJson}
           >
             <div class="ctile__thumb">
@@ -497,19 +499,33 @@ const { items } = Astro.props;
 
       if (dl) {
         dl.innerHTML = '';
-        const raw = tile.dataset.result;
+
+        // Lazy-fetch the full result JSON if not already cached on the tile.
+        let raw = tile.dataset.result;
+        if (!raw) {
+          const resultUrl = tile.dataset.resultUrl;
+          if (resultUrl) {
+            try {
+              const res = await fetch(resultUrl);
+              if (res.ok) {
+                raw = await res.text();
+                tile.dataset.result = raw;   // cache for subsequent clicks
+              }
+            } catch { /* network error, show empty popup */ }
+          }
+        }
+
         if (raw) {
           try {
-            const result = JSON.parse(raw);
-            const r = result as Record<string, unknown>;
+            const data = JSON.parse(raw);
+            const r = (data.result ?? data) as Record<string, unknown>;
             const media = (r.media ?? {}) as Record<string, unknown>;
             const props = (media.properties ?? {}) as Record<string, unknown>;
-            const basename = (tile.dataset.name ?? '').replace(/\.[^.]+$/, '');
-            const resultUrl = `https://demo.thumbrella.dev/results/${encodeURIComponent(basename)}.json`;
 
             // ── Thumbrella section ──
             const tbr = document.createElement('div');
             tbr.className = 'cpopup__sec';
+            const resultUrl = tile.dataset.resultUrl ?? '';
             tbr.innerHTML = `<dt class="cpopup__sec-title"><a href="${resultUrl}" target="_blank" rel="noopener">Thumbrella</a></dt>`;
             if (r.duration != null) {
               tbr.innerHTML += `<div class="cpopup__row"><dt>Rendered in</dt><dd>${formatMs(Number(r.duration))}</dd></div>`;

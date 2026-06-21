@@ -1,33 +1,54 @@
 /**
  * Fetches and maps demo gallery data from demo.thumbrella.dev.
  * Runs server-side (SSR) — fetch is available in both Node 18+ and CF Workers.
+ *
+ * Uses the index.json template URLs (media/thumb/data) to construct paths
+ * instead of manually assembling them.  Timing and kind data are now in the
+ * index, so we no longer fetch individual result JSONs for basic carousel data.
  */
 
 const DEMO_BASE = 'https://demo.thumbrella.dev';
 
-interface DemoIndexFile {
-  name: string;
-  full_url: string;
-  file_size: number;
-  mimetype: string | null;
+// ── Index.json shape (new schema) ─────────────────────────────────────────
+
+interface DemoIndex {
+  generated: string;
+  media: string;   // "https://demo.thumbrella.dev/media/{{name}}"
+  thumb: string;   // "https://demo.thumbrella.dev/thumb/{{name}}.jpg"
+  data: string;    // "https://demo.thumbrella.dev/results/{{name}}.json"
+  files: DemoIndexFile[];
 }
 
+interface DemoIndexFile {
+  name: string;
+  size: number;
+  kind: string;
+  extension: string;
+  link: string;
+  description: string;
+  duration: number;  // seconds
+}
+
+// ── Per-result JSON shape (only fetched lazily for popup) ─────────────────
+
 interface DemoResult {
-  result: {
+  result?: {
     url: string;
     status: string;
-    source: string;
-    duration: number; // seconds
+    duration: number;
     download_size: number;
-    media: {
+    media?: {
       file_size: number;
       kind: string;
       extension: string;
       mime: string;
       properties: Record<string, unknown>;
+      thumbnail?: string;
     };
   };
 }
+
+// ── Carousel item (consumed by MediaCarousel.astro) ───────────────────────
 
 export interface CarouselItem {
   name: string;
@@ -35,14 +56,17 @@ export interface CarouselItem {
   resolution: string;
   codec: string;
   type: string;
-  /** Original media kind from result (image, video, audio, geometry, …) */
   kind: string;
   duration: string;
   size: string;
   procMs: number;
-  /** Full result JSON (minus thumbnail binary) for popup details */
-  resultJson: string;
+  /** URL to fetch the full result JSON for popup details. */
+  resultUrl: string;
+  /** Full result JSON (minus thumbnail), populated lazily on the client. */
+  resultJson?: string;
 }
+
+// ── Lookup tables ─────────────────────────────────────────────────────────
 
 const KIND_TO_TYPE: Record<string, string> = {
   image: 'photo',
@@ -54,26 +78,19 @@ const KIND_TO_TYPE: Record<string, string> = {
 };
 
 const EXT_OVERRIDE: Record<string, string> = {
-  jpeg: 'JPEG',
-  png: 'PNG',
-  gif: 'GIF',
-  webp: 'WebP',
-  avif: 'AVIF',
-  heic: 'HEIC',
-  mp4: 'MP4',
-  avi: 'AVI',
-  mkv: 'MKV',
-  mp3: 'MP3',
-  svg: 'SVG',
-  glb: 'GLB',
-  stl: 'STL',
-  cr2: 'CR2',
-  pef: 'PEF',
-  jp2: 'JP2',
-  exr: 'EXR',
-  dds: 'DDS',
-  tiff: 'TIFF',
+  jpeg: 'JPEG',  png: 'PNG',   gif: 'GIF',   webp: 'WebP',
+  avif: 'AVIF',  heic: 'HEIC', mp4: 'MP4',   avi: 'AVI',
+  mkv: 'MKV',    mp3: 'MP3',   svg: 'SVG',   glb: 'GLB',
+  stl: 'STL',    cr2: 'CR2',   pef: 'PEF',   jp2: 'JP2',
+  exr: 'EXR',    dds: 'DDS',   tiff: 'TIFF',
 };
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+
+/** Naive {{name}} template substitution. */
+function resolveTemplate(template: string, name: string): string {
+  return template.replaceAll('{{name}}', encodeURIComponent(name));
+}
 
 function formatSize(bytes: number): string {
   if (bytes >= 1_000_000_000) return `${(bytes / 1_000_000_000).toFixed(1)} GB`;
@@ -82,38 +99,35 @@ function formatSize(bytes: number): string {
   return `${bytes} B`;
 }
 
-function mapResult(file: DemoIndexFile, result: DemoResult): CarouselItem | null {
-  const r = result.result;
-  if (!r) return null;
+// ── Mapping ───────────────────────────────────────────────────────────────
 
-  const media = r.media ?? ({} as DemoResult['result']['media']);
-  const props = (media.properties ?? {}) as Record<string, number | undefined>;
-  const w = props.width_pixels ?? 0;
-  const h = props.height_pixels ?? 0;
-  const ext = media.extension?.toLowerCase() ?? file.name.split('.').pop()?.toLowerCase() ?? '';
-
-  // Strip the huge base64 thumbnail from the result before serializing
-  const slimResult = { ...r, media: { ...media } };
-  delete (slimResult.media as Record<string, unknown>).thumbnail;
+function mapIndexFile(file: DemoIndexFile, thumbTemplate: string, dataTemplate: string): CarouselItem {
+  const ext = (file.extension || file.name.split('.').pop() || '').toLowerCase();
 
   return {
     name: file.name,
-    src: `${DEMO_BASE}/thumb/${encodeURIComponent(file.name.replace(/\.[^.]+$/, ''))}.jpg`,
-    resolution: w && h ? `${w}×${h}` : '',
+    src: resolveTemplate(thumbTemplate, file.name),
+    resolution: '',   // only available from per-result JSON (fetched lazily)
     codec: EXT_OVERRIDE[ext] ?? ext.toUpperCase(),
-    type: KIND_TO_TYPE[media.kind] ?? 'photo',
-    kind: media.kind,
-    duration: '', // result JSON doesn't include video duration
-    size: formatSize(file.file_size),
-    procMs: Math.round(r.duration * 1000),
-    resultJson: JSON.stringify(slimResult),
+    type: KIND_TO_TYPE[file.kind] ?? 'photo',
+    kind: file.kind,
+    duration: '',      // media duration (not in index — in result JSON only)
+    size: formatSize(file.size),
+    procMs: Math.round((file.duration || 0) * 1000),
+    resultUrl: resolveTemplate(dataTemplate, file.name),
   };
 }
 
+// ── Public API ────────────────────────────────────────────────────────────
+
 /**
- * Fetches the demo gallery data.
- * Only fetches results for files specified in `includeNames`.
- * If includeNames is omitted, fetches all files from the index (slow).
+ * Fetches the demo gallery index and maps to CarouselItem[].
+ *
+ * Only one HTTP request — the new index.json includes kind, extension, and
+ * duration so we don't need to fetch individual result JSONs for basic tile
+ * data.  Per-result JSON is fetched lazily on the client when the popup opens.
+ *
+ * If `includeNames` is given, only those files are returned (faster seed).
  */
 export async function fetchDemoGallery(
   includeNames?: string[],
@@ -124,29 +138,13 @@ export async function fetchDemoGallery(
     console.error(`Demo index fetch failed: ${indexRes.status}`);
     return [];
   }
-  const index = await indexRes.json() as { files: DemoIndexFile[] };
+  const index = await indexRes.json() as DemoIndex;
 
   const files = includeNames
     ? index.files.filter((f) => includeNames.includes(f.name))
     : index.files;
 
-  // Fetch all result JSONs in parallel
-  const items = await Promise.all(
-    files.map(async (file) => {
-      const baseName = file.name.replace(/\.[^.]+$/, '');
-      const resultPath = `${DEMO_BASE}/results/${encodeURIComponent(baseName)}.json`;
-      try {
-        const resultRes = await fetch(resultPath);
-        if (!resultRes.ok) return null;
-        const result = await resultRes.json() as DemoResult;
-        return mapResult(file, result);
-      } catch {
-        return null;
-      }
-    }),
-  );
-
-  return items.filter((item): item is CarouselItem => item !== null);
+  return files.map((f) => mapIndexFile(f, index.thumb, index.data));
 }
 
 /**
