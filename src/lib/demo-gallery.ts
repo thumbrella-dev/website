@@ -70,26 +70,6 @@ export interface CarouselItem {
   resultJson?: string;
 }
 
-// ── Lookup tables ─────────────────────────────────────────────────────────
-
-const KIND_TO_TYPE: Record<string, string> = {
-  image: 'photo',
-  video: 'video',
-  audio: 'audio',
-  geometry: '3d',
-  document: 'document',
-  vector: 'vector',
-};
-
-const EXT_OVERRIDE: Record<string, string> = {
-  jpeg: 'JPEG',  png: 'PNG',   gif: 'GIF',   webp: 'WebP',
-  avif: 'AVIF',  heic: 'HEIC', mp4: 'MP4',   avi: 'AVI',
-  mkv: 'MKV',    mp3: 'MP3',   svg: 'SVG',   glb: 'GLB',
-  stl: 'STL',    cr2: 'CR2',   pef: 'PEF',   jp2: 'JP2',
-  exr: 'EXR',    dds: 'DDS',   tiff: 'TIFF',
-};
-
-// ── Helpers ───────────────────────────────────────────────────────────────
 
 /** Naive {{name}} template substitution. */
 function resolveTemplate(template: string, name: string): string {
@@ -103,7 +83,6 @@ function formatSize(bytes: number): string {
   return `${bytes} B`;
 }
 
-// ── Mapping ───────────────────────────────────────────────────────────────
 
 function mapIndexFile(file: DemoIndexFile, thumbTemplate: string, dataTemplate: string): CarouselItem {
   const ext = (file.extension || file.name.split('.').pop() || '').toLowerCase();
@@ -112,8 +91,8 @@ function mapIndexFile(file: DemoIndexFile, thumbTemplate: string, dataTemplate: 
     name: file.name,
     src: resolveTemplate(thumbTemplate, file.name),
     resolution: '',   // only available from per-result JSON (fetched lazily)
-    codec: EXT_OVERRIDE[ext] ?? ext.toUpperCase(),
-    type: KIND_TO_TYPE[file.kind] ?? 'photo',
+    codec: ext.toUpperCase(),
+    type: file.kind ?? 'unknown',
     kind: file.kind,
     duration: '',      // media duration (not in index — in result JSON only)
     size: formatSize(file.size),

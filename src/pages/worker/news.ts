@@ -1,15 +1,19 @@
 /**
  * GET /worker/news
  *
- * Proxies GitHub Discussions (News category) through a Cloudflare Worker
- * endpoint.  Uses the GITHUB_TOKEN secret and caches responses for 5 minutes.
+ * Returns recent GitHub Discussions from the thumbrella-dev/community
+ * "News" category as JSON.  Requires GITHUB_TOKEN as a Cloudflare secret
+ * (set via `npx wrangler secret put GITHUB_TOKEN`).
  *
- * Response:  JSON array of { title, url, updatedAt, commentCount, reactions }
+ * Cached for 5 minutes (Cache-Control: max-age=300).
  */
 
 import type { APIRoute } from 'astro';
 
+// ── Config ────────────────────────────────────────────────────────────────
+
 const GITHUB_API = 'https://api.github.com/graphql';
+const CACHE_MAX_AGE = 300; // seconds
 
 const QUERY = `
 query($org: String!) {
@@ -33,77 +37,97 @@ query($org: String!) {
   }
 }`;
 
-export const GET: APIRoute = async ({ locals }) => {
-  const cloudflareEnv = (locals as any).runtime?.env;
-  const token: string | undefined = cloudflareEnv?.GITHUB_TOKEN;
+// ── Helpers ───────────────────────────────────────────────────────────────
 
-  if (!token || token === 'github_pat_replace_me') {
-    return new Response(JSON.stringify({ error: 'token not configured' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+function json(body: unknown, status = 200, extraHeaders: Record<string, string> = {}) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...extraHeaders },
+  });
+}
+
+function resolveToken(locals: unknown): string | undefined {
+  // 1. Cloudflare Worker runtime (production + wrangler dev).
+  //    Wrapped in try-catch because Astro v6 changed the runtime.env API.
+  try {
+    const env = (locals as any)?.runtime?.env;
+    if (env?.GITHUB_TOKEN) return env.GITHUB_TOKEN;
+  } catch { /* locals.runtime.env was removed in Astro v6 */ }
+
+  // 2. process.env fallback for astro dev (Node.js SSR).
+  try {
+    if (typeof process !== 'undefined' && process.env?.GITHUB_TOKEN) {
+      return process.env.GITHUB_TOKEN;
+    }
+  } catch { /* not Node.js */ }
+
+  return undefined;
+}
+
+// ── Handler ───────────────────────────────────────────────────────────────
+
+export const GET: APIRoute = async ({ locals }) => {
+  const token = resolveToken(locals);
+
+  if (!token) {
+    return json({ error: 'GITHUB_TOKEN not configured' }, 500);
   }
 
-  const twoMonthsAgo = new Date();
-  twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - 2);
 
+  // Fetch from GitHub
+  let ghRes: Response;
   try {
-    const res = await fetch(GITHUB_API, {
+    ghRes = await fetch(GITHUB_API, {
       method: 'POST',
       headers: {
-        'Authorization': `bearer ${token}`,
+        Authorization: `bearer ${token}`,
         'Content-Type': 'application/json',
         'User-Agent': 'thumbrella-web',
       },
       body: JSON.stringify({ query: QUERY, variables: { org: 'thumbrella-dev' } }),
     });
-
-    if (!res.ok) {
-      return new Response(JSON.stringify({ error: `GitHub API ${res.status}` }), {
-        status: 502,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    const json = await res.json() as any;
-    if (json.errors) {
-      return new Response(JSON.stringify({ error: 'GraphQL errors', detail: json.errors }), {
-        status: 502,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    const nodes = json.data?.organization?.repository?.discussions?.nodes ?? [];
-
-    const items = nodes
-      .filter((n: any) => n.category.slug === 'news')
-      .filter((n: any) => new Date(n.updatedAt) >= twoMonthsAgo)
-      .slice(0, 3)
-      .map((n: any) => {
-        const reactions: Record<string, number> = {};
-        for (const g of n.reactionGroups) {
-          if (g.reactors.totalCount > 0) reactions[g.content] = g.reactors.totalCount;
-        }
-        return {
-          title: n.title,
-          url: n.url,
-          updatedAt: n.updatedAt,
-          commentCount: n.comments.totalCount,
-          reactions,
-        };
-      });
-
-    return new Response(JSON.stringify(items), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=300',  // 5 minutes
-      },
-    });
   } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ error: 'GitHub API unreachable', detail: e.message }, 502);
   }
+
+  if (!ghRes.ok) {
+    const body = await ghRes.text().catch(() => '');
+    return json({ error: `GitHub API ${ghRes.status}`, detail: body.slice(0, 500) }, 502);
+  }
+
+  let data: any;
+  try {
+    data = await ghRes.json();
+  } catch {
+    return json({ error: 'GitHub API returned invalid JSON' }, 502);
+  }
+
+  if (data.errors) {
+    return json({ error: 'GitHub GraphQL errors', detail: data.errors }, 502);
+  }
+
+  const nodes: any[] = data?.data?.organization?.repository?.discussions?.nodes ?? [];
+
+  const items = nodes
+    .filter((n: any) => n.category?.slug === 'news')
+    .filter((n: any) => new Date(n.updatedAt) >= cutoff)
+    .slice(0, 3)
+    .map((n: any) => {
+      const reactions: Record<string, number> = {};
+      for (const g of n.reactionGroups ?? []) {
+        if (g.reactors?.totalCount > 0) reactions[g.content] = g.reactors.totalCount;
+      }
+      return {
+        title: n.title,
+        url: n.url,
+        updatedAt: n.updatedAt,
+        commentCount: n.comments?.totalCount ?? 0,
+        reactions,
+      };
+    });
+
+  const response = json(items, 200, { 'Cache-Control': `public, max-age=${CACHE_MAX_AGE}` });
+  return response;
 };
