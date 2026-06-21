@@ -10,4 +10,6 @@ declare namespace App {
 interface Env {
 	/** Service binding — calls thumbrella-admin worker directly (no external HTTP). */
 	ADMIN_WORKER: Fetcher;
+	/** GitHub fine-grained PAT with read-only Discussions access (thumbrella-dev org). */
+	GITHUB_TOKEN: string;
 }

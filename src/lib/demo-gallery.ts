@@ -60,6 +60,10 @@ export interface CarouselItem {
   duration: string;
   size: string;
   procMs: number;
+  /** Source link from the demo gallery. */
+  link: string;
+  /** Description from the demo gallery. */
+  description: string;
   /** URL to fetch the full result JSON for popup details. */
   resultUrl: string;
   /** Full result JSON (minus thumbnail), populated lazily on the client. */
@@ -114,6 +118,8 @@ function mapIndexFile(file: DemoIndexFile, thumbTemplate: string, dataTemplate: 
     duration: '',      // media duration (not in index — in result JSON only)
     size: formatSize(file.size),
     procMs: Math.round((file.duration || 0) * 1000),
+    link: file.link || '',
+    description: file.description || '',
     resultUrl: resolveTemplate(dataTemplate, file.name),
   };
 }

@@ -9,6 +9,8 @@ interface CarouselItem {
   duration: string;
   size: string;
   procMs: number;
+  link: string;
+  description: string;
   resultUrl?: string;
   resultJson?: string;
 }
@@ -29,16 +31,16 @@ const { items } = Astro.props;
   >Full gallery at demo.thumbrella.dev &rarr;</a>
   <div class="carousel-track-wrap" aria-label="Sample media thumbnails">
     <ul class="carousel-track" id="carousel-track" role="list">
-      {[0, 1, 2].flatMap(() => items).map((item) => {
-        const rx = ((Math.random() - 0.5) * 20).toFixed(1);
-        const ry = ((Math.random() - 0.5) * 28).toFixed(1);
-        const tx = ((Math.random() - 0.5) * 4).toFixed(1);
-        const ty = ((Math.random() - 0.5) * 2).toFixed(1);
-        const placeholderSrc = `https://api.thumbrella.dev/placeholder/${item.kind}.jpeg`;
+      {[0, 1, 2].flatMap(() => items).map((item, i) => {
+        const f = (8 * Math.PI) / items.length;  // four full wave cycles per set
+        const rx = (Math.sin(i * f * 1) * 10).toFixed(1);
+        const ry = (Math.cos(i * f * 1) * 13).toFixed(1);
+        const ty = (Math.cos(i * f * 1) * 1).toFixed(1);
+        const placeholderSrc = `https://api.thumbrella.dev/placeholder/${item.kind || 'unknown'}.jpeg`;
         return (
           <li
             class="ctile"
-            style={`--ctile-rx: ${rx}deg; --ctile-ry: ${ry}deg; --ctile-tx: ${tx}rem; --ctile-ty: ${ty}rem`}
+            style={`--ctile-rx: ${rx}deg; --ctile-ry: ${ry}deg; --ctile-tx: 0rem; --ctile-ty: ${ty}rem`}
             data-thumb-src={item.src}
             data-name={item.name}
             data-resolution={item.resolution}
@@ -48,6 +50,8 @@ const { items } = Astro.props;
             data-duration={item.duration}
             data-size={item.size}
             data-proc={item.procMs}
+            data-link={item.link}
+            data-description={item.description}
             data-result-url={item.resultUrl}
             data-result={item.resultJson}
           >
@@ -121,7 +125,7 @@ const { items } = Astro.props;
   }
 
   .carousel-track-wrap {
-      overflow: hidden;
+      overflow-y: visible;
       cursor: default;
   }
 
@@ -133,6 +137,7 @@ const { items } = Astro.props;
       margin: 0;
       will-change: transform;
       width: max-content;
+      overflow-y: visible;
   }
 
   /* ── tile ── */
@@ -275,6 +280,13 @@ const { items } = Astro.props;
       text-overflow: ellipsis;
       margin: 0;
       padding: 0 2px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+  }
+
+  .ctile.is-pending .ctile__name,
+  .ctile.is-loaded .ctile__name {
+      opacity: 1;
   }
 
   /* ── popup ── */
@@ -282,7 +294,7 @@ const { items } = Astro.props;
       position: absolute;
       z-index: 10;
       margin: 0;
-      width: 248px;
+      width: 22rem;
       max-height: 80vh;
       overflow-y: auto;
       background: #21193a;
@@ -350,6 +362,16 @@ const { items } = Astro.props;
       font-weight: 500;
       text-align: right;
   }
+
+  .cpopup__desc {
+      margin-top: 0.35rem;
+      padding-left: 0.8em;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      white-space: normal;
+      word-wrap: break-word;
+      line-height: 1.4;
+  }
 </style>
 
 <script>
@@ -363,37 +385,45 @@ const { items } = Astro.props;
     const setCount = allTiles.length / 3;
     const oneSetWidth = allTiles.slice(0, setCount).reduce((w, el) => w + el.offsetWidth + 120 /* gap */, 0);
 
-    // Observe ALL tiles so each clone restarts its animation when entering view
+    // Observe ALL tiles so each clone restarts its animation when fully on screen.
+    // Reset only when fully off screen so tiles stay loaded during scroll-out.
     const enterObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         const el = entry.target as HTMLElement;
-        if (!entry.isIntersecting) return;
-        // Skip tiles that already started their animation
-        if (el.classList.contains('is-pending') || el.classList.contains('is-loaded')) return;
-        enterObserver.unobserve(el);
-        const src = el.dataset.thumbSrc ?? '';
-        const procMs = parseInt(el.dataset.proc ?? '0', 10);
+        const ratio = entry.intersectionRatio;
 
-        const loadThumb = () => {
+        if (ratio >= 0.99) {
+          // Fully on screen — start the load simulation
+          if (el.classList.contains('is-pending') || el.classList.contains('is-loaded')) return;
+          const src = el.dataset.thumbSrc ?? '';
+          const procMs = parseInt(el.dataset.proc ?? '0', 10);
+
+          const loadThumb = () => {
+            const img = el.querySelector<HTMLImageElement>('.ctile__img');
+            if (!img || !src) return;
+            el.classList.remove('is-pending');
+            el.classList.add('is-loaded');
+            img.addEventListener('load',  () => {}, { once: true });
+            img.addEventListener('error', () => el.classList.add('is-error'), { once: true });
+            img.src = src;
+          };
+
+          if (procMs < 20) {
+            loadThumb();
+          } else {
+            el.classList.add('is-pending');
+            const holdMs = Math.min(procMs, 4000);
+            setTimeout(loadThumb, holdMs);
+          }
+        } else if (ratio === 0) {
+          // Fully off screen — reset for next loop cycle
+          el.classList.remove('is-pending', 'is-loaded', 'is-error');
           const img = el.querySelector<HTMLImageElement>('.ctile__img');
-          if (!img || !src) return;
-          el.classList.remove('is-pending');
-          el.classList.add('is-loaded');
-          img.addEventListener('load',  () => {}, { once: true });
-          img.addEventListener('error', () => el.classList.add('is-error'), { once: true });
-          img.src = src;
-        };
-
-        if (procMs < 20000) {
-          // Fast render — skip placeholder, go straight to thumbnail
-          loadThumb();
-        } else {
-          el.classList.add('is-pending');
-          const holdMs = Math.min(procMs, 4000);
-          setTimeout(loadThumb, holdMs);
+          if (img) img.removeAttribute('src');
         }
+        // Ratios between 0 and 0.99: transitioning, do nothing.
       });
-    }, { threshold: 0.85 });
+    }, { threshold: [0, 0.99] });
 
     allTiles.forEach((item) => enterObserver.observe(item));
 
@@ -405,14 +435,35 @@ const { items } = Astro.props;
     let pos = 0;
     let lastTime: number | null = null;
 
+    // Frame-rate monitor — disable animation if the browser can't keep up
+    // (common in embedded VS Code browser and low-power devices).
+    let slowFrames = 0;
+    const SLOW_THRESHOLD_MS = 80;   // frame delta above this is "slow"
+    const SLOW_LIMIT = 10;           // consecutive slow frames → kill animation
+    let animationActive = true;
+
     function step(ts: number) {
+      if (!animationActive) return;
       const dt = lastTime !== null ? Math.min((ts - lastTime) / 1000, 0.1) : 0;
+
+      // Monitor frame health
+      if (lastTime !== null && (ts - lastTime) > SLOW_THRESHOLD_MS) {
+        slowFrames++;
+        if (slowFrames >= SLOW_LIMIT) {
+          animationActive = false;
+          return;
+        }
+      } else {
+        slowFrames = Math.max(0, slowFrames - 1);
+      }
+
       lastTime = ts;
       speed += (targetSpeed - speed) * (1 - Math.exp(-EASE_K * dt));
       if (speed > 0.3 && track && oneSetWidth > 0) {
         pos += speed * dt;
-        // Subtract (not modulo) — no visual jump since content repeats
         if (pos >= oneSetWidth) pos -= oneSetWidth;
+        // Reset to 0 periodically to avoid unbounded float growth
+        if (pos > 100000) pos = 0;
         track.style.transform = `translateX(${-pos}px)`;
       }
       requestAnimationFrame(step);
@@ -426,6 +477,22 @@ const { items } = Astro.props;
     });
 
     // ── Popup: dynamic fields from result JSON ────────────────────────────
+
+    /** Escape HTML entities so raw text is safe to embed. */
+    function escHtml(s: string): string {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /** Render the demo site's "poor man's markdown" (same as generate-index.js). */
+    function renderInlineMd(text: string): string {
+      return escHtml(text)
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/__([^_]+)__/g, '<u>$1</u>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/_([^_]+)_/g, '<em>$1</em>');
+    }
 
     function formatSize(bytes: number): string {
       let unit = "kb";
@@ -556,6 +623,24 @@ const { items } = Astro.props;
             }
 
             dl.appendChild(msec);
+
+            // ── About section ──
+            const link = tile.dataset.link;
+            const desc = tile.dataset.description;
+            if (link || desc) {
+              const asec = document.createElement('div');
+              asec.className = 'cpopup__sec';
+              if (link) {
+                asec.innerHTML = `<dt class="cpopup__sec-title"><a href="${link}" target="_blank" rel="noopener">About</a></dt>`;
+              } else
+              {
+                asec.innerHTML = '<dt class="cpopup__sec-title">About</dt>';
+              }
+              if (desc) {
+                asec.innerHTML += `<div class="cpopup__desc">${renderInlineMd(desc)}</div>`;
+              }
+              dl.appendChild(asec);
+            }
           } catch { /* ignore parse errors */ }
         }
       }
