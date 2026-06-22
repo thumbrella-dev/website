@@ -17,9 +17,9 @@ const tabs = await Promise.all(
 
 <section class="client-gs-section" id="get-hosting">
   <div class="container">
-    <h2 class="client-gs__heading">Start Hosting</h2>
+    <h2 class="section-heading">Start Hosting</h2>
     <div class="client-tabs" id="hosting-tabs">
-      <div class="hosting-tabs__bar" role="tablist" aria-label="Hosting option">
+      <div class="client-tabs__bar" role="tablist" aria-label="Hosting option">
         {tabs.map((tab, i) => (
           <ClientTabButton id={tab.id} label={tab.label} active={i === 0} prefix="hst" />
         ))}
@@ -44,8 +44,8 @@ const tabs = await Promise.all(
 </section>
 
 <script>
-  const barEl    = document.querySelector<HTMLElement>('.hosting-tabs__bar');
-  const barTabs  = Array.from(document.querySelectorAll<HTMLElement>('.hosting-tabs__bar > [data-hst-tab]'));
+  const barEl    = document.querySelector<HTMLElement>('.client-tabs__bar');
+  const barTabs  = Array.from(document.querySelectorAll<HTMLElement>('.client-tabs__bar > [data-hst-tab]'));
   const moreBtn  = document.getElementById('hst-more-btn') as HTMLButtonElement | null;
   const moreList = document.getElementById('hst-more-list') as HTMLElement | null;
 
@@ -63,7 +63,7 @@ const tabs = await Promise.all(
     moreList?.querySelectorAll<HTMLElement>('[data-hst-mirror]').forEach((btn) => {
       btn.classList.toggle('is-active', btn.dataset.hstMirror === targetId);
     });
-    document.querySelectorAll<HTMLElement>('.hst-panel').forEach((panel) => {
+    document.querySelectorAll<HTMLElement>('.hosting-panel').forEach((panel) => {
       const active = panel.id === targetId;
       panel.classList.toggle('is-active', active);
       panel.hidden = !active;
@@ -74,7 +74,15 @@ const tabs = await Promise.all(
     }
   };
 
-  barTabs.forEach((tab) => tab.addEventListener('click', () => activateTab(tab)));
+  const switchTab = (tab: HTMLElement) => {
+    if ('startViewTransition' in document) {
+      document.startViewTransition(() => activateTab(tab));
+    } else {
+      activateTab(tab);
+    }
+  };
+
+  barTabs.forEach((tab) => tab.addEventListener('click', () => switchTab(tab)));
 
   const recalcTabs = () => {
     if (!barEl) return;

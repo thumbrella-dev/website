@@ -2,15 +2,6 @@
 label: PHP
 ---
 
-Composer package, PSR-18 compatible HTTP client.
+There is no PHP client library yet. Until then code will require straightforward
+http requests to the server.
 
-```sh
-composer require thumbrella/thumbrella-php
-```
-
-```php
-$tbr = new \Thumbrella\Client('YOUR_KEY');
-$thumb = $tbr->thumb('https://example.com/video.mp4');
-
-file_put_contents('thumb.webp', base64_decode($thumb->data));
-```

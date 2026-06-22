@@ -2,10 +2,21 @@
 label: curl
 ---
 
-No install. The response is the raw image — pipe it wherever you need it.
+The http api is designed to be straightforward and direct to use. 
 
-```sh
-curl https://go.thumbrella.dev/thumb/https://example.com/video.mp4 \
-  -H "Authorization: Bearer YOUR_KEY" \
-  -o thumb.webp
+No client libraries are needed (from any language). This is great for quick
+and one-off use-cases. 
+
+```bash
+curl https://api.thumbrella.dev/thumb?url=https://demo.thumbrella.dev/media/harbor-trucks.mp4 \
+  --header "Authorization: Bearer AUTH_TOKEN" \
+  --output thumb.jpeg
 ```
+
+An auth token is likely unnecessary when running your own server. When using
+the Thumbrella service at `api.thumbrella.dev` you will need to provide a
+private or publishable key in the bearer authorization header.
+
+The features of the higher level client libraries become valuable when
+creating interactive use cases that benefit from client caching, rate
+control, and other features they provide.

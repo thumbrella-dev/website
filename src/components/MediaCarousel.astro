@@ -593,7 +593,7 @@ const { items } = Astro.props;
             const tbr = document.createElement('div');
             tbr.className = 'cpopup__sec';
             const resultUrl = tile.dataset.resultUrl ?? '';
-            tbr.innerHTML = `<dt class="cpopup__sec-title"><a href="${resultUrl}" target="_blank" rel="noopener">Thumbrella</a></dt>`;
+            tbr.innerHTML = `<dt class="cpopup__sec-title"><a href="${resultUrl}">Thumbrella</a></dt>`;
             if (r.duration != null) {
               tbr.innerHTML += `<div class="cpopup__row"><dt>Rendered in</dt><dd>${formatMs(Number(r.duration))}</dd></div>`;
             }
@@ -610,7 +610,7 @@ const { items } = Astro.props;
             const ext = (String(media.extension ?? '')).toLowerCase();
             const size = media.file_size != null ? formatSize(Number(media.file_size)) : '';
             const kindExt = [ext, kind].filter(Boolean).join(' ');
-            msec.innerHTML = `<dt class="cpopup__sec-title"><a href="${url}" target="_blank" rel="noopener">Media</a></dt>`;
+            msec.innerHTML = `<dt class="cpopup__sec-title"><a href="${url}">Media</a></dt>`;
 
             if (size || kindExt) {
               const line1 = [size, kindExt].filter(Boolean).join(' ∙ ');
@@ -631,7 +631,7 @@ const { items } = Astro.props;
               const asec = document.createElement('div');
               asec.className = 'cpopup__sec';
               if (link) {
-                asec.innerHTML = `<dt class="cpopup__sec-title"><a href="${link}" target="_blank" rel="noopener">About</a></dt>`;
+                asec.innerHTML = `<dt class="cpopup__sec-title"><a href="${link}">About</a></dt>`;
               } else
               {
                 asec.innerHTML = '<dt class="cpopup__sec-title">About</dt>';
@@ -650,7 +650,7 @@ const { items } = Astro.props;
       const { x, y } = await computePosition(tile, popup, {
         strategy: 'absolute',
         placement: 'bottom',
-        middleware: [offset(10), flip(), shift({ padding: 8 })],
+        middleware: [offset(10), shift({ padding: 8 })],
       });
       Object.assign(popup.style, { left: `${x}px`, top: `${y}px` });
     });

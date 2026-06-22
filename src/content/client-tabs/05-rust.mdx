@@ -2,15 +2,18 @@
 label: Rust
 ---
 
-Async-first, `tokio` runtime. Pairs with the `image` crate for further processing.
+The Rust client provides easy, high level functionality for caching, error
+control, and other conveniences.
 
-```sh
-cargo add thumbrella
-```
+Use `cargo add thumbrella` to get started.
+
+The Rust library provides an async interface built on `reqwests` and
+`tokio`.
 
 ```rust
-let tbr = thumbrella::Client::new("YOUR_KEY");
-let thumb = tbr.thumb("https://example.com/video.mp4").await?;
+let tbr = thumbrella::Client::new(None);
+let result = tbr.thumb("https://demo.thumbrella.dev/media/harbor-trucks.mp4").await?;
 
-let img = image::load_from_memory(&thumb.data)?;
+let img = image::load_from_memory(&result.thumbnail)?;
 ```
+

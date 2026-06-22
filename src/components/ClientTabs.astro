@@ -17,7 +17,7 @@ const tabs = await Promise.all(
 
 <section class="client-gs-section" id="get-started">
   <div class="container">
-    <h2 class="client-gs__heading">Get Started</h2>
+    <h2 class="section-heading">Get Started</h2>
     <div class="client-tabs" id="client-tabs">
       <div class="client-tabs__bar" role="tablist" aria-label="Client environment">
         {tabs.map((tab, i) => (
@@ -64,7 +64,7 @@ const tabs = await Promise.all(
     moreList?.querySelectorAll<HTMLElement>('[data-cgs-mirror]').forEach((btn) => {
       btn.classList.toggle('is-active', btn.dataset.cgsMirror === targetId);
     });
-    document.querySelectorAll<HTMLElement>('.cgs-panel').forEach((panel) => {
+    document.querySelectorAll<HTMLElement>('.client-panel').forEach((panel) => {
       const active = panel.id === targetId;
       panel.classList.toggle('is-active', active);
       panel.hidden = !active;
@@ -75,7 +75,15 @@ const tabs = await Promise.all(
     }
   };
 
-  barTabs.forEach((tab) => tab.addEventListener('click', () => activateClientTab(tab)));
+  const switchTab = (tab: HTMLElement) => {
+    if ('startViewTransition' in document) {
+      document.startViewTransition(() => activateClientTab(tab));
+    } else {
+      activateClientTab(tab);
+    }
+  };
+
+  barTabs.forEach((tab) => tab.addEventListener('click', () => switchTab(tab)));
 
   const recalcTabs = () => {
     if (!barEl) return;

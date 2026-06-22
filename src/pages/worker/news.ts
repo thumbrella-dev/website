@@ -24,6 +24,7 @@ query($org: String!) {
           title
           url
           updatedAt
+          body
           number
           category { name slug }
           comments { totalCount }
@@ -38,6 +39,58 @@ query($org: String!) {
 }`;
 
 // ── Helpers ───────────────────────────────────────────────────────────────
+
+/** Strip markdown formatting and truncate to ~40 words. */
+function bodyPreview(md: string): string {
+  let text = md
+    // Remove code blocks
+    .replace(/```[\s\S]*?```/g, '')
+    // Remove inline code
+    .replace(/`([^`]+)`/g, '$1')
+    // Remove images
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
+    // Convert links to just text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    // Remove heading markers
+    .replace(/^#{1,6}\s+/gm, '')
+    // Remove bold/italic markers
+    .replace(/\*{1,3}([^*]+)\*{1,3}/g, '$1')
+    .replace(/_{1,3}([^_]+)_{1,3}/g, '$1')
+    // Remove blockquote markers
+    .replace(/^>\s?/gm, '')
+    // Remove list markers
+    .replace(/^[\s]*[-*+]\s/gm, '')
+    .replace(/^[\s]*\d+\.\s/gm, '')
+    // Remove horizontal rules
+    .replace(/^[-*_]{3,}\s*$/gm, '')
+    // Collapse whitespace
+    .replace(/\n{2,}/g, ' ')
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Truncate to ~32 words
+  const words = text.split(/\s+/);
+  if (words.length > 32) {
+    text = words.slice(0, 32).join(' ') + ' …';
+  }
+  return text;
+}
+
+/** Relative time string like "4 days ago", "2 hours ago". */
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const secs = Math.floor(diff / 1000);
+  if (secs < 60) return 'just now';
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} day${days !== 1 ? 's' : ''} ago`;
+  const months = Math.floor(days / 30);
+  return `${months} month${months !== 1 ? 's' : ''} ago`;
+}
 
 function json(body: unknown, status = 200, extraHeaders: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
@@ -122,9 +175,10 @@ export const GET: APIRoute = async ({ locals }) => {
       return {
         title: n.title,
         url: n.url,
-        updatedAt: n.updatedAt,
+        updatedAt: relativeTime(n.updatedAt),
         commentCount: n.comments?.totalCount ?? 0,
         reactions,
+        bodyPreview: n.body ? bodyPreview(n.body) : '',
       };
     });
 

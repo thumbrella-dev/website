@@ -2,15 +2,6 @@
 label: .NET
 ---
 
-.NET 8+. Async throughout, returns `byte[]` ready for `SkiaSharp` or `ImageSharp`.
+There is no C# client library yet. Until then code will require straightforward
+http requests to the server.
 
-```sh
-dotnet add package Thumbrella
-```
-
-```csharp
-var tbr = new Thumbrella.Client("YOUR_KEY");
-var thumb = await tbr.ThumbAsync("https://example.com/video.mp4");
-
-await File.WriteAllBytesAsync("thumb.webp", thumb.Data);
-```

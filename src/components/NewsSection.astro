@@ -2,9 +2,10 @@
 interface NewsItem {
   title: string;
   url: string;
-  updatedAt: string;
+  updatedAt: string;   // relative time like "4 days ago"
   commentCount: number;
   reactions: Record<string, number>;
+  bodyPreview: string;
 }
 
 let items: NewsItem[] = [];
@@ -20,23 +21,22 @@ try {
 
 <section class="hp-section hp-section--no-border">
   <div class="container">
-    <h2 class="client-gs__heading">
-      <a href="https://github.com/orgs/thumbrella-dev/discussions/categories/news" target="_blank" rel="noopener">News</a>
-    </h2>
+    <h2 class="section-heading">News</h2>
     <div class="caps-panel">
     {items.length > 0 ? (
     <ul class="news-list">
       {items.map((item) => {
-        const date = new Date(item.updatedAt);
-        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const reactionStr = Object.entries(item.reactions)
           .map(([emoji, count]) => `${emoji} ${count}`)
           .join(' ');
         return (
           <li class="news-item">
-            <a class="news-title" href={item.url} target="_blank" rel="noopener">{item.title}</a>
+            <div class="news-line1">
+              <a class="news-title" href={item.url}>{item.title}</a>
+              <span class="news-date">{item.updatedAt}</span>
+            </div>
+            {item.bodyPreview && <p class="news-preview">{item.bodyPreview}</p>}
             <span class="news-meta">
-              <time datetime={item.updatedAt}>{dateStr}</time>
               {item.commentCount > 0 && <span class="news-comments">{item.commentCount} comment{item.commentCount !== 1 ? 's' : ''}</span>}
               {reactionStr && <span class="news-reactions">{reactionStr}</span>}
             </span>
@@ -44,8 +44,9 @@ try {
         );
       })}
     </ul>
+    <p class="news-footer"><a href="https://github.com/orgs/thumbrella-dev/discussions/categories/news">View all discussions &rarr;</a></p>
   ) : (
-    <p class="news-empty">No recent news. <a href="https://github.com/orgs/thumbrella-dev/discussions/categories/news" target="_blank" rel="noopener">View all discussions &rarr;</a></p>
+    <p class="news-footer">No recent news. <a href="https://github.com/orgs/thumbrella-dev/discussions/categories/news">View all discussions &rarr;</a></p>
   )}
     </div>
   </div>
@@ -66,17 +67,46 @@ try {
     gap: 0.15rem;
   }
 
+  .news-line1 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-weight: 600;
+  }
+
   .news-title {
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--text);
     text-decoration: none;
     line-height: 1.35;
+    flex: 1;
+    min-width: 0;
   }
 
   .news-title:hover {
     color: var(--accent-strong);
     text-decoration: underline;
+  }
+
+  .news-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .news-preview {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: 0;
+    padding-left: 0.8em;
+    line-height: 1.45;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
   }
 
   .news-meta {
@@ -92,18 +122,20 @@ try {
     color: rgba(255, 255, 255, 0.45);
   }
 
-  .news-empty {
-    font-size: 0.85rem;
+  .news-footer {
+    font-size: 0.9rem;
     color: var(--text-muted);
     margin: 0;
+    padding-top: 0.85rem;
   }
 
-  .news-empty a {
+
+  .news-footer a {
     color: var(--accent-strong);
     text-decoration: none;
   }
 
-  .news-empty a:hover {
+  .news-footer a:hover {
     text-decoration: underline;
   }
 </style>

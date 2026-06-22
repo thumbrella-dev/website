@@ -44,7 +44,7 @@ if (carouselItems.length > 0) {
   <!-- ═══════════════════════════════════════════ WHAT IT DOES -->
   <section class="hp-section hp-section--no-border">
     <div class="container">
-      <h2 class="client-gs__heading">About</h2>
+      <h2 class="section-heading">About</h2>
       <div class="caps-panel">
 
         <p class="caps-prose">
@@ -133,7 +133,7 @@ if (carouselItems.length > 0) {
 
   // ── CapsItem, ProsePopover + FormatChip popovers ──────────────────────────
   document.querySelectorAll<HTMLElement>(
-    '.caps-item[aria-controls], .prose-popover[aria-controls], .fmt-chip[aria-controls]'
+    '.prose-popover[aria-controls], .fmt-chip[aria-controls]'
   ).forEach((item) => {
     const id = item.getAttribute('aria-controls')!;
     const popover = document.getElementById(id) as HTMLElement | null;

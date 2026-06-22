@@ -2,17 +2,6 @@
 label: Ruby
 ---
 
-Plain Ruby gem, no runtime dependencies beyond the standard library.
+There is no Ruby client library yet. Until then code will require straightforward
+http requests to the server.
 
-```sh
-gem install thumbrella
-```
-
-```ruby
-require "thumbrella"
-
-tbr = Thumbrella.new("YOUR_KEY")
-thumb = tbr.thumb("https://example.com/video.mp4")
-
-File.write("thumb.webp", Base64.decode64(thumb.data))
-```

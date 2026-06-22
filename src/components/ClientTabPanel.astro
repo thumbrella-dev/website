@@ -11,12 +11,13 @@ interface Props {
 const { id, Content, active = false, prefix = 'cgs' } = Astro.props;
 const panelId = `${prefix}-${id}`;
 const tabId   = `${prefix}-tab-${id}`;
+const panelClass = prefix === 'hst' ? 'hosting-panel' : 'client-panel';
 ---
 <div
   id={panelId}
   role="tabpanel"
   aria-labelledby={tabId}
-  class:list={[`${prefix}-panel`, active && 'is-active']}
+  class:list={[panelClass, active && 'is-active']}
   hidden={!active}
 >
   <div class="client-panel__body">

@@ -2,21 +2,27 @@
 label: Astro
 ---
 
-Use the JS client in any `.astro` component, server-side at build time.
+The Astro components provide a higher level component for thumbnails. These
+components are still a work in progress and not ready yet for immediate
+use.
 
-```sh
-npm install @thumbrella/client
-```
+Get started with `npm install @thumbrella/astro`.
+
+The thumbnail components work together to handle streaming, batching,
+and caching automatically.
 
 ```astro
 ---
-import { Thumbrella } from '@thumbrella/client';
+import { Client, Thumbnail } from '@thumbrella/client';
 
-const tbr = new Thumbrella(import.meta.env.THUMBRELLA_KEY);
-const thumb = await tbr.thumb(Astro.props.mediaUrl);
+const tbr = new Client(import.meta.env.THUMBRELLA_KEY);
 ---
-<img
-  src={`data:${thumb.format};base64,${thumb.data}`}
-  alt="thumbnail"
-/>
+<Thumbnail src="https://demo.thumbrella.dev/media/harbor-trucks.mp4" />
 ```
+
+Each page is expected to have a global `<Thumbrella>` component to define
+the server and configuration details. The page then uses multiple
+`<Thumbnail>` components.
+
+The thumbnails are intended to be handled by browsers as the page is viewed.
+They are not downloaded and applied to the site as static content.
