@@ -300,12 +300,13 @@ pre {
 }
 
 .footer__inner a {
-    color: rgba(255,255,255,0.32);
+    color: rgb(167, 125, 186);
     text-decoration: none;
 }
 
 .footer__inner a:hover {
-    color: rgba(255,255,255,0.55);
+    color: rgb(208, 142, 239);
+    text-decoration: underline;
 }
 
 /* ─────────────────────────────────── HERO gradient text */
