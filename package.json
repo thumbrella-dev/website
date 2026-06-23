@@ -1,33 +1,33 @@
 {
   "name": "thumbrella-web",
-  "version": "1.0.0",
-  "description": "Home page and documentation for Thumbrella.",
-  "main": "index.astro",
+  "version": "0.3.0",
+  "description": "Project website and documentation for Thumbrella thumbnail platform.",
+  "homepage": "https://thumbrella.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PeterShinners/thumbrella-web"
+  },
   "scripts": {
     "dev": "astro dev",
-    "preview": "bash scripts/preview.sh",
     "deploy": "astro build --logLevel warn && wrangler deploy"
   },
   "engines": {
     "node": ">=22"
   },
   "keywords": [
-    "Thumbrella",
-    "SaaS",
-    "marketing",
-    "developer",
+    "thumbrella",
+    "thumbnails",
+    "media",
     "documentation"
   ],
-  "author": "pete@thumbrella.dev",
-  "license": "MIT",
+  "author": "Peter Shinners <pete@thumbrella.dev>",
+  "license": "Apache-2.0",
   "dependencies": {
     "@astrojs/cloudflare": "^13.3.0",
     "@astrojs/mdx": "^6.0.3",
     "@astrojs/react": "^5.0.4",
     "@astrojs/starlight": "^0.39.2",
     "@clerk/astro": "^3.2.2",
-    "@clerk/clerk-js": "^6.10.1",
-    "@clerk/themes": "^2.4.57",
     "@floating-ui/dom": "^1.7.6",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

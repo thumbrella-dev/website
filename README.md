@@ -1,96 +1,61 @@
 # Thumbrella Web
 
-Welcome to the Thumbrella Web project! This is a SaaS-style marketing website focused on providing developers with comprehensive information about Thumbrella, its features, and documentation.
+Public marketing site and documentation for [Thumbrella](https://thumbrella.dev), the fast media thumbnail platform. Built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build), deployed to Cloudflare Workers.
 
-## Project Structure
+The project's documentation lives in `src/content/docs/` and is rendered by
+Starlight. Nearly everything is for the main landing page home page.
 
-The project is organized as follows:
-
-```
-thumbrella-web
-├── src
-│   ├── components          # Reusable components for the site
-│   │   ├── FeatureCards.astro
-│   │   ├── Hero.astro
-│   │   ├── Navbar.astro
-│   │   └── Section.astro
-│   ├── layouts             # Layout components for page structure
-│   │   └── MainLayout.astro
-│   ├── pages               # Pages of the website
-│   │   ├── index.astro
-│   │   ├── what-is-thumbrella.astro
-│   │   ├── features.astro
-│   │   ├── media-lib-browser.astro
-│   │   └── docs
-│   │       ├── web-client.astro
-│   │       └── hosting.astro
-│   └── styles              # Global styles for the website
-│       └── global.css
-├── public                  # Public assets
-│   └── robots.txt
-├── astro.config.mjs       # Astro framework configuration
-├── package.json           # npm configuration
-├── tsconfig.json          # TypeScript configuration
-└── README.md              # Project documentation
-```
-
-## Features
-
-- **What is Thumbrella?**: A dedicated page explaining the purpose and benefits of Thumbrella.
-- **Feature Highlights**: A visually appealing section showcasing the key features of Thumbrella through feature cards.
-- **Live Media-Lib Browser**: An interactive page demonstrating the functionality of the media-lib browser.
-- **Web Client Documentation**: Comprehensive documentation for developers on how to use the web client effectively.
-- **Hosting Documentation**: Guidelines on how to host applications using Thumbrella.
+This website hosts the main static website for Thumbrella. There are several
+related websites that are part of the Thumbrella platform. This does not
+include
+- https://api.thumbrella.dev - the host thumbrella service
+- https://demo.thumbrella.dev - gallery of example media and mock api
+- https://admin.thumbrella.dev - backend account management
 
 ## Getting Started
 
-To get started with the Thumbrella Web project, follow these steps:
-
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   ```
-
-2. Navigate to the project directory:
-   ```
-   cd thumbrella-web
-   ```
-
-3. Install the dependencies:
-   ```
-   npm install
-   ```
-
-4. Start the development server:
-   ```
-   npm run dev
-   ```
-
-5. Open your browser and visit `http://localhost:3000` to see the site in action.
-
-## Clerk Prototype Customer Area
-
-This repo now includes a static-first prototype customer dashboard using Clerk.
-
-- Logout route: `/logout`
-- Route: `/user`
-
-Set your Clerk publishable key before running the client-only first pass:
-
 ```bash
-# .dev.vars
-PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+npm install
+npm run dev        # Astro dev server on port 4321
 ```
 
-If you later move to Clerk middleware or server-verified sessions, add a secret key at that point.
+The dev server binds to `0.0.0.0` so it works with forwarded ports in container
+environments.
 
-The prototype currently stores demo token data in browser local storage and uses
-placeholder usage metrics to model the UX for API token management.
+## Directory Structure
 
-## Contributing
+```
+web/
+├── src/
+│   ├── components/       # Reusable Astro and React components
+│   │   └── starlight/    # Starlight component overrides
+│   ├── content/          # Markdown content for main page and documentation
+│   │   └── docs/         # Documentation pages (Starlight content collection)
+│   ├── layouts/          # Page layout components
+│   ├── pages/            # Route pages and API endpoints
+│   └── styles/           # Global CSS and Starlight theme overrides
+└── public/               # Static assets (favicon, robots.txt, logos)
+```
 
-Contributions are welcome! Please feel free to submit a pull request or open an issue for any enhancements or bug fixes.
+## Documentation
+
+## Authentication
+
+The site connects with [Clerk](https://clerk.com) to allow users to create
+and manage their accounts. This is a static website, and those interactions
+are routed through a separate "admin" project with all the dynamic account
+and credentials management.
+
+None of the Clerk or Admin is needed to edit, browse, and develop the static
+Thumbrella web contents. 
+
+## Deployment
+
+Deployment is handled by the repository owner via `npm run deploy`, which builds
+the Astro site and deploys to Cloudflare Workers. The site runs at
+[thumbrella.dev](https://thumbrella.dev). See `wrangler.toml` for the worker
+configuration.
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+Apache 2.0 — see [LICENSE](./LICENSE).
