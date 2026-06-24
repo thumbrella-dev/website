@@ -3,21 +3,18 @@ title: Introduction
 description: What Thumbrella is, what problems it solves, and who should use it.
 ---
 
-Placeholder for high-level introduction content.
 
-## Purpose
+The primary development and support for Thumbrella comes through sponsors.
+The free and paid levels of the online service are meant to be provide a
+useful and easy service for most users. Thumbrella sponsors get access to
+some excellent features, but really drive the project forward, making it 
+sustainable for everyone. Sustatianable projects that have integrated with
+Thumbrella would be ideal candidates for supporting Thumbrella's future.
 
-Explain the product in one clear paragraph.
-
-## Who This Is For
-
-- Application developers needing thumbnails from diverse media.
-- Teams operating a thumbnail service for internal or external consumers.
-- Platform maintainers evolving architecture and hosting.
 
 ## Next Steps
 
-- [Project and Author](/docs/introduction/project-and-author): Repositories and who built this.
+- [Project](/docs/introduction/project): Repositories and who built this.
 - [Choose a path](/docs/introduction/choose-a-path)
 - [Clients](/docs/clients/overview)
 - [Server](/docs/server/overview)

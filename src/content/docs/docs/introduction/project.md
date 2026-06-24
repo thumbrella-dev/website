@@ -1,5 +1,5 @@
 ---
-title: Project and Author
+title: Project
 description: Overview of the project repositories and the author behind Thumbrella.
 ---
 
