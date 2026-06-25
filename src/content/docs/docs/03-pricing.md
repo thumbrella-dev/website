@@ -1,11 +1,12 @@
 ---
 title: Pricing
 description: Every way to use Thumbrella and what each costs.
+slug: docs/pricing
 ---
 
 Start free. Upgrade when it makes sense — or run it yourself for nothing.
 
-## Hosted Service
+### Hosted Service
 
 Thumbrella processes thumbnails on shared infrastructure. A registered account works across the hosted API, self-hosted instances, and AI platforms.
 
@@ -54,7 +55,7 @@ Higher limits for heavier workloads. Details to be determined closer to launch.
 - Higher render caps
 - More cache storage and longer TTL
 
-## Self-Run
+### Self-Run
 
 Install and operate Thumbrella on your own hardware or a third-party compute platform. Self-hosted users can still register a caching account to tap into the shared network.
 
@@ -71,7 +72,7 @@ Run the full Thumbrella server on your own hardware. No account required. Unlimi
 
 Unlimited renders on your hardware.
 
-[Self-hosted docs →](/docs/server/self-hosted)
+[Self-hosted docs →](/docs/server#self-hosted)
 
 ### AI Platforms
 
@@ -85,7 +86,7 @@ Use Thumbrella on Replicate and similar compute platforms at no added charge. Pl
 
 Account limits apply if registered.
 
-[AI platform docs →](/docs/server/ai-platforms)
+[AI platform docs →](/docs/server#ai-platforms)
 
 ---
 

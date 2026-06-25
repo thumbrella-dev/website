@@ -15,9 +15,4 @@ const popoverId =
   tabindex="0"
   aria-expanded="false"
   aria-controls={popoverId}
->
-  <slot name="trigger" />
-  <span class="info-popover" id={popoverId} popover="auto">
-    <slot />
-  </span>
-</span>
+><slot name="trigger" /><span class="info-popover" id={popoverId} popover="auto"><slot /></span></span>

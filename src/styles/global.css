@@ -155,6 +155,7 @@ pre {
     justify-content: space-between;
     gap: 1rem;
     padding: 1rem 0;
+    width: 90%;
 }
 
 .brand {

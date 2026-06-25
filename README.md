@@ -1,14 +1,16 @@
 # Thumbrella Web
 
-Public marketing site and documentation for [Thumbrella](https://thumbrella.dev), the fast media thumbnail platform. Built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build), deployed to Cloudflare Workers.
+Primary website and documentation for [Thumbrella](https://thumbrella.dev), the
+fast media thumbnail platform. Built with [Astro](https://astro.build), deployed
+to Cloudflare Workers.
 
-The project's documentation lives in `src/content/docs/` and is rendered by
-Starlight. Nearly everything is for the main landing page home page.
+The project documentation lives in `src/content/docs/` and is rendered by
+[Starlight](https://starlight.astro.build).
 
 This website hosts the main static website for Thumbrella. There are several
 related websites that are part of the Thumbrella platform. This does not
 include
-- https://api.thumbrella.dev - the host thumbrella service
+- https://api.thumbrella.dev - the hosted thumbrella service (requires account)
 - https://demo.thumbrella.dev - gallery of example media and mock api
 - https://admin.thumbrella.dev - backend account management
 

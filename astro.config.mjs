@@ -20,13 +20,12 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: 'Thumbrella Docs',
+      title: 'Thumbrella Documentation',
       description: 'Documentation for the Thumbrella fast media thumbnail platform.',
       logo: { src: './public/thumbrella.png', alt: 'thumbrella.dev' },
       head: [
         { tag: 'link', attrs: { rel: 'icon', href: '/favicon.png'} },
       ],
-      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/thumbrella' }],
       components: {
         Header: './src/components/starlight/Header.astro',
         Footer: './src/components/starlight/Footer.astro',
@@ -36,64 +35,7 @@ export default defineConfig({
         baseUrl: 'https://github.com/thumbrella-dev/web/edit/main/',
       },
       lastUpdated: true,
-      sidebar: [
-        { label: 'Overview', link: '/docs/' },
-        { label: 'Pricing', link: '/docs/pricing/' },
-        { label: 'Supporters', link: '/docs/supporters/' },
-        {
-          label: '\u{1F4D6} Introduction',
-          items: [
-            { label: 'Introduction', slug: 'docs/introduction/overview' },
-            { label: 'Project and Author', slug: 'docs/introduction/project-and-author' },
-            { label: 'Choose a Path', slug: 'docs/introduction/choose-a-path' },
-            { label: 'FAQ', slug: 'docs/introduction/faq' },
-          ],
-        },
-        {
-          label: '\u{1F4E6} Clients',
-          items: [
-            { label: 'Clients', slug: 'docs/clients/overview' },
-            { label: 'Quickstart', slug: 'docs/clients/quickstart' },
-            { label: 'Web Client (JS/TS)', slug: 'docs/clients/web-client' },
-            { label: 'Request Options', slug: 'docs/clients/request-options' },
-            { label: 'Auth and Limits', slug: 'docs/clients/auth-and-limits' },
-            { label: 'Errors and Retries', slug: 'docs/clients/errors-and-retries' },
-            { label: 'API Reference', slug: 'docs/clients/api-reference' },
-          ],
-        },
-        {
-          label: '\u{1F5A5}\u{FE0F} Server',
-          items: [
-            { label: 'Server', slug: 'docs/server/overview' },
-            { label: 'Self-Hosted', slug: 'docs/server/self-hosted' },
-            { label: 'AI Platforms', slug: 'docs/server/ai-platforms' },
-            { label: 'Configuration', slug: 'docs/server/configuration' },
-            { label: 'Operations', slug: 'docs/server/operations' },
-            { label: 'CLI Reference', slug: 'docs/server/cli-reference' },
-            { label: 'Troubleshooting', slug: 'docs/server/troubleshooting' },
-          ],
-        },
-        {
-          label: '\u2601\u{FE0F} Service',
-          items: [
-            { label: 'Service', slug: 'docs/service/overview' },
-            { label: 'Account Management', slug: 'docs/service/account-management' },
-            { label: 'Usage and Limits', slug: 'docs/service/usage-and-limits' },
-            { label: 'API Tokens', slug: 'docs/service/api-tokens' },
-            { label: 'Pricing and Billing', slug: 'docs/service/pricing-and-billing' },
-          ],
-        },
-        {
-          label: '\u{1F6E0}\u{FE0F} Developers',
-          items: [
-            { label: 'Developers', slug: 'docs/developers/overview' },
-            { label: 'Architecture', slug: 'docs/developers/architecture' },
-            { label: 'Internals', slug: 'docs/developers/internals' },
-            { label: 'Hosting Strategy', slug: 'docs/developers/hosting-strategy' },
-            { label: 'Repos and Ownership', slug: 'docs/developers/repos-and-ownership' },
-          ],
-        },
-      ],
+      tableOfContents: false,
       customCss: ['./src/styles/starlight-custom.css'],
       expressiveCode: {
         themes: ['github-dark'],

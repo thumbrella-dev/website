@@ -1,11 +1,10 @@
 ---
 title: FAQ
 description: Common introductory and cross-cutting questions.
+slug: docs/faq
 ---
 
 Placeholder FAQ page.
-
-## Suggested Questions
 
 - What media types are supported?
 - What is the difference between hosted and self-hosted usage?
