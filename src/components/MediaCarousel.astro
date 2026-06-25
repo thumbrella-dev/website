@@ -58,10 +58,10 @@ const { items } = Astro.props;
             <div class="ctile__thumb">
               <div class="ctile__bg" aria-hidden="true"></div>
               <div class="ctile__placeholder" aria-hidden="true">
-                <img class="ctile__ph-img" src={placeholderSrc} alt="" />
+                <img class="ctile__ph-img" src={placeholderSrc} alt="" draggable="false" />
                 <span class="ctile__spinner"></span>
               </div>
-              <img class="ctile__img" alt={item.name} />
+              <img class="ctile__img" alt={item.name} draggable="false" />
               <div class="ctile__badges" aria-hidden="true">
                 <span class={`ctile__badge ctile__badge--${item.type}`}>{item.codec}</span>
                 {item.duration && <span class="ctile__badge ctile__badge--dur">{item.duration}</span>}
@@ -126,7 +126,11 @@ const { items } = Astro.props;
 
   .carousel-track-wrap {
       overflow-y: visible;
-      cursor: default;
+      cursor: grab;
+  }
+
+  .carousel-track-wrap:active {
+      cursor: grabbing;
   }
 
   .carousel-track {
@@ -476,6 +480,58 @@ const { items } = Astro.props;
       if (!popup || !popup.classList.contains('is-open')) targetSpeed = TARGET_SPEED;
     });
 
+    // ── Drag / swipe ──────────────────────────────────────────────────────
+    const trackWrap = track.parentElement as HTMLElement | null;
+    let dragging = false;
+    let dragStartX = 0;
+    let dragStartPos = 0;
+    let dragMoved = false;
+
+    function onPointerDown(e: PointerEvent) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return; // left-click only
+      dragging = true;
+      dragMoved = false;
+      dragStartX = e.clientX;
+      dragStartPos = pos;
+      targetSpeed = 0;
+      speed = 0;
+      trackWrap?.setPointerCapture(e.pointerId);
+    }
+
+    function onPointerMove(e: PointerEvent) {
+      if (!dragging) return;
+      const dx = e.clientX - dragStartX;
+      if (Math.abs(dx) < 2) return; // dead zone to avoid jitter
+      dragMoved = true;
+      pos = dragStartPos - dx;
+      if (oneSetWidth > 0) {
+        // Wrap position within one set
+        while (pos < 0) pos += oneSetWidth;
+        while (pos >= oneSetWidth) pos -= oneSetWidth;
+      }
+      if (track) track.style.transform = `translateX(${-pos}px)`;
+    }
+
+    function onPointerUp(_e: PointerEvent) {
+      if (!dragging) return;
+      dragging = false;
+      trackWrap?.releasePointerCapture((_e as PointerEvent).pointerId);
+      if (!popup?.classList.contains('is-open')) targetSpeed = TARGET_SPEED;
+    }
+
+    trackWrap?.addEventListener('pointerdown', onPointerDown);
+    trackWrap?.addEventListener('pointermove', onPointerMove);
+    trackWrap?.addEventListener('pointerup', onPointerUp);
+    trackWrap?.addEventListener('pointercancel', onPointerUp);
+
+    // Prevent text selection while dragging
+    trackWrap?.addEventListener('selectstart', (e) => {
+      if (dragging) e.preventDefault();
+    });
+
+    // Prevent native image drag-and-drop
+    trackWrap?.addEventListener('dragstart', (e) => e.preventDefault());
+
     // ── Popup: dynamic fields from result JSON ────────────────────────────
 
     /** Escape HTML entities so raw text is safe to embed. */
@@ -556,6 +612,7 @@ const { items } = Astro.props;
     }
 
     track.addEventListener('click', async (e) => {
+      if (dragMoved) return; // suppress click after drag
       const tile = (e.target as Element).closest('.ctile[data-name]') as HTMLElement | null;
       if (!tile || !popup) return;
 
