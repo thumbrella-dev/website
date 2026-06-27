@@ -5,7 +5,7 @@ slug: docs/project
 ---
 
 
-## Thumbnails as a Service
+### Thumbnails as a Service
 
 Thumbrella is a server that creates thumbnails and metadata for online media. 
 The code is open source and simple to run your own standalone service. The
@@ -25,7 +25,7 @@ simple developer tools and diagnostics.
 (More details in documetation)
 
 
-## Become a Fan
+### Become a Fan
 
 The free service for Thumbrella already provides a usable and poweful foundation
 for online applications. This can be extended further by becoming an early
@@ -40,7 +40,7 @@ Thumbrella.
 (More details in documetation)
 
 
-## Runtime
+### Runtime
 
 The Thumbrella server comes with a large collection of renderers statically
 compiled into the Rust executable. It can also be extended by finding additional
@@ -56,7 +56,7 @@ which commands are discovered and the types of media that will be supported
 by the running server.
 
 
-## Not Thumbrella
+### Not Thumbrella
 
 Thumbrella is an opinionated service for generating thumbnail images. These are
 intended to be low reseolution, static representations of media. This includes
@@ -74,7 +74,7 @@ environment. (It does allow service users to create publishable keys that can
 be used to access the service from a browser.)
 
 
-## Online
+### Online
 
 Online thumbnails create unique challenges that are not handled by traditional
 desktop thumbnailing applications. The primary challenge is that IO and access to
