@@ -26,9 +26,8 @@ if (carouselItems.length > 0) {
 ---
 
 <MainLayout
-  title="Thumbrella — fast thumbnails for any media"
-  description="Thumbrella generates fast thumbnails for any online media: video, camera photos, documents, 3D models, and more. Open source, free to self-host, with client libraries for most languages."
->
+  title="Thumbrella is the open source server for online thumbnails"
+  description="Serve fast, cached thumbnails from over 100 formats: photographs, videos, documents, even 3D models. Feed it your media libraries and get reliable thumbnail back. One command runs it locally or in Docker. Our Thumbrella Cloud is efficient enough to offer a genuinely useful free tier. Start with client the packages for languages you already use. Docs and examples get you streaming thumbnails immediately.">
 
   <!-- ═══════════════════════════════════════════════════ HERO -->
   <section class="hero" id="hero">
@@ -50,24 +49,20 @@ if (carouselItems.length > 0) {
         <p class="caps-prose">
           Thumbrella is the
           <ProsePopover> <span slot="trigger">open source</span>
-            Apache&nbsp;2 license for the server and various client libraries.<br>
+            Apache&nbsp;2 license for the server and all client libraries.<br>
             One of the easiest licenses to integrate into any project.
           </ProsePopover>
-          thumbnail server. 
+          server for online thumbnails. 
           
         </p>
         <p class="caps-prose">
           
-          Get
+          Serve
           <ProsePopover> <span slot="trigger">fast, cached</span>
             Processing written in Rust. Cache thumbnails across 300+ worldwide regions. Every response includes standard HTTP cache headers. Re-requesting the same thumbnail is nearly free.
           </ProsePopover>
-          thumbnails from
-          <ProsePopover> <span slot="trigger">large files</span>
-            Remote data only downloads what is needed using byte-range requests. Process files of any size without downloading the entire thing.
-          </ProsePopover>
-          and even
-          <ProsePopover> <span slot="trigger">complicated media formats</span>
+          thumbnails from over 100 formats —
+          <ProsePopover> <span slot="trigger">photographs, video, documents, even 3D models</span>
             Camera RAW, legacy video codecs, old document formats, 3D geometry, vector graphics, and more.
           </ProsePopover>.
 
@@ -90,7 +85,7 @@ if (carouselItems.length > 0) {
             Run your own production server with one simple command. Or work with docker compose and other container tools.
           </ProsePopover>
           or use the
-          <ProsePopover> <span slot="trigger">hosted service</span>
+          <ProsePopover> <span slot="trigger">Thumbrella Cloud</span>
             One click sign in for a new account and get going for free.
           </ProsePopover>
           for free.

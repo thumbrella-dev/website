@@ -34,7 +34,7 @@ Becoming one of the first supporters of Thumbrella allows focusing on specific n
 
 A production-ready self-hosted deployment with enterprise-grade features, full offline capability, and priority support.
 
-Supporters get access to the enhanced Docker image. This contains the open source Thumbrella server running in an environment with all optional renderers enabled and optimized to work together. This is the ideal out-of-the-box environment for Thumbrella, matching what powers the online service. The sponsor edition also extends the server with locally controlled resources like cache management backends. The full environment can run offline in a standalone Docker image.
+Supporters get access to the enhanced Docker image. This contains the open source Thumbrella server running in an environment with all optional renderers enabled and optimized to work together. This is the ideal out-of-the-box environment for Thumbrella, matching what powers Thumbrella Cloud. The sponsor edition also extends the server with locally controlled resources like cache management backends. The full environment can run offline in a standalone Docker image.
 
 - Docker image — full media type support out of the box
 - Perpetual license with one full year of upgrades (works offline, no phone home)
@@ -42,7 +42,7 @@ Supporters get access to the enhanced Docker image. This contains the open sourc
 - Email support
 - Redis and other cache backends with maintenance tooling
 - Optional: access the global distributed cache network
-- Optional: access the hosted service with elevated quotas
+- Optional: access Thumbrella Cloud with elevated quotas
 
 Unlimited renders on your server.
 

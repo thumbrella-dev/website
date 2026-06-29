@@ -4,11 +4,11 @@ description: Working with the Thumbrella service
 slug: docs/service
 ---
 
-Placeholder for hosted service section overview.
+Placeholder for Thumbrella Cloud section overview.
 
 ## Section Goals
 
-- Help users set up and manage their hosted service account.
+- Help users set up and manage their Thumbrella Cloud account.
 - Explain usage limits, quotas, and scaling options.
 - Document billing and token management.
 

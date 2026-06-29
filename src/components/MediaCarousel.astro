@@ -36,7 +36,7 @@ const { items } = Astro.props;
         const rx = (Math.sin(i * f * 1) * 10).toFixed(1);
         const ry = (Math.cos(i * f * 1) * 13).toFixed(1);
         const ty = (Math.cos(i * f * 1) * 1).toFixed(1);
-        const placeholderSrc = `https://api.thumbrella.dev/placeholder/${item.kind || 'unknown'}.jpeg`;
+        const placeholderSrc = `https://cloud.thumbrella.dev/placeholder/${item.kind || 'unknown'}.jpeg`;
         return (
           <li
             class="ctile"

@@ -10,7 +10,7 @@ The project documentation lives in `src/content/docs/` and is rendered by
 This website hosts the main static website for Thumbrella. There are several
 related websites that are part of the Thumbrella platform. This does not
 include
-- https://api.thumbrella.dev - the hosted thumbrella service (requires account)
+- https://cloud.thumbrella.dev - the hosted thumbrella service (requires account)
 - https://demo.thumbrella.dev - gallery of example media and mock api
 - https://admin.thumbrella.dev - backend account management
 

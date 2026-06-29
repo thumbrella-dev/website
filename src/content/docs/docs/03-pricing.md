@@ -6,9 +6,9 @@ slug: docs/pricing
 
 Start free. Upgrade when it makes sense — or run it yourself for nothing.
 
-### Hosted Service
+### Thumbrella Cloud
 
-Thumbrella processes thumbnails on shared infrastructure. A registered account works across the hosted API, self-hosted instances, and AI platforms.
+Thumbrella processes thumbnails on shared infrastructure. A registered account works across Thumbrella Cloud, self-hosted instances, and AI platforms.
 
 ### Free
 
