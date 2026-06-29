@@ -29,7 +29,7 @@ if (carouselItems.length > 0) {
   title="Thumbrella is the open source server for online thumbnails"
   description="Serve fast, cached thumbnails from over 100 formats: photographs, videos, documents, even 3D models. Feed it your media libraries and get reliable thumbnail back. One command runs it locally or in Docker. Our Thumbrella Cloud is efficient enough to offer a genuinely useful free tier. Start with client the packages for languages you already use. Docs and examples get you streaming thumbnails immediately.">
 
-  <!-- ═══════════════════════════════════════════════════ HERO -->
+  <!-- HERO -->
   <section class="hero" id="hero">
     <div class="container hero__inner">
       <img src="/thumbrella.png" alt="Thumbrella" class="hero__logo" />
@@ -37,10 +37,10 @@ if (carouselItems.length > 0) {
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════ CAROUSEL -->
+  <!-- CAROUSEL -->
   <MediaCarousel items={carouselItems} />
 
-  <!-- ═══════════════════════════════════════════ WHAT IT DOES -->
+  <!-- WHAT IT DOES -->
   <section class="hp-section hp-section--no-border">
     <div class="container">
       <h2 class="section-heading">About</h2>
@@ -50,55 +50,64 @@ if (carouselItems.length > 0) {
           Thumbrella is the
           <ProsePopover> <span slot="trigger">open source</span>
             Apache&nbsp;2 license for the server and all client libraries.<br>
-            One of the easiest licenses to integrate into any project.
+            One of the simplest licenses to integrate into any project.
           </ProsePopover>
           server for online thumbnails. 
           
         </p>
         <p class="caps-prose">
-          
           Serve
           <ProsePopover> <span slot="trigger">fast, cached</span>
-            Processing written in Rust. Cache thumbnails across 300+ worldwide regions. Every response includes standard HTTP cache headers. Re-requesting the same thumbnail is nearly free.
+            Server written in Rust and deployed to the edge in over 300 regions.<br>
+            Full integration with http caching headers and range requests 
+            for excellent performance.
           </ProsePopover>
-          thumbnails from over 100 formats —
-          <ProsePopover> <span slot="trigger">photographs, video, documents, even 3D models</span>
-            Camera RAW, legacy video codecs, old document formats, 3D geometry, vector graphics, and more.
-          </ProsePopover>.
+          thumbnails from over
+          <ProsePopover> <span slot="trigger">100 formats</span>
+            Handles megapixel imagery with complicated pixel formats and codecs.<br>
+            Efficiently work through massive video files.<br>
+            Render quality images from vector artwork, 3d models, and documents.<br>
+            Quickly extract embedded thumbnails and cover art from other formats.
+          </ProsePopover>:
+          photographs, videos, documents, even 3D models.
 
         </p>
         <p class="caps-prose">
-
-          Many
-          <ProsePopover> <span slot="trigger">client libraries</span>
-            <code>npm install @thumbrella/client</code>, <code>pip install thumbrella</code>, Go, Rust, React. Same URL-based interface everywhere. <a href="/docs/client">Docs →</a>
+          <ProsePopover> <span slot="trigger">One command</span>
+            Run from most operating systems, `<code>npx @thumbrella/server serve</code>`
+            and be running in seconds.<br>
+            Or work with Docker with `<code>docker run -it -p 3114:3114 thumbrella/server</code>`.<br>
           </ProsePopover>
-          provide easy
-          <ProsePopover> <span slot="trigger">streaming and batching</span>
-            Stream individual thumbnails or batch-process entire directories. Built-in concurrency control and automatic retry.
-          </ProsePopover>
-          out of the box.
-
-        </p>
-        <p class="caps-prose">
-          <ProsePopover> <span slot="trigger">Self-host</span>
-            Run your own production server with one simple command. Or work with docker compose and other container tools.
-          </ProsePopover>
-          or use the
+          runs it locally or in Docker. Our
           <ProsePopover> <span slot="trigger">Thumbrella Cloud</span>
-            One click sign in for a new account and get going for free.
+            Register with an existing developer account in <a href="/account">two clicks</a>, no payment info.<br>
+            Set your token and get full access to all features.
           </ProsePopover>
-          for free.
+          is efficient enough to offer a genuinely useful free tier.
+        </p>
+        <p class="caps-prose">
+          Start with
+          <ProsePopover> <span slot="trigger">client libraries</span>
+            Packages already available for Typescript, Python, and Rust.<br>
+            High level web components for Astro and React.<br>
+            Set a connection string, `<code>Client().batch(urls)</code>`, and done.<br>
+            <a href="/docs/client">Docs →</a>
+          </ProsePopover>
+          for languages you already use. Docs and examples get you
+          <ProsePopover> <span slot="trigger">streaming thumbnails</span>
+            Stream individual thumbnails or batch-process entire directories.<br>
+            Resilient clients provide placeholders even when the server is unreachable.
+          </ProsePopover>
+          immediately.
         </p>
 
         <div class="caps-formats">
-          <FormatChip icon="🎬" title="Video" count="12">Video thumbnails are efficiently extracted from encoded keyframes early in the video.<br>MP4, MOV, MKV, AVI, FLV, TS, M4V, 3GP, OGV, WMV, MPEG...</FormatChip>
-          <FormatChip icon="🖼️" title="Images" count="16">Image formats often contain simple colors pixel data for a variety of digital uses.<br>JPEG, PNG, WEBP, AVIF, GIF, TIFF, BMP, HEIC, JP2, JXL, ICO, PSD, PPM, TGA...</FormatChip>
-          <FormatChip icon="📷" title="Photographs" count="17">Camera and film formats are often heavy and high definition frame captures and often need color processing.<br>RAW, DNG, EXR, HDR, CR2, NEF, ARW, ORF, RW2, PEF, SRW, RAF, 3FR, MEF...</FormatChip>
-          <FormatChip icon="📄" title="Documents" count="7">Documents are usually multi-page collections
-            of styled text and media.<br>PDF, DOCX, PPTX, ODT, XLSX, ODS, ODP.</FormatChip>
-          <FormatChip icon="🧊" title="3D geometry" count="37">Three dimensional models and scenes that can contain triangles, shaders, and textures.<br>OBJ, GLTF, GLB, STL, FBX, USDZ, IGES, DAE, PLY, 3DS, VRML...</FormatChip>
-          <FormatChip icon="✏️" title="Vector graphics" count="1">Graphical descriptions of shapes and materials.<br>SVG<br>(more formats coming soon).</FormatChip>
+          <FormatChip icon="🎬" title="Video" count="14">Video thumbnails are efficiently extracted from encoded keyframes in the video.<br>MP4, MOV, MKV, AVI, FLV, TS, M4V, 3GP, OGV, WMV, MPEG...</FormatChip>
+          <FormatChip icon="🖼️" title="Images" count="19">Common image formats designed to be lightweight for a variety of digital uses. From tiny pixel art to panoramic megapixels.<br>JPEG, PNG, WEBP, AVIF, GIF, TIFF, BMP, HEIC, JP2, JXL, ICO, PSD, PPM, TGA...</FormatChip>
+          <FormatChip icon="📷" title="Photographs" count="27">Camera and film formats are often heavy and high definition frame captures, multichannel imagery that requires color processing.<br>RAW, DNG, EXR, HDR, CR2, NEF, ARW, ORF, RW2, PEF, SRW, RAF, 3FR, MEF...</FormatChip>
+          <FormatChip icon="🧊" title="3D geometry" count="26">Three dimensional models and scenes that can contain triangles, shaders, and textures.<br>OBJ, GLTF, GLB, STL, FBX, USDZ, IGES, DAE, PLY, 3DS, VRML...</FormatChip>
+          <FormatChip icon="📄" title="Documents" count="6">Documents are usually multi-page collections of styled text and media.<br>DOCX, PPTX, ODT, XLSX, ODS, ODP, PDF (soon).</FormatChip>
+          <FormatChip icon="📦" title="And more" count="10">Vector graphics are rendered in high quality. Even audio formats commonly provide cover art to view. And more on the way.<br>SVG, MP3, FLAC, OGG, M4A, AAC...</FormatChip>
         </div>
 
       </div>
@@ -113,7 +122,7 @@ if (carouselItems.length > 0) {
   <HostingTabs />
 
 
-  <!-- ══════════════════════════════════════════ DOCS / ABOUT -->
+  <!-- DOCS / ABOUT -->
   <section class="hp-section">
     <div class="container hp-prose">
       <AboutContent />
@@ -125,7 +134,6 @@ if (carouselItems.length > 0) {
 <script>
   import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom';
 
-  // ── CapsItem, ProsePopover + FormatChip popovers ──────────────────────────
   document.querySelectorAll<HTMLElement>(
     '.prose-popover[aria-controls], .fmt-chip[aria-controls]'
   ).forEach((item) => {
@@ -164,7 +172,5 @@ if (carouselItems.length > 0) {
       if (newState === 'closed') { cleanup?.(); cleanup = null; }
     });
   });
-
-
 
 </script>
