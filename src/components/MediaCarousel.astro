@@ -81,9 +81,10 @@ const { items } = Astro.props;
 </section>
 
 <style is:global>
-  /* ──────────────────────────────── CAROUSEL */
+  /* CAROUSEL */
   .carousel-section {
       position: relative;
+      overflow-x: clip;
   }
 
   .carousel-demo-link {
@@ -144,7 +145,7 @@ const { items } = Astro.props;
       overflow-y: visible;
   }
 
-  /* ── tile ── */
+  /* tile  */
   .ctile {
       flex-shrink: 0;
       width: 190px;
@@ -293,7 +294,7 @@ const { items } = Astro.props;
       opacity: 1;
   }
 
-  /* ── popup ── */
+  /* popup  */
   .cpopup {
       position: absolute;
       z-index: 10;
@@ -480,7 +481,7 @@ const { items } = Astro.props;
       if (!popup || !popup.classList.contains('is-open')) targetSpeed = TARGET_SPEED;
     });
 
-    // ── Drag / swipe ──────────────────────────────────────────────────────
+    //  Drag / swipe 
     const trackWrap = track.parentElement as HTMLElement | null;
     let dragging = false;
     let dragStartX = 0;
@@ -532,7 +533,7 @@ const { items } = Astro.props;
     // Prevent native image drag-and-drop
     trackWrap?.addEventListener('dragstart', (e) => e.preventDefault());
 
-    // ── Popup: dynamic fields from result JSON ────────────────────────────
+    //  Popup: dynamic fields from result JSON 
 
     /** Escape HTML entities so raw text is safe to embed. */
     function escHtml(s: string): string {
@@ -646,7 +647,7 @@ const { items } = Astro.props;
             const media = (r.media ?? {}) as Record<string, unknown>;
             const props = (media.properties ?? {}) as Record<string, unknown>;
 
-            // ── Thumbrella section ──
+            //  Thumbrella section 
             const tbr = document.createElement('div');
             tbr.className = 'cpopup__sec';
             const resultUrl = tile.dataset.resultUrl ?? '';
@@ -659,7 +660,7 @@ const { items } = Astro.props;
             }
             dl.appendChild(tbr);
 
-            // ── Media section ──
+            //  Media section 
             const msec = document.createElement('div');
             msec.className = 'cpopup__sec';
             const url = String(r.url ?? '');
@@ -681,7 +682,7 @@ const { items } = Astro.props;
 
             dl.appendChild(msec);
 
-            // ── About section ──
+            //  About section 
             const link = tile.dataset.link;
             const desc = tile.dataset.description;
             if (link || desc) {

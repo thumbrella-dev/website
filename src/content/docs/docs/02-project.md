@@ -4,59 +4,32 @@ description: Project information
 slug: docs/project
 ---
 
-
 ### Thumbnails as a Service
 
-Thumbrella is a server that creates thumbnails and metadata for online media. 
+Thumbrella is a server that creates thumbnails and metadata for online media.
 The code is open source and simple to run your own standalone service. The
 Apache 2 license makes it easy to customize, use, and contribute to.
 
-The thumbrella.dev is a simple on-ramp to scalable resources, a global caching
-network, and integration with the most complicated renderers. The architecture
-allows managing this service on lightweight cloud services that allows anyone
-to use the service free. There are payment options for the more demanding
-use cases to help manage the service costs.
+Thumbrella Cloud is a hosted on-ramp to scalable resources. It brings a global
+caching network and integration with the most complicated renderers. The
+architecture allows managing this service on lightweight cloud services that
+allows anyone to use the service free. There are payment options for the more
+demanding use cases to help manage the service costs.
 
 A family of rich client libraries makes getting started even easier. These are
 also Apache 2 client and ready to integrate into any project. These extend the
 server with persistent caching, simplifying streaming requests, as well as
 simple developer tools and diagnostics.
 
-(More details in documetation)
 
+### Authors
 
-### Become a Fan
+- **Peter Shinners** - creator and maintainer of Thumbrella.
+  Bringing long and fortunate career as a Python developer and technical artist
+  for various game and film studios. Peter has also been the maintainer of Pygame
+  and couple minimal open source libraries over the years.
 
-The free service for Thumbrella already provides a usable and poweful foundation
-for online applications. This can be extended further by becoming an early
-supporter of Thumbrella. Thumbrella fans automatically receive triple the usage 
-limits over the free plan. There are several ways to become a fan and support
-Thumbrella.
-
-* Star on Github
-* Purchase merch
-* Contribute documentation or bug fixes
-
-(More details in documetation)
-
-
-### Runtime
-
-The Thumbrella server comes with a large collection of renderers statically
-compiled into the Rust executable. It can also be extended by finding additional
-command line renderers to handle the most complicated media formats.
-
-The server will look for commands like ``ffmpeg`` and ``f3d`` to handle the
-most complicated media types. These are run in limited resource processes,
-and if sandbox tools like Bubblewrap are available, they will be applied to
-the external commands.
-
-Run the server with the ``diag`` subcommand to get detailed output about
-which commands are discovered and the types of media that will be supported
-by the running server.
-
-
-### Not Thumbrella
+### Unsupported Features
 
 Thumbrella is an opinionated service for generating thumbnail images. These are
 intended to be low reseolution, static representations of media. This includes
@@ -94,24 +67,26 @@ to enable shared caching and other features. AI applications are already running
 and those applications can immediately make use of Thumbrella for high quality media management.
 * Replicate
 * fal.ai
-* Modal
 
 
 ### Repositories
 
-- [thumbrella](https://github.com/thumbrella-dev/thumbrella): Core Rust codebase (tier1 library, tier2 binary, tier3 media).
-- [thumbrella-api](https://github.com/PeterShinners/thumbrella-api): Cloudflare Worker wrapping tier1 via WASM.
-- [thumbrella-web](https://github.com/PeterShinners/thumbrella-web): Public marketing site and documentation (this site).
-- [thumbrella-admin](https://github.com/PeterShinners/thumbrella-admin): Admin dashboard (CF Access-protected).
-- [thumbrella-clients](https://github.com/PeterShinners/thumbrella-clients): Public client SDKs (JS/TS, Python, Go, Rust, React, Astro).
-- [thumbrella-docker](https://github.com/PeterShinners/thumbrella-docker): Container image definitions for tier2 and tier3.
-- [thumbrella-demo](https://github.com/PeterShinners/thumbrella-demo): Demo site showcasing thumbnails and media.
-- [thumbrella-platform](https://github.com/PeterShinners/thumbrella-platform): Dev container, docs, and orchestration scripts.
-
-### Authors
-
-Peter Shinners — creator and maintainer of Thumbrella.
+- [thumbrella](https://github.com/thumbrella-dev/thumbrella): Thumbrella server in Rust
+- [website](https://github.com/thumbrella-dev/website): Project information and documentation (this site).
+- [clients](https://github.com/thumbrella-dev/clients): Public client packages (JS/TS, Python, Go, Rust, React, Astro).
 
 ### Demo Site
 
-Info about the cool demo site
+Thumbrella provides a simple, static gallery of media and the thumbnail results
+from the current versions of the Thumbrella server. This has a collection of
+over 30 media with a variety of formats and encodings.
+
+https://demo.thumbrella.dev
+
+The demo site also acts as a mock thumbrella server itself. This allows free
+and immediate testing of Thumbrella clients with no server or account tokens.
+
+Set `TBR_CONNECT=https://demo.thumbrella.dev` and access thumbnails for any 
+of the media it hosts.
+
+Or directly, `curl https://demo.thumbrealla.dev/thumb.jpeg&url=https://demo.thumbrella.dev/media/stream-barn.mkv --output thumbnail.jpeg`

@@ -1,7 +1,7 @@
 ---
-title: Service
-description: Working with the Thumbrella service
-slug: docs/service
+title: Cloud
+description: Online thumbnail service
+slug: docs/cloud
 ---
 
 Placeholder for Thumbrella Cloud section overview.

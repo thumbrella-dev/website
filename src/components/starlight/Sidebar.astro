@@ -35,17 +35,21 @@ const pages = docs.map((entry) => {
   return { slug, title: entry.data.title, h2s };
 });
 
-// Desired sidebar order
+// Explicit sidebar order.
+// We tried sorting by filename prefix and by frontmatter `order` —
+// neither works because entry.id is the frontmatter slug, not the file path.
+// This list is the source of truth; keep it synced with the files in
+// src/content/docs/docs/ when adding or reordering pages.
 const slugOrder = [
   'docs',
   'docs/project',
   'docs/pricing',
+  'docs/sponsor',
   'docs/faq',
   'docs/client',
   'docs/server',
-  'docs/service',
+  'docs/cloud',
   'docs/development',
-  'docs/supporters',
 ];
 pages.sort((a, b) => slugOrder.indexOf(a.slug) - slugOrder.indexOf(b.slug));
 ---

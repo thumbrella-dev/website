@@ -22,13 +22,13 @@ Thumbrella service. This also extends the server by providing more locally
 controlled resources like cache management. This full environment can be
 run offline in a standalone Docker image.
 
-## Sponsors
+### Sponsors
 
 Thumbrella is designed to be a flexible and reliable part of any type of media application. Significant and supportive clients can sign up for a sponsor-level subscription. This encourages Thumbrella to thrive and grow even further. The service is under active development and there is no end of features and integrations that could be added.
 
 Becoming one of the first supporters of Thumbrella allows focusing on specific needs and customizations for early adopters. Help drive the future direction of Thumbrella for all users.
 
-## Sponsor Edition
+### Sponsor Edition
 
 **~$100/mo**
 

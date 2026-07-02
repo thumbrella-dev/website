@@ -1,0 +1,85 @@
+---
+title: Pricing
+description: Every way to use Thumbrella and what each costs.
+slug: docs/pricing
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import PricingCard from '../../../components/PricingCard.astro';
+
+:::note
+Thumbrella Cloud is still in prerelease and being deployed. Until systems
+stabilize, only free accounts with reduced limits are available.
+:::
+
+### Thumbrella Cloud
+
+The online cloud service is an easy, optional way to use Thumbrella. The online
+service is designed to be the simplest way to get started, it also provides
+additional value to self hosted or other ways to run the service.
+
+
+<div class="card-grid">
+  <PricingCard title="Free" price="$0" href="/account">
+    The primary use of Thumbrella Cloud is intended to be free and immediately
+    useful.
+
+    No payment information. Connect your existing developer account 
+    in 2 clicks. Get your authentication token immediately.
+
+    **Cache**
+    - Data: 10 MB
+    - TTL: 5 days
+
+    **Render**
+    - Hourly: 500
+    - Daily: 1,000
+    - Monthly: 10,000
+  </PricingCard>
+  <PricingCard title="Paid" price="$5/month" href="/account">
+    Paid accounts run on dedicated servers for faster responses. Accounts get 
+    vastly expanded usage quotas.
+
+    Paid accounts can subdivide their usage into separate authentication tokens
+    with their own limits and permissions.
+
+    **Cache**
+    - Data: 200 MB
+    - TTL: 30 days
+
+    **Render**
+    - Hourly: 5,000
+    - Daily: 10,000
+    - Monthly: 100,000
+  </PricingCard>
+</div>
+
+There are two measurements of a Thumbrella Cloud account.
+
+- **Cache** - the amount and lifetime of preserved thumbnails in the global,
+  distributed edge caching.
+- **Render** - the amount of thumbnails processed by the server. Quotas
+  prevent new thumbnails from generating for media. Although Thumbrella always
+  provides placeholder thumbnails for any request, even over quota.
+
+Each thumbnail is usually between 5kb - 10kb in size. Not all thumbnails are
+charged at the same rate. See the [cloud](../cloud/) pages for more details.
+
+
+### Other Options
+
+- Thumbrella is easy to serve and host on your own. The open source server is
+  ready to run immediately with a single command. See the [server
+  documentation](../server) for details.
+
+- AI platforms __(coming soon)__. Specially deployed Thumbrella servers are
+  available on hosted platforms like [fal.ai](https://fal.ai) and
+  [Replicate](https://replicate.com). Run on these platforms using your existing
+  accounts at no additional cost. 
+
+- Project supporters get access to significantly higher resources and custom
+  Docker images with custom functionality. See the [supporter](../supporter/)
+  page for details.
+
+- The [demo gallery](https://demo.thumbrella.dev) has a collection of media
+  and can be used as a free server for the media it hosts.

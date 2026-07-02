@@ -1,5 +1,5 @@
 ---
-title: Clients
+title: Client
 description: Making requests
 slug: docs/client
 ---
@@ -35,6 +35,7 @@ Components for Astro, React, and other browser environments.
 ## Http
 
 Http api spec
+
 
 ## Libraries
 

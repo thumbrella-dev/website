@@ -65,12 +65,112 @@ starlight-theme-select { display: none; }
   border-left: 3px solid rgba(200, 149, 78, 0.45) !important;
 }
 
+/* ── Asides — dark, low-saturation, brown/purple family ───── */
+
+.starlight-aside {
+  background-color: var(--sl-color-gray-6) !important;
+  border-color: var(--sl-color-accent-high) !important;
+}
+.starlight-aside--note  { background-color: #24202a !important; }
+.starlight-aside--tip   { background-color: #282118 !important; }
+.starlight-aside--caution { background-color: #2a2318 !important; }
+.starlight-aside--danger  { background-color: #2a1e1c !important; }
+
+.starlight-aside__title {
+  color: var(--sl-color-accent-high) !important;
+}
+
 /* ── Page footer wrapper ───────────────────────────────────── */
 
 .sl-page-footer {
   margin-top: 3rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--sl-color-hairline-light);
+}
+
+/* ── Pricing card grid ─────────────────────────────────────── */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: 100%;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  align-items: start;
+}
+
+@media (min-width: 50rem) {
+  .card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Table styling ───────────────────────────────────────────
+
+   Starlight ships minimal table styles — header cells get white
+   text but no background, and rows have no alternating shading.
+   We match the code-block aesthetic: purplish header bar (#1e1530,
+   same as Expressive Code terminal titlebar), 8px rounded corners,
+   gold left-edge accent, and subtle zebra striping. */
+
+.sl-markdown-content table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin: 1.5rem 0;
+  font-size: var(--sl-text-sm);
+  border-left: 3px solid rgba(200, 149, 78, 0.45);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid rgba(200, 149, 78, 0.1);
+  border-right: 1px solid rgba(200, 149, 78, 0.1);
+}
+
+.sl-markdown-content :is(th, td):last-child:not(:where(.not-content *)) {
+  border-right: none;
+}
+
+.sl-markdown-content thead th {
+  background: #1e1530;
+  color: var(--sl-color-accent-high);
+  font-weight: 600;
+  font-size: var(--sl-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Top row: first cell gets top-left radius, last gets top-right */
+.sl-markdown-content thead th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.sl-markdown-content thead th:last-child {
+  border-top-right-radius: 8px;
+}
+
+/* Bottom row: first cell gets bottom-left radius, last gets bottom-right */
+.sl-markdown-content tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.sl-markdown-content tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+/* Last row has no bottom border (radius handles the edge) */
+.sl-markdown-content tbody tr:last-child :is(th, td) {
+  border-bottom: none;
+}
+
+.sl-markdown-content tbody tr:nth-child(even) {
+  background: rgba(30, 21, 48, 0.18);
+}
+
+.sl-markdown-content tbody tr:hover {
+  background: rgba(200, 149, 78, 0.08);
 }
 
 .sl-page-footer-meta {
