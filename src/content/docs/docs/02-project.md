@@ -21,7 +21,6 @@ also Apache 2 client and ready to integrate into any project. These extend the
 server with persistent caching, simplifying streaming requests, as well as
 simple developer tools and diagnostics.
 
-
 ### Authors
 
 - **Peter Shinners** - creator and maintainer of Thumbrella.
@@ -46,7 +45,6 @@ Thumbrella runs as a standalone service. It cannot be run inside a browser
 environment. (It does allow service users to create publishable keys that can
 be used to access the service from a browser.)
 
-
 ### Online
 
 Online thumbnails create unique challenges that are not handled by traditional
@@ -67,7 +65,6 @@ to enable shared caching and other features. AI applications are already running
 and those applications can immediately make use of Thumbrella for high quality media management.
 * Replicate
 * fal.ai
-
 
 ### Repositories
 

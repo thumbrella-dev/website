@@ -25,6 +25,7 @@ cd thumbrella
 cargo run serve
 ```
 
+
 ## Command Line
 
 The Thumbrella executable provides several subcommands beyond the standard
@@ -44,6 +45,7 @@ web server. Any subcommand accepts `--help` for further details.
   requires an output path to save the generated jpeg image.
 - `thumbrella serve` runs the primary server. It includes built-in hints and
   diagnostics to help with onboarding.
+
 
 ## Configuration
 
@@ -73,6 +75,7 @@ most self hosted services.
 | `TBR_TIER3` | <none> | Connection string to contact a separate Thumbrella server for tier3. |
 | `TBR_SERVER` | <none> | Short identifier allowing inter server requests to log the origins. |
 
+
 ## Handshake
 
 Each server can define a secret handshake via the `$TBR_HANDSHAKE` environment
@@ -100,6 +103,7 @@ TBR_CONNECT=http://localhost:3114,wafflecones npm run thumbclient
 The handshake value must not look like a Thumbrella Cloud API token (i.e.
 starting with `tbr_`). The server will reject such values at startup to avoid
 confusion about where each kind of credential belongs.
+
 
 ## Caching
 
@@ -150,6 +154,7 @@ Each value in the list resembles a URL.
 Server caching is a separate thing than client side caching, which is included
 with all the provided client libraries. Server caches are shared by all users.
 
+
 ### SQLite Cache Management
 
 SQLite has no stored procedure support, so the database ships maintenance
@@ -167,6 +172,7 @@ sqlite3 /path/to/cache.db "VACUUM;"
 ```
 
 Additional recipes cover trimming by total cache size.
+
 
 ### Cache String
 
