@@ -177,27 +177,28 @@ side cache will want to preserve.
 | Field | Type | Description |
 |---|---|---|
 | `url` | string | The original URL that was requested. |
-| `status` | string | An enumeration describing the status of each individual thumbnail. (`success` `failed` `overloaded` `intermediate` `unavailable`) |
-| `source` | string | A descriptive explanation of what part of the pipeline provided this thumbnail. (`render` `shortcut` `cache` `not_modified` `fallback` `placeholder`) |
-| `placeholder` | string? | When the thumbnail is a predefined placeholder image, a short slug will be used here to identify the placeholder type. For rich clients this can be used to deduplicate common, recurring images. |
-| `message` | string? | Optional human-readable explanation, usually only set when there were failures or unusual conditions. |
-| `duration` | number | The number of seconds to produce this result. This will often be a small fractional number like `.0015`. This time includes the full downloading and render time for this individual url. For cached results the value will be even smaller. |
-| `downloadSize` | number | The number of bytes actually downloaded from the server. For many formats this will be the same as the total bytes in the file, which is provided in the `media` field`. Ideally it will be much smaller. |
-| `media` | object | A nested structure with information from the remote media. |
+| `status` | string | Outcome of this request. (`success` `failed` `overloaded` `intermediate`) |
+| `source` | string | How the thumbnail was produced. (`render` `shortcut` `cache` `not_modified` `fallback` `placeholder`) |
+| `message` | string | Human-readable detail, usually only set on failure. |
+| `duration` | number | Wall-clock seconds to produce this result (fractional, e.g. `.0015`). |
+| `downloadSize` | number | Bytes fetched from the upstream source. |
+| `httpStatus` | number | HTTP status returned by the upstream source, if fetched. |
+| `media` | object | The thumbnail and its metadata. `null` on total failure. |
 
-The `media` field is present on all non-error results and holds the thumbnail
-and metadata for the source file:
+The `media` object carries the stable, cacheable payload. Two results for the
+same file share the same `media` — clients can compare fields to deduplicate.
 
 | Field | Type | Description |
 |---|---|---|
-| `url` | string | The original URL that was requested is duplicated onto the media structure. This simplifies tools that want to cache only the media information. |
-| `thumbnail` | base64 | The JPEG thumbnail image encoded in base64. |
-| `kind` | string | An enumeration of various file types recognized by Thumbrella. (`image` `video` `audio` `document` `vector` `geometry` `archive` `text` `unknown`) |
-| `extension` | string | A consistent description of the file format or file extension. This will use a canonical name, for example, all forms of `jpg` or `jpe` filenames will be represented as `jpeg`. |
-| `mime` | string | The registered MIME type of the source file |
-| `fileSize` | number | Source file size in bytes |
-| `properties` | object | Optional metadata (e.g. `width_pixels`, `height_pixels`) |
-| `cache` | string? | Cache string for re-use on future requests |
+| `url` | string | Source URL that produced this thumbnail. |
+| `thumbnail` | base64 | JPEG thumbnail, base64-encoded. |
+| `kind` | string | Media category. (`image` `video` `audio` `document` `vector` `geometry` `archive` `text` `binary` `unknown`) |
+| `extension` | string | Canonical file extension, no dot (e.g. `jpeg`, `png`, `pdf`). |
+| `mime` | string | Sniffed MIME type (e.g. `image/jpeg`). |
+| `fileSize` | number | `Content-Length` from the upstream server, or 0. |
+| `placeholder` | string | Non-empty when the thumbnail is a fallback icon. Clients can compare this to deduplicate placeholder images. |
+| `cache` | string | Cache token for round-tripping. Format: `<hex_epoch>:<base64>`. Empty means do not cache. |
+| `properties` | object | Format-specific metadata. See below. |
 
 `source` describes how the thumbnail was produced. `render` means a fresh
 thumbnail was generated. `shortcut` means an embedded thumbnail inside the
@@ -207,6 +208,47 @@ mean the response came from a cache without re-rendering.
 Client libraries will convert the `thumbnail` base64 information into a binary
 or bytes representation appropriate for that language. The contents are usually
 around 5kb to 10kb in size.
+
+### Properties
+
+The media `properties` object holds format-specific metadata. Many of the fields
+are common across kinds where they have the same meaning. If a value cannot be
+determined reliably it is omitted.
+
+The values are always numbers. Some properties like "lossless" represent a
+boolean value with a numeric `0` or `1`.
+
+**Image**
+
+| Field | Unit | Description |
+|-------|------|-------------|
+| `width` | px | Source pixel width (not the thumbnail). |
+| `height` | px | Source pixel height. |
+| `bpp` | bits | Colour bits per pixel, excluding alpha. Omitted when ambiguous. |
+| `alpha` | bool | Has a transparency / alpha channel. |
+| `lossless` | bool | Codec uses lossless compression. |
+
+**Video**
+
+| Field | Unit | Description |
+|-------|------|-------------|
+| `width` | px | Frame width. |
+| `height` | px | Frame height. |
+| `bpp` | bits | Colour bits per pixel, if known from the codec. |
+| `duration` | sec | Playback duration. |
+| `channels` | num | Audio track count. 0 if silent. |
+
+**Audio**
+
+| Field | Unit | Description |
+|-------|------|-------------|
+| `channels` | num | Audio channel count. 0 if silent. |
+| `duration` | sec | Playback duration. |
+| `lossless` | bool | Inferred from the file extension (flac, wav, aiff). |
+
+**Geometry, Vector, Document, Archive, Text, Binary, Unknown**
+
+These kinds currently have no properties.
 
 ## Batch Streaming
 

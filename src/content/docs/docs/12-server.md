@@ -60,7 +60,7 @@ server can be further tuned with these.
 | `TBR_ALLOW_LOCAL` | `0` | Boolean that allows file paths or localhost URLs. (`0` `1` `false` `true`) |
 | `TBR_HANDSHAKE` | <none> | Private token required as a custom HTTP header on every request. |
 | `TBR_TRACE` | <none> | File path to append more detailed logging output. |
-| `TBR_CACHE` | <none> | Comma-separated list of cache backend definitions. |
+| `TBR_CACHE` | `mem:` (100 MB) | Cache backend definition (`mem:`, `sqlite:`, `none:`). |
 | `TBR_SCRATCH` | `$TMP/thumbrella` | A location on disk to download temporary files into. |
 
 Be aware that some of these settings may not make sense or even break things
@@ -73,7 +73,6 @@ most self hosted services.
 |---|---|---|
 | `TBR_TIER2` | <none> | Connection string to contact a separate Thumbrella server for tier2. |
 | `TBR_TIER3` | <none> | Connection string to contact a separate Thumbrella server for tier3. |
-| `TBR_SERVER` | <none> | Short identifier allowing inter server requests to log the origins. |
 
 
 ## Handshake
@@ -107,71 +106,45 @@ confusion about where each kind of credential belongs.
 
 ## Caching
 
-With default settings the server performs no server-side caching. This is
-not ideal — HTTP already provides rich caching directives, and a Thumbrella
-server that ignores them leaves significant performance on the table.
+The server includes a **short-term sticky cache** (5 seconds) with
+**request coalescing** built in.  When two identical requests arrive
+within 5 seconds, only one fetches the remote source — the second is
+served from the sticky cache.  This is always active.
 
-The http protocol has excellent standards for cache control. Thumbrella takes
-advantage of all of these. Both servers and client libraries can optionally
-store thumbnail results in persistent caches. 
-Thumbrella caches thumbnails at both the client and server levels. This is
-one of the key strategies for keeping Thumbrella fast and efficient.
+With default settings the server also enables a 100 MB in-memory LRU
+cache.  Set `TBR_CACHE` to customise or disable it.
 
-Thumbrella results encode the caching data into a single "cache string".
-This is used for a few things.
+Thumbrella respects upstream HTTP caching:
+- `Cache-Control: no-store` and `private` responses are **not** stored
+  in durable backends (they still pass through the 5 s sticky cache for
+  request deduplication).
+- `Cache-Control: max-age` and `s-maxage` are captured and returned to
+  clients as freshness hints.
+- `ETag` and `Last-Modified` are used for conditional revalidation.
 
-- Clients have a defined way to check the cache string for freshness. If the
-  cache is fresh, there's no need to request a new thumbnail from the server.
-  This is indeed the fastest code path possible, the client already knows
-  the answer and knows it is safe to reuse.
-- The client should also send this cache string along with every thumbnail
-  request. The server will coordinate with the remote host and determine the
-  current state of the media. If the server agrees the media is unchanged
-  it returns a special "not modified" status for the request. This only happens
-  when the request comes with a "cache string" that was returned from a 
-  previous request.
-- Even if a client requests a thumbnail with no cache string, the server can
-  still cache the state of thumbnail. If checking with the server validates
-  its recorded cache is up to date it can be returned immediately, with no
-  download or rendering of the actual media.
-
-`$TBR_CACHE` accepts a comma-separated list of cache backend definitions.
-Thumbrella ships with two built-in backends.
-
-Each value in the list resembles a URL.
+`$TBR_CACHE` selects a single cache backend:
 
 - **Memory** (`mem:`)
-  Not persistent — all cached data is lost when the server restarts.
-  Control the cache size with a hash anchor: `mem:/#2gb` or `mem:/#100mb`.
-  Defaults to 100 MB if no size is given. Modest, but plenty of room for
-  thumbnails.
+  Not persistent.  Size: `mem:200mb`, `mem:2gb`, `mem:500` (entries).
+  Defaults to 100 MB (just `mem:`).
+
 - **SQLite** (`sqlite:`)
-  Persistent across restarts. Provide a file path where the database will
-  live: `sqlite:/var/lib/thumbrella/cache.db`. The database grows
-  unbounded unless maintained. It ships with a `readme` table containing
-  ready-to-run SQL recipes for trimming by age or total size (see below).
+  Persistent.  `sqlite:cache.db`, `sqlite:/var/cache.db#1gb`.
+  Oldest entries evicted automatically when over the byte limit;
+  expired entries purged on each write.  No manual maintenance needed.
 
-Server caching is a separate thing than client side caching, which is included
-with all the provided client libraries. Server caches are shared by all users.
+- **Cloud** (`cloud:`)
+  Uses the Thumbrella cloud service as a distributed cache.
+  `cloud:tbr_s_AbCd...` — your cloud API token.
+  Size and TTL are managed by the cloud.
 
+- **None** (`none:`)
+  Disables all caching.  Takes no parameters.
 
-### SQLite Cache Management
-
-SQLite has no stored procedure support, so the database ships maintenance
-recipes as plain SQL in a `readme` table instead.
-
-List the available recipes:
-```bash
-sqlite3 /path/to/cache.db "SELECT name, description, sql_template FROM readme;"
-```
-
-Example — drop entries older than 20 days, then reclaim disk space:
-```bash
-sqlite3 /path/to/cache.db "DELETE FROM thumbrella WHERE last_accessed_at < unixepoch() - (20 * 86400);"
-sqlite3 /path/to/cache.db "VACUUM;"
-```
-
-Additional recipes cover trimming by total cache size.
+Every cache entry has an expiration timestamp.  By default upstream
+`Cache-Control: max-age` / `s-maxage` sets the TTL, capped at 7 days
+(`TBR_CACHE_MAX_TTL`).  When the upstream provides no hints, entries
+default to 1 hour (`TBR_CACHE_DEFAULT_TTL`).
 
 
 ### Cache String
