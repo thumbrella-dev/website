@@ -65,7 +65,7 @@ starlight-theme-select { display: none; }
   border-left: 3px solid rgba(200, 149, 78, 0.45) !important;
 }
 
-/* ── Asides — dark, low-saturation, brown/purple family ───── */
+/*  Asides — dark, low-saturation, brown/purple family ─ */
 
 .starlight-aside {
   background-color: var(--sl-color-gray-6) !important;
@@ -80,7 +80,7 @@ starlight-theme-select { display: none; }
   color: var(--sl-color-accent-high) !important;
 }
 
-/* ── Page footer wrapper ───────────────────────────────────── */
+/*  Page footer wrapper ─ */
 
 .sl-page-footer {
   margin-top: 3rem;
@@ -88,7 +88,7 @@ starlight-theme-select { display: none; }
   border-top: 1px solid var(--sl-color-hairline-light);
 }
 
-/* ── Pricing card grid ─────────────────────────────────────── */
+/*  Pricing card grid ─ */
 
 .card-grid {
   display: grid;
@@ -104,7 +104,7 @@ starlight-theme-select { display: none; }
   }
 }
 
-/* ── Table styling ───────────────────────────────────────────
+/*  Table styling
 
    Starlight ships minimal table styles — header cells get white
    text but no background, and rows have no alternating shading.

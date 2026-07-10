@@ -9,7 +9,7 @@
 
 const DEMO_BASE = 'https://demo.thumbrella.dev';
 
-// ── Index.json shape (new schema) ─────────────────────────────────────────
+//  Index.json shape (new schema)
 
 interface DemoIndex {
   generated: string;
@@ -29,7 +29,7 @@ interface DemoIndexFile {
   duration: number;  // seconds
 }
 
-// ── Per-result JSON shape (only fetched lazily for popup) ─────────────────
+//  Per-result JSON shape (only fetched lazily for popup)
 
 interface DemoResult {
   result?: {
@@ -48,7 +48,7 @@ interface DemoResult {
   };
 }
 
-// ── Carousel item (consumed by MediaCarousel.astro) ───────────────────────
+//  Carousel item (consumed by MediaCarousel.astro)
 
 export interface CarouselItem {
   name: string;
@@ -103,7 +103,7 @@ function mapIndexFile(file: DemoIndexFile, thumbTemplate: string, dataTemplate: 
   };
 }
 
-// ── Public API ────────────────────────────────────────────────────────────
+//  Public API 
 
 /**
  * Fetches the demo gallery index and maps to CarouselItem[].

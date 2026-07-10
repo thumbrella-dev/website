@@ -310,7 +310,7 @@ pre {
     text-decoration: underline;
 }
 
-/* ─────────────────────────────────── HERO gradient text */
+/* ─ HERO gradient text */
 .hero__any {
     background: linear-gradient(90deg, var(--accent-strong), #c8c0ff);
     -webkit-background-clip: text;
@@ -318,12 +318,12 @@ pre {
     background-clip: text;
 }
 
-/* ──────────────────────────── CAPS GRID (homepage what-section) */
+/*  CAPS GRID (homepage what-section) */
 .run-modes-heading {
     margin-bottom: 1.25rem;
 }
 
-/* ───────────────────────────── CAPS PANEL (prose + inline formats) */
+/* ─ CAPS PANEL (prose + inline formats) */
 .caps-panel {
     max-width: 900px;
     margin: 0 auto 0;
@@ -338,7 +338,7 @@ pre {
     color: var(--text-muted);
 }
 
-/* ── format chips grid */
+/*  format chips grid */
 .caps-formats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -407,7 +407,7 @@ pre {
     line-height: 1.5;
 }
 
-/* ───────────────────────────── PROSE POPOVER (inline) */
+/* ─ PROSE POPOVER (inline) */
 
 .prose-popover {
     position: relative;
@@ -429,7 +429,7 @@ pre {
     text-decoration-color: var(--accent-strong, #c8954e);
 }
 
-/* ──────────────────────────────────── INFO POPOVER */
+/*  INFO POPOVER */
 .info-popover {
     position: fixed;
     margin: 0;
@@ -507,7 +507,7 @@ pre {
     padding: 0 0 3rem;
 }
 
-/* ── Client Get Started ──────────────────────────────────────── */
+/*  Client Get Started  */
 .client-gs-section {
     padding: 2.5rem 0 3rem;
 }
@@ -909,7 +909,7 @@ pre {
     font-weight: 700;
 }
 
-/* ─────────────────────────────── GENERIC HP SECTION */
+/* ─ GENERIC HP SECTION */
 .hp-section {
     padding: 4rem 0;
 }
@@ -919,7 +919,7 @@ pre {
     padding-top: 2rem;
 }
 
-/* ── Homepage prose (simple article-style) ── */
+/*  Homepage prose (simple article-style)  */
 .hp-prose {
     display: grid;
     gap: 2.5rem;
@@ -960,7 +960,7 @@ pre {
     font-size: 0.88em;
 }
 
-/* ── Starlight <Tabs> inside homepage prose — styled to match .client-tabs ── */
+/*  Starlight <Tabs> inside homepage prose — styled to match .client-tabs  */
 .hp-prose starlight-tabs {
     display: block;
     margin-top: 0.5rem;
@@ -1049,7 +1049,7 @@ pre {
     margin-bottom: 1rem;
 }
 
-/* ─────────────────────────────────── BENCHMARK BARS */
+/* ─ BENCHMARK BARS */
 .bench-bars {
     display: grid;
     gap: 0.75rem;
@@ -1102,7 +1102,7 @@ pre {
     margin-top: 0.5rem;
 }
 
-/* ──────────────────────────────────── TOOLKIT GRID */
+/*  TOOLKIT GRID */
 .toolkit-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -1170,7 +1170,7 @@ pre {
     font-size: 0.8rem;
 }
 
-/* ──────────────────────────────────── WHO-USES GRID */
+/*  WHO-USES GRID */
 .who-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -1247,7 +1247,7 @@ pre {
     color: var(--accent-strong);
 }
 
-/* ──────────────────────────────────── API GRID */
+/*  API GRID */
 .api-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1287,7 +1287,7 @@ pre {
     font-size: 0.78rem;
 }
 
-/* ──────────────────────────────── PROSE DESCRIPTION */
+/*  PROSE DESCRIPTION */
 .prose-section {
     display: grid;
     grid-template-columns: 1fr 1.6fr;
@@ -1334,7 +1334,7 @@ pre {
     color: var(--text);
 }
 
-/* ──────────────────────────────── CODE TESTIMONIAL */
+/*  CODE TESTIMONIAL */
 .testimonial-card {
     display: grid;
     grid-template-columns: 1fr 1.6fr;
@@ -1402,7 +1402,7 @@ pre {
     line-height: 1.6;
 }
 
-/* ──────────────────────────────── SPEED COMPARE */
+/*  SPEED COMPARE */
 .speed-compare {
     display: grid;
     gap: 0.6rem;
@@ -1456,7 +1456,7 @@ pre {
     font-size: 0.88rem;
 }
 
-/* ──────────────────────────────────── TWEET GRID */
+/*  TWEET GRID */
 .tweet-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -1485,7 +1485,7 @@ pre {
     line-height: 1.55;
 }
 
-/* ──────────────────────────────────── LEARN CTA */
+/*  LEARN CTA */
 .learn-cta {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1527,7 +1527,7 @@ pre {
     margin: 0;
 }
 
-/* ──────────────────────────────── MEDIA BROWSER */
+/*  MEDIA BROWSER */
 .mbrowser {
     background: rgba(27, 19, 14, 0.96);
     border: 1px solid var(--border);
@@ -1620,7 +1620,7 @@ pre {
     padding: 0.5rem 0 0;
 }
 
-/* ──────────────────────────────── CUSTOMER PROTOTYPE */
+/*  CUSTOMER PROTOTYPE */
 .customer-proto {
     padding: 3rem 0 4rem;
 }
@@ -1838,7 +1838,7 @@ pre {
     opacity: 0.65;
 }
 
-/* ── grid layout ── */
+/*  grid layout  */
 .mbrowser__grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
@@ -1855,7 +1855,7 @@ pre {
     border-top: none;
 }
 
-/* ── media item (grid mode) ── */
+/*  media item (grid mode)  */
 .mitem {
     display: grid;
     gap: 0.45rem;
@@ -1869,7 +1869,7 @@ pre {
     background: rgba(215, 155, 91, 0.07);
 }
 
-/* ── media item (list mode) ── */
+/*  media item (list mode)  */
 .mbrowser__grid[data-view="list"] .mitem {
     grid-template-columns: 88px 1fr;
     gap: 0.75rem;
@@ -1883,7 +1883,7 @@ pre {
     border-bottom: none;
 }
 
-/* ── thumbnail ── */
+/*  thumbnail  */
 .mitem__thumb {
     position: relative;
     aspect-ratio: 4 / 3;
@@ -1892,7 +1892,7 @@ pre {
     overflow: hidden;
 }
 
-/* ── shimmer skeleton ── */
+/*  shimmer skeleton  */
 .mitem__shimmer {
     position: absolute;
     inset: 0;
@@ -1920,7 +1920,7 @@ pre {
     100% { background-position: -200% 0; }
 }
 
-/* ── actual thumbnail image ── */
+/*  actual thumbnail image  */
 .mitem__img {
     position: absolute;
     inset: 0;
@@ -1940,7 +1940,7 @@ pre {
     background: rgba(180, 40, 40, 0.12);
 }
 
-/* ── overlay badges ── */
+/*  overlay badges  */
 .mitem__badges {
     position: absolute;
     inset: auto 0 0;
@@ -1983,7 +1983,7 @@ pre {
     display: none;
 }
 
-/* ── caption ── */
+/*  caption  */
 .mitem__caption {
     display: grid;
     gap: 0.1rem;
@@ -2008,7 +2008,7 @@ pre {
     text-overflow: ellipsis;
 }
 
-/* ──────────────────────────────── RESPONSIVE */
+/*  RESPONSIVE */
 @media (max-width: 720px) {
     .navbar__inner,
     .footer__inner,

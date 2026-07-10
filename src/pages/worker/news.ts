@@ -10,7 +10,7 @@
 
 import type { APIRoute } from 'astro';
 
-// ── Config ────────────────────────────────────────────────────────────────
+//  Config 
 
 const GITHUB_API = 'https://api.github.com/graphql';
 const CACHE_MAX_AGE = 300; // seconds
@@ -38,7 +38,7 @@ query($org: String!) {
   }
 }`;
 
-// ── Helpers ───────────────────────────────────────────────────────────────
+//  Helpers
 
 /** Strip markdown formatting and truncate to ~40 words. */
 function bodyPreview(md: string): string {
@@ -117,7 +117,7 @@ function resolveToken(locals: unknown): string | undefined {
   return undefined;
 }
 
-// ── Handler ───────────────────────────────────────────────────────────────
+//  Handler
 
 export const GET: APIRoute = async ({ locals }) => {
   const token = resolveToken(locals);

@@ -117,7 +117,7 @@ if (clerkUserId && adminWorker) {
 </header>
 
 <script is:inline>
-  // ── Nav logo: fade in after scrolling past hero ───────────────────────────
+  //  Nav logo: fade in after scrolling past hero
   window.addEventListener('DOMContentLoaded', () => {
     const navLogo = document.getElementById('nav-logo');
     const hero = document.getElementById('hero');
@@ -236,7 +236,7 @@ if (clerkUserId && adminWorker) {
     });
   }, 100);
 
-  // ── /account URL sync ─────────────────────────────────────────────────────
+  //  /account URL sync
   // Push /account when the Clerk modal opens; restore / when it closes.
   // Also handles the browser back button while the modal is open.
   (function () {
