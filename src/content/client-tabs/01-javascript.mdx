@@ -2,28 +2,46 @@
 label: JavaScript
 ---
 
-The Javascript client is written in Typescript and allows running inside
-web browsers, Node, Bun, Deno, and other Javascript environments.
+The [Javascript client](https://www.npmjs.com/package/@thumbrella/client) is a great starting point for both node and browser
+environments. 
 
-Use `npm install @thumbrella/client` to get started (or the equivalent
-for your package manager of choice).
+- Zero runtime dependencies — only needs `fetch`
+- Stream async results as the server renders thumbnail batches
+- Caching takes full advantage of HTTP cache headers
+- Binary thumbnails load easily into `sharp`, dom nodes, and other image libraries
+- Always provides placeholder, even when disconnected or misconfigured
+- Typed results with media classification and metadata
+- Bundled CLI for thumbnailing local files
+- Thumbrella server supports hundreds of formats
 
-The Javascript client provides a rich async interface that supports local
-caching and other features.
+```ts
+//  Install with, `npm install @thumbrella/client`  //
 
-```js
-import { Thumbrella } from '@thumbrella/client';
+import { Client } from "@thumbrella/client";
 
-const tbr = new Thumbrella('<connect string>');
-const result = await tbr.thumb('https://demo.thumbrella.dev/media/harbor-trucks.mp4');
+// Connect and generate a single thumbnail
+const tbr = await new Client();
+const result = await tbr.thumb("https://demo.thumbrella.dev/media/pocket-game.webp");
+console.log(result.status, result.media!.thumbnail.length, "bytes");
 
-img.src = result.thumbnail.as_data_url();
+// Stream results as they complete
+for await (const r of tbr.stream([
+  "https://demo.thumbrella.dev/media/padres-stereo.exr",
+  "https://demo.thumbrella.dev/media/golden-gate.exr",
+])) {
+  console.log(r.url, r.status);
+}
 ```
 
-The connection string is usually an http server url, or an authentication
-token to use with the standard hosted server. It can also be set to the
-`$TBR_CONNECT` environment variable to get used automatically.
+The source comes with several starting point examples. See the [client
+documentation](https://thumbrella.dev/docs/client/) for more details and
+examples.
 
-There are higher level libraries available for `React`, `Astro`, and
-other web frameworks. Prefer these component libraries when running in those
-types of environments.
+- [examples/basic.js](https://github.com/thumbrella-dev/clients/blob/main/typescript/examples/basic.js) 
+  Download a thumbnail from a single url.
+- [examples/stream.ts](https://github.com/thumbrella-dev/clients/blob/main/typescript/examples/stream.ts) 
+  Stream multiple thumbnails as they render.
+
+There are separate packages with high level web components for 
+[React](https://www.npmjs.com/package/@thumbrella/astro),
+[Astro](https://www.npmjs.com/package/@thumbrella/astro), and others.

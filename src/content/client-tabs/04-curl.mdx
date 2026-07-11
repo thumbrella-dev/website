@@ -1,0 +1,32 @@
+---
+label: curl
+---
+
+The direct HTTP requests are designed to be usable without rich clients. This
+can work from any language with any HTTP library. Also from command line tools
+like `curl` or `wget`.
+
+- Batch requests process in parallel
+- Streamable batch results with `ndjson` or `sse`
+- Every request results in a valid image or placeholder
+- Server provides advanced http caching support
+- Thumbrella server supports hundreds of formats
+
+```bash
+curl -G "http://localhost:3114/thumb" \
+  --data-urlencode "url=https://demo.thumbrella.dev/media/harbor-trucks.mp4" \
+  --output thumb.jpeg
+```
+
+To interact with Thumbrella Cloud, register online for a quick and free
+account. Then add the token into the Authoriation header.
+
+```bash
+curl -G "https://cloud.thumbrella.dev/thumb" \
+  --data-urlencode "url=https://demo.thumbrella.dev/media/golden-gate.exr" \
+  --header "Authorization: Bearer tbr_e_HVZgIwSOUwhJZscXQ2sN7eO" \
+  --output thumb.jpeg
+```
+
+See the [client api documentation](https) for more details on the calls
+available.

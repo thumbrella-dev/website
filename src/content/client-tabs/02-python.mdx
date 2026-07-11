@@ -2,35 +2,40 @@
 label: Python
 ---
 
-The Python client provides easy, high level functionality for caching, error
-control, and other conveniences.
+The Python client uses `requests` for blocking and optionally `aiohttp` for
+async streaming results.
 
-Use `uv install thumbrella/client` to get started (or the equivalent
-for your package manager of choice).
+- Client defaults to synchronous requests with [requests](https://pypi.org/project/requests/)
+- Async support via `thumbrella-client[async]` using [aiohttp](https://pypi.org/project/aiohttp/)
+- Caching takes full advantage of HTTP cache headers
+- Binary thumbnails load easily into `PIL`, `Qt`, `Pygame, and other image libraries
+- Always provides placeholder, even when disconnected or misconfigured
+- Typed results with media classification and metadata
+- Thumbrella server supports hundreds of formats
 
-The Python interface provides both a syncronous API (which relies on `requests`)
-and an async streaming call (which relies on `aiohttp`).
 
 ```python
+##  Install with,  `uv add thumbrella-client`  ##
+
 import thumbrella
 
+# Connect to server and generate a thumbnail.
 tbr = thumbrella.Client()
-result = tbr.thumb("https://demo.thumbrella.dev/media/harbor-trucks.mp4")
+result = tbr.thumb("https://demo.thumbrella.dev/media/blue-scooter.fbx")
+print(result.status, len(result.media.thumbnail), "bytes")
 
-print(f"Media type: {result.kind}")
-Path("thumbnail.jpeg").write_bytes(result.thumbnail)
-
+# Pillow can decode from a zero-copy buffer.
 from PIL import Image
-img = Image.open(result.thumbnail.io)
+img = Image.open(result.media.thumbnail.io)
 ```
 
-The connection string is usually an http server url, or an authentication
-token to use with the standard hosted server. It can also be set to the
-`$TBR_CONNECT` environment variable to get used automatically.
+The source comes with several starting point examples. See the [client
+documentation](https://thumbrella.dev/docs/client/) for more details and
+examples.
 
-The `Result.thumbnail` value provides efficient buffer and io objects allow
-decode data into image libraries like `Pillow` or `Qt` without needing to 
-import or depend on those libraries itself.
-
-The ``async`` method ``stream()`` returns a series of incremental updates as
-thumbnails and placeholders are available.
+- [examples/basic.py](https://github.com/thumbrella-dev/clients/blob/main/python/examples/basic.py) 
+  Download a thumbnail from a single url.
+- [examples/stream.py](https://github.com/thumbrella-dev/clients/blob/main/python/examples/stream.py) 
+  Stream multiple thumbnails as they render.
+- [examples/collage.py](https://github.com/thumbrella-dev/clients/blob/main/python/examples/collage.py) 
+  Assemble thumbnails from multiple sources into a single grid image.

@@ -1,0 +1,22 @@
+---
+label: Demo Gallery
+---
+
+The [Thumbrella Demo gallery](https://demo.thumbrella.dev) also hosts 
+a Thumbrella server that can be used immediately with no account. The only
+restriction is that this only provides thumbnails for media in in the demo
+gallery.
+
+set `TBR_CONNECT=https://demo.thumbrella.dev`
+
+This makes it one of the easiest ways to test client tools and environments.
+It requires no server, and no Thumbrella cloud account.
+
+The demo site provides an [`index.json`](https://demo.thumbrella.dev)
+that describes the catalog of media.
+
+```sh
+curl https://demo.thumbrella.dev/thumb.jpeg?url=https://demo.thumbrella.dev/media/wavy-wall.svg \
+  --output vector.jpeg
+```
+

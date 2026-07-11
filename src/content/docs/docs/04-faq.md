@@ -27,12 +27,23 @@ available.
 
 The Thumbrella Cloud service has support for all available file formats.
 It also has a globally distributed cache that improves performance for all
-users. The Thumbrella server is efficient and lean, making it economic
+users. The Thumbrella architecture is efficient and lean, making it economic
 and viable for free use cases. There are also paid subscriptions available
 for more resources.
 
 A self hosted server has other advantages. It can be run in offline environments
 with resources that are not publically available.
+
+### I don't need a server, I just want to thumbnail a file?
+
+The server has a `thumb` subcommand for this exact purpose. The executable
+is a single, static binary that runs without difficulty. It is packaged
+in several formats that make running it straightforward, even without
+installing anything.
+
+```sh
+npx @thumbrella/server thumb my_cool_video.mp4 thumb.jpeg
+```
 
 ### What caching is supported?
 

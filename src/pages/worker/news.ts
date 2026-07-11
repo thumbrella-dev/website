@@ -63,16 +63,18 @@ function bodyPreview(md: string): string {
     .replace(/^[\s]*\d+\.\s/gm, '')
     // Remove horizontal rules
     .replace(/^[-*_]{3,}\s*$/gm, '')
+    // Remove bare URLs (words starting with http:// or https://)
+    .replace(/https?:\/\/\S+/g, '')
     // Collapse whitespace
     .replace(/\n{2,}/g, ' ')
     .replace(/\n/g, ' ')
-    .replace(/\s+/g, ' ')
+    .replace(/\s{2,}/g, ' ')
     .trim();
 
-  // Truncate to ~32 words
+  // Truncate to intitial words
   const words = text.split(/\s+/);
-  if (words.length > 32) {
-    text = words.slice(0, 32).join(' ') + ' …';
+  if (words.length > 22) {
+    text = words.slice(0, 22).join(' ') + ' …';
   }
   return text;
 }
@@ -81,15 +83,19 @@ function bodyPreview(md: string): string {
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const secs = Math.floor(diff / 1000);
-  if (secs < 60) return 'just now';
+  if (secs < 40) return 'just now';
+  if (secs < 100) return 'a minute ago';
   const mins = Math.floor(secs / 60);
-  if (mins < 60) return `${mins} min ago`;
+  if (mins < 40) return `${mins} minutes ago`;
+  if (mins < 100) return `an hour ago`;
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 22) return `${hours} hours ago`;
+  if (hours < 40) return `a day ago`;
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days} day${days !== 1 ? 's' : ''} ago`;
+  if (days < 26) return `${days} days ago`;
+  if (days < 50) return `a month ago`;
   const months = Math.floor(days / 30);
-  return `${months} month${months !== 1 ? 's' : ''} ago`;
+  return `${months} months ago`;
 }
 
 function json(body: unknown, status = 200, extraHeaders: Record<string, string> = {}) {

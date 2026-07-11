@@ -1,0 +1,29 @@
+---
+label: Replicate
+---
+
+Run Thumbrella as a serverless model on <a href="https://replicate.com">Replicate</a>. 
+No installation. The platform bills per render, there is no additional Thumbrella cost.
+
+> This is not yet enabled. Wait for Thumbrella's general release to
+> access this service.
+
+```sh
+npm install replicate
+```
+
+```js
+import Replicate from 'replicate';
+const replicate = new Replicate();
+
+const output = await replicate.run(
+  "thumbrella/thumb",
+  { input: { url: "https://example.com/video.mp4" } }
+);
+// output base64 image data
+```
+
+You can greatly reduce the efficiency of using Replicate by attaching your
+Thumbnail Cloud token to each request. This allows Replicate to use 
+Thumberlla Cloud's distributed caching. Use with your free account to
+cache thousands of thumbnail results.

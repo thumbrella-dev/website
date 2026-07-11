@@ -1,0 +1,46 @@
+---
+label: Rust
+---
+
+The Rust client provides easy, high level functionality for caching, error
+control, and other conveniences. By default it provides async calls using
+`reqwests` and `tokio`. Using the `blocking` feature provides a blocking
+interface for simpler environments.
+
+- Async-first with [reqwest](https://crates.io/crates/reqwest) _(rustls TLS)_
+- Minimal dependencies, `reqwest`, `serde`, `base64`, `thiserror`
+- Stream results as the server renders thumbnails _(coming soon)_
+- In-memory LRU cache takes full advantage of HTTP cache headers
+- The client and server always provide placeholder images, even when disconnected
+- Typed results with media classification and metadata
+- Thumbrella server supports hundreds of formats
+
+```rust
+//  Install with, `cargo add thumbrella-client`  //
+
+use thumbrella_client as thumbrella;
+
+#[tokio::main]
+async fn main() -> Result<(), thumbrella::Error> {
+    let tbr = thumbrella::Client::new(None);
+    tbr.verify().await?;
+
+    // Get result and write thumbnail to jpeg file
+    let result = tbr.thumb("https://demo.thumbrella.dev/media/game-level.png").await?;
+    if let Some(media) = &result.media {
+        println!("{} bytes  {}", media.thumbnail.len(), media.kind);
+        std::fs::write("thumb.jpg", media.thumbnail.bytes())?;
+    }
+
+    Ok(())
+}
+```
+
+The source comes with several starting point examples. See the [client
+documentation](https://thumbrella.dev/docs/client/) for more details and
+examples.
+
+- [examples/basic.rs](https://github.com/thumbrella-dev/clients/blob/main/rust/examples/basic.rs) 
+  Download a thumbnail from a single url.
+- [examples/stream.rs](https://github.com/thumbrella-dev/clients/blob/main/rust/examples/stream.rs) 
+  Stream multiple thumbnails as they render.
