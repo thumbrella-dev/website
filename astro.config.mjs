@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 import cloudflare from '@astrojs/cloudflare';
+import sitemap from '@astrojs/sitemap';
 
 import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
@@ -15,10 +16,12 @@ const isDevBuild = buildMode === 'development';
 
 export default defineConfig({
   site: 'https://thumbrella.dev',
+  compressHTML: true,
   server: {
     host: '0.0.0.0',
   },
   integrations: [
+    sitemap(),
     starlight({
       title: 'Thumbrella Documentation',
       description: 'Documentation for the Thumbrella fast media thumbnail platform.',
@@ -85,7 +88,7 @@ export default defineConfig({
       },
     }),
   ],
-  output: 'server',
+  output: 'static',
 
   markdown: {
     shikiConfig: {

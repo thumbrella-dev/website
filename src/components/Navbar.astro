@@ -1,6 +1,5 @@
 ---
 import { SignInButton, UserButton, Show } from '@clerk/astro/components';
-import { env } from 'cloudflare:workers';
 
 const userIconSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
@@ -25,38 +24,6 @@ const links = [
 ] as const;
 
 const currentPath = Astro.url.pathname;
-const currentUser =
-  typeof Astro.locals.currentUser === 'function' ? await Astro.locals.currentUser() : null;
-const primaryEmail = currentUser?.primaryEmailAddress?.emailAddress ?? 'account';
-const clerkUserId = currentUser?.id;
-
-const adminWorker = env.ADMIN_WORKER;
-
-type DashboardTab = { id: string; label: string; url: string; html: string };
-let dashboardTabs: DashboardTab[] = [];
-
-const SIGNOUT_BTN =
-  '<button type="button" class="tbr-btn tbr-btn-xs tbr-btn-primary" style="text-transform:none;letter-spacing:0;margin-left:auto" data-manage-account-sign-out>Sign out</button>';
-const processTabHtml = (tab: DashboardTab) => tab.html.replace('{{SIGNOUT}}', SIGNOUT_BTN);
-
-if (clerkUserId && adminWorker) {
-  try {
-    const url = new URL(
-      `/api/dashboard?clerkUserId=${encodeURIComponent(clerkUserId)}`,
-      'http://admin.internal'
-    );
-    const resp = await adminWorker.fetch(url.toString());
-    if (resp.ok) {
-      const data = await resp.json<{ tabs?: DashboardTab[] }>();
-      dashboardTabs = Array.isArray(data?.tabs) ? data.tabs : [];
-    } else {
-      const text = await resp.text();
-      console.log('[Navbar] error body:', text);
-    }
-  } catch (err) {
-    console.log('[Navbar] fetch threw:', err);
-  }
-}
 ---
 
 <header class="navbar">
@@ -93,22 +60,14 @@ if (clerkUserId && adminWorker) {
         </li>
         <li class="nav-auth-group">
           <UserButton>
-            {dashboardTabs.length > 0 ? dashboardTabs.map(tab => (
-              <UserButton.UserProfilePage label={tab.label} url={tab.url}>
-                <div class="nav-admin-dashboard-shell">
-                  <div class="nav-admin-dashboard" set:html={processTabHtml(tab)} />
-                </div>
-              </UserButton.UserProfilePage>
-            )) : (
-              <UserButton.UserProfilePage label="Thumbrella" url="manage-account">
-                <div class="nav-admin-dashboard-shell">
-                  <button type="button" class="nav-dashboard-sign-out" data-manage-account-sign-out>
-                    Sign out
-                  </button>
-                  <p>Dashboard data is currently unavailable.</p>
-                </div>
-              </UserButton.UserProfilePage>
-            )}
+            <UserButton.UserProfilePage label="Thumbrella" url="manage-account">
+              <div class="nav-admin-dashboard-shell">
+                <button type="button" class="nav-dashboard-sign-out" data-manage-account-sign-out>
+                  Sign out
+                </button>
+                <p>Manage your account settings.</p>
+              </div>
+            </UserButton.UserProfilePage>
           </UserButton>
         </li>
       </ul>

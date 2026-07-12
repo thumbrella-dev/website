@@ -13,21 +13,21 @@ maintainers working on the internals.
 
 --- 
 
-- The [Client](/docs/client/overview) section details accessing a Thumbrella
+- The [Client](/docs/client/) section details accessing a Thumbrella
 server. There are high level libraries for a variety of languages and
 environments. The server is also intended to be easy to access directly over
 HTTP.
 
-- The [Server](/docs/server) section describes running your own server.
+- The [Server](/docs/server/) section describes running your own server.
 There are various convenient ways to download the server on any operating
 system. Learn how to enable the various features, troubleshoot problems,  and
 take your own server to production.
 
-- The [Cloud](/docs/cloud) section describes interacting with the
+- The [Cloud](/docs/cloud/) section describes interacting with the
 public server. Resource limits, managing tokens, account administration, and
 more.
 
-- The [development](/docs/development/overview) section goes deeper into the
+- The [Development](/docs/development/) section goes deeper into the
 project architecture. Discover how the main features are implemented. Explain
 the development process, coding guidelines, and more. This also gives an
 overview of the 
