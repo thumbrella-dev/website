@@ -1,6 +1,4 @@
 ---
-import { SignInButton, UserButton, Show } from '@clerk/astro/components';
-
 const userIconSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
 const links = [
@@ -43,32 +41,14 @@ const currentPath = Astro.url.pathname;
           </li>
         ))}
         <li class="nav-auth-group">
-          <Show when="signed-out">
-            <SignInButton mode="modal" asChild>
-              <button type="button" id="nav-sign-in" class="nav-auth-btn">
-                <Fragment set:html={userIconSvg} />
-                Account
-              </button>
-            </SignInButton>
-          </Show>
-          <Show when="signed-in">
-            <button type="button" id="open-manage-account-nav" class="nav-auth-btn">
-              <Fragment set:html={userIconSvg} />
-              Account
-            </button>
-          </Show>
-        </li>
-        <li class="nav-auth-group">
-          <UserButton>
-            <UserButton.UserProfilePage label="Thumbrella" url="manage-account">
-              <div class="nav-admin-dashboard-shell">
-                <button type="button" class="nav-dashboard-sign-out" data-manage-account-sign-out>
-                  Sign out
-                </button>
-                <p>Manage your account settings.</p>
-              </div>
-            </UserButton.UserProfilePage>
-          </UserButton>
+          <button type="button" id="nav-sign-in-btn" class="nav-auth-btn">
+            <Fragment set:html={userIconSvg} />
+            Account
+          </button>
+          <button type="button" id="nav-account-btn" class="nav-auth-btn" style="display:none">
+            <Fragment set:html={userIconSvg} />
+            Account
+          </button>
         </li>
       </ul>
     </nav>
@@ -101,50 +81,101 @@ const currentPath = Astro.url.pathname;
     }
   });
 
-  const manageAccount = document.getElementById('open-manage-account-nav');
-  let previousUserId = null;
+  // ---- Clerk integration (vanilla JS, no Astro components) ----
+  (function () {
+    var poll = setInterval(function () {
+      if (!window.Clerk) return;
+      clearInterval(poll);
 
-  const getUserButtonConfig = () => {
-    const userButtonMap = window.__astro_clerk_component_props?.get('user-button');
-    return userButtonMap ? Array.from(userButtonMap.values())[0] : undefined;
-  };
+      var signInBtn = document.getElementById('nav-sign-in-btn');
+      var accountBtn = document.getElementById('nav-account-btn');
 
-  const openManageAccount = () => {
-    if (!window.Clerk?.user) {
-      return;
-    }
+      function updateAuthUI() {
+        var signedIn = !!window.Clerk.user;
+        if (signInBtn) signInBtn.style.display = signedIn ? 'none' : '';
+        if (accountBtn) accountBtn.style.display = signedIn ? '' : 'none';
+      }
 
-    const userButtonConfig = getUserButtonConfig();
-    window.Clerk.openUserProfile({
-      ...(userButtonConfig?.userProfileProps ?? {}),
-      __experimental_startPath: '/manage-account',
-    });
-  };
+      updateAuthUI();
+      window.Clerk.addListener(updateAuthUI);
 
-  // Manual button event listeners
-  if (manageAccount) {
-    manageAccount.addEventListener('click', () => {
-      void openManageAccount();
-    });
-  }
+      // Sign-in button opens Clerk's sign-in modal
+      if (signInBtn) {
+        signInBtn.addEventListener('click', function () {
+          window.Clerk.openSignIn();
+        });
+      }
 
-  document.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof Element)) {
-      return;
-    }
+      // Account button: fetch dashboard tabs, build customPages, open profile
+      if (accountBtn) {
+        accountBtn.addEventListener('click', function () {
+          accountBtn.disabled = true;
+          console.log('[nav] fetching /admin/dashboard...');
+          fetch('/admin/dashboard')
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+              accountBtn.disabled = false;
+              console.log('[nav] dashboard response:', data);
+              if (!data || !Array.isArray(data.tabs)) {
+                console.log('[nav] no tabs array in response');
+                return;
+              }
 
-    if (target.closest('[data-manage-account-sign-out]')) {
-      void window.Clerk?.signOut({ redirectUrl: '/' });
-    }
-  });
+              console.log('[nav] tabs:', data.tabs.map(function(t) { return t.label; }));
+
+              var signOutHtml = '<button onclick="window.Clerk.signOut({redirectUrl:\'/\'})">Sign out</button>';
+
+              var customPages = data.tabs.map(function (tab) {
+                var html = tab.html.replace(/\{\{SIGNOUT\}\}/g, signOutHtml);
+                return {
+                  label: tab.label,
+                  url: tab.url,
+                  mount: function (el) { el.innerHTML = html; },
+                  unmount: function (el) { el.innerHTML = ''; },
+                  mountIcon: function (el) { el.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg>'; },
+                  unmountIcon: function (el) { el.innerHTML = ''; }
+                };
+              });
+
+              // Default to the Thumbrella tab.  ?tab=manage-usage overrides.
+              var params = new URLSearchParams(window.location.search);
+              var deepTab = params.get('tab') || 'manage-account';
+              var openProps = { customPages: customPages };
+              openProps.__experimental_startPath = '/user/' + deepTab;
+              if (deepTab !== 'manage-account') {
+                console.log('[nav] deep-linking to tab:', deepTab);
+              }
+
+              console.log('[nav] calling openUserProfile with', Object.keys(openProps));
+              window.Clerk.openUserProfile(openProps);
+              console.log('[nav] openUserProfile called');
+            })
+            .catch(function (err) {
+              accountBtn.disabled = false;
+              console.log('[nav] dashboard fetch error:', err);
+            });
+        });
+      }
+
+      // Auto-open on /account or ?open=account
+      if (accountBtn && window.Clerk.user) {
+        var searchParams = new URLSearchParams(window.location.search);
+        if (window.location.pathname === '/account' ||
+            searchParams.get('open') === 'account') {
+          accountBtn.click();
+          if (window.location.pathname === '/account') {
+            history.replaceState({}, '', '/');
+          }
+        }
+      }
+    }, 100);
+  })();
 
   // Dashboard script re-activation shim.
-  // Clerk renders UserButton.UserProfilePage content via innerHTML, which does not
-  // execute <script> tags. This shim watches for [data-tbr-script] elements to appear
-  // and copies their content to new <script> tags that the browser WILL execute.
+  // React's dangerouslySetInnerHTML does not execute <script> tags.
+  // This shim watches for [data-tbr-script] elements and creates real <script> tags.
   (function () {
-    function activateDashboardScripts() {
+    function activate() {
       document.querySelectorAll('[data-tbr-script]').forEach(function (s) {
         if (s.dataset.tbrActivated) return;
         s.dataset.tbrActivated = '1';
@@ -153,78 +184,8 @@ const currentPath = Astro.url.pathname;
         document.head.appendChild(n);
       });
     }
-    activateDashboardScripts();
-    var obs = new MutationObserver(activateDashboardScripts);
-    obs.observe(document.body, { childList: true, subtree: true });
-  })();
-
-  // Wait for Clerk to load, then set up listener
-  const waitForClerk = window.setInterval(() => {
-    if (!window.Clerk) return;
-
-    window.clearInterval(waitForClerk);
-
-    // Seed previousUserId from current state so a page load/refresh while
-    // already signed in does NOT look like a fresh sign-in transition.
-    // NOTE: user may not be populated yet even when Clerk SDK is ready —
-    // the session loads asynchronously and arrives via addListener below.
-    previousUserId = window.Clerk?.user?.id ?? null;
-
-    // Fast path: session already available (cached/warm load)
-    if (window.location.pathname === '/account' && window.Clerk.user) {
-      openManageAccount();
-    }
-
-    // Listen for auth state changes
-    window.Clerk.addListener(() => {
-      const currentUserId = window.Clerk?.user?.id;
-      const wasSignedOut = previousUserId === null;
-      const isNowSignedIn = currentUserId !== null && currentUserId !== undefined;
-
-      if (wasSignedOut && isNowSignedIn) {
-        const createdAt = window.Clerk?.user?.createdAt;
-        const isNewSignUp = createdAt && (Date.now() - new Date(createdAt).getTime()) < 30000;
-        // Auto-open on /account direct navigation (session just loaded),
-        // or on a fresh sign-up anywhere on the site.
-        if (window.location.pathname === '/account' || isNewSignUp) {
-          openManageAccount();
-        }
-      }
-
-      previousUserId = currentUserId;
-    });
-  }, 100);
-
-  //  /account URL sync
-  // Push /account when the Clerk modal opens; restore / when it closes.
-  // Also handles the browser back button while the modal is open.
-  (function () {
-    var modalOpen = false;
-
-    var urlObs = new MutationObserver(function () {
-      var nowOpen = !!document.querySelector('.cl-modalBackdrop');
-      if (nowOpen === modalOpen) return;
-      modalOpen = nowOpen;
-      if (nowOpen) {
-        if (window.location.pathname !== '/account') {
-          history.pushState({ clerkModal: true }, '', '/account');
-        }
-      } else {
-        if (window.location.pathname === '/account') {
-          history.replaceState({}, '', '/');
-        }
-      }
-    });
-    urlObs.observe(document.body, { childList: true, subtree: true });
-
-    // Back button while modal is open → close the modal, stay on /
-    window.addEventListener('popstate', function (e) {
-      if (modalOpen) {
-        document.dispatchEvent(
-          new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
-        );
-      }
-    });
+    activate();
+    new MutationObserver(activate).observe(document.body, { childList: true, subtree: true });
   })();
 </script>
 
@@ -254,31 +215,5 @@ const currentPath = Astro.url.pathname;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  :global(.nav-admin-dashboard-shell) {
-    display: grid;
-    gap: 1rem;
-  }
-
-  :global(.nav-dashboard-sign-out) {
-    justify-self: start;
-    border: 1px solid rgba(248, 113, 113, 0.35);
-    background: rgba(248, 113, 113, 0.1);
-    color: #f87171;
-    border-radius: 6px;
-    padding: 0.45rem 1rem;
-    cursor: pointer;
-    font: 500 0.825rem inherit;
-    letter-spacing: 0.01em;
-  }
-
-  :global(.nav-dashboard-sign-out:hover) {
-    background: rgba(248, 113, 113, 0.18);
-    border-color: rgba(248, 113, 113, 0.55);
-  }
-
-  :global([data-clerk-id^='clerk-user-button']) {
-    display: none;
   }
 </style>
