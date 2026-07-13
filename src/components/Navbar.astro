@@ -104,6 +104,37 @@ const currentPath = Astro.url.pathname;
     var clerkReady = false;      // script loaded AND Clerk.load() has resolved
     var clerkLoading = false;    // script in-flight or Clerk.load() in-flight
     var pendingCallbacks = [];   // queue while Clerk is loading/initialising
+    var btnOriginalHtml = '';    // saved button content for load/restore
+    var clerkPushed = false;     // did we pushState /account?
+
+    function btnLoading(on) {
+      if (on) {
+        if (!btnOriginalHtml) btnOriginalHtml = accountBtn.innerHTML;
+        accountBtn.innerHTML = '<span class="nav-spin"></span> Loading\u2026';
+        accountBtn.disabled = true;
+      } else {
+        if (btnOriginalHtml) accountBtn.innerHTML = btnOriginalHtml;
+        accountBtn.disabled = false;
+      }
+    }
+
+    function clerkPushAccountUrl() {
+      if (clerkPushed || window.location.pathname === '/account') return;
+      clerkPushed = true;
+      history.pushState({}, '', '/account');
+    }
+
+    function clerkRestoreUrl() {
+      if (window.location.pathname !== '/account') return;
+      if (clerkPushed) {
+        // We pushed /account; pop it.
+        clerkPushed = false;
+        history.back();
+      } else {
+        // We arrived at /account directly; replace with /.
+        history.replaceState({}, '', '/');
+      }
+    }
 
     function whenClerkReady(cb) {
       if (clerkReady) { cb(); return; }
@@ -117,7 +148,7 @@ const currentPath = Astro.url.pathname;
         return;
       }
       clerkLoading = true;
-      accountBtn.disabled = true;
+      btnLoading(true);
 
       var script = document.createElement('script');
       script.async = true;
@@ -146,18 +177,18 @@ const currentPath = Astro.url.pathname;
           .then(function () {
             clerkReady = true;
             clerkLoading = false;
-            accountBtn.disabled = false;
+            btnLoading(false);
             flushCallbacks();
           })
           .catch(function (err) {
             clerkLoading = false;
-            accountBtn.disabled = false;
+            btnLoading(false);
             flushCallbacks(err);
           });
       };
       script.onerror = function () {
         clerkLoading = false;
-        accountBtn.disabled = false;
+        btnLoading(false);
         flushCallbacks(new Error('Failed to load Clerk JS'));
       };
       document.head.appendChild(script);
@@ -191,7 +222,11 @@ const currentPath = Astro.url.pathname;
             };
           });
 
-          window.Clerk.openUserProfile({ customPages: customPages });
+          clerkPushAccountUrl();
+          var opened = window.Clerk.openUserProfile({ customPages: customPages });
+          if (opened && typeof opened.then === 'function') {
+            opened.then(function () { clerkRestoreUrl(); });
+          }
         })
         .catch(function (err) {
           accountBtn.disabled = false;
@@ -199,14 +234,29 @@ const currentPath = Astro.url.pathname;
         });
     }
 
+    function openClerkPanel(onClose) {
+      clerkPushAccountUrl();
+      if (window.Clerk.user) {
+        openDashboard();
+      } else {
+        var opened = window.Clerk.openSignIn();
+        if (opened && typeof opened.then === 'function') {
+          opened.then(function () {
+            // After sign-in, open dashboard if now signed in
+            if (window.Clerk && window.Clerk.user) {
+              openDashboard();
+            } else if (onClose) {
+              onClose();
+            }
+          });
+        }
+      }
+    }
+
     accountBtn.addEventListener('click', function () {
       whenClerkReady(function (err) {
         if (err) { console.error('[nav]', err.message || err); return; }
-        if (window.Clerk.user) {
-          openDashboard();
-        } else {
-          window.Clerk.openSignIn();
-        }
+        openClerkPanel();
       });
     });
 
@@ -214,16 +264,15 @@ const currentPath = Astro.url.pathname;
     var path = window.location.pathname;
     var search = window.location.search;
     if (path === '/account' || search.indexOf('open=account') >= 0 || search.indexOf('signin=account') >= 0) {
+      // Clean up query params so they don't persist across reloads.
+      if (path !== '/account') {
+        history.replaceState({}, '', '/');
+      }
       whenClerkReady(function (err) {
         if (err) { console.error('[nav]', err.message || err); return; }
-        if (window.Clerk.user) {
-          openDashboard();
-          if (path === '/account') {
-            history.replaceState({}, '', '/');
-          }
-        } else {
-          window.Clerk.openSignIn();
-        }
+        openClerkPanel(function () {
+          clerkRestoreUrl();
+        });
       });
     }
   })();
@@ -265,6 +314,26 @@ const currentPath = Astro.url.pathname;
     color: #fff;
     border-color: rgba(255, 255, 255, 0.45);
     background: rgba(215, 155, 91, 0.16);
+  }
+
+  .nav-auth-btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .nav-spin {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    animation: nav-spin 0.6s linear infinite;
+    vertical-align: middle;
+  }
+
+  @keyframes nav-spin {
+    to { transform: rotate(360deg); }
   }
 
   .nav-auth-btn--email {
