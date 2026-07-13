@@ -4,7 +4,8 @@ export const prerender = false;
 import MainLayout from '../layouts/MainLayout.astro';
 import ErrorPageContent from '../components/ErrorPageContent.astro';
 
-// Middleware handles /admin/*, /account, /account/:tab, /user/*.
+// /admin/* is proxied to the admin worker by middleware.
+// /account and /user/ routes are handled client-side by Navbar JS.
 // Everything else that lands here is a genuine 404.
 ---
 

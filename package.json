@@ -23,12 +23,12 @@
   "author": "Peter Shinners <pete@thumbrella.dev>",
   "license": "Apache-2.0",
   "dependencies": {
+    "@astrojs/check": "^0.9.9",
     "@astrojs/cloudflare": "^14.0.0",
     "@astrojs/mdx": "^7.0.0",
     "@astrojs/react": "^6.0.0",
     "@astrojs/sitemap": "^3.7.3",
     "@astrojs/starlight": "^0.41.0",
-    "@clerk/astro": "^3.4.0",
     "@floating-ui/dom": "^1.7.6",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -38,6 +38,6 @@
     "wrangler": "^4.105.0"
   },
   "devDependencies": {
-    "typescript": "^6.0.0"
+    "typescript": "^6.0.3"
   }
 }

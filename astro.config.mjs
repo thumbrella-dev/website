@@ -5,7 +5,6 @@ import sitemap from '@astrojs/sitemap';
 
 import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
-import clerk from '@clerk/astro';
 import starlight from '@astrojs/starlight';
 
 // When running `astro build --mode development` (i.e. `npm run preview`),
@@ -70,23 +69,6 @@ export default defineConfig({
     }),
     react(),
     mdx(),
-    clerk({
-      appearance: {
-        variables: {
-          colorBackground: '#212126',
-          colorNeutral: 'white',
-          colorPrimary: '#ffffff',
-          colorPrimaryForeground: 'black',
-          colorForeground: 'white',
-          colorInputForeground: 'white',
-          colorInput: '#26262B',
-        },
-        elements: {
-          providerIcon__apple: { filter: 'invert(1)' },
-          providerIcon__github: { filter: 'invert(1)' },
-        },
-      },
-    }),
   ],
   output: 'static',
 
@@ -97,7 +79,6 @@ export default defineConfig({
   },
 
   adapter: cloudflare({
-    sessionKVBindingName: 'CLERK_SESSION',
     imageService: 'passthrough',
     platformProxy: { enabled: true },
   }),

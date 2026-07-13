@@ -1,6 +1,8 @@
 ---
 const userIconSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
+const clerkPublishableKey = import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY ?? '';
+
 const links = [
   {
     href: '/docs',
@@ -41,11 +43,7 @@ const currentPath = Astro.url.pathname;
           </li>
         ))}
         <li class="nav-auth-group">
-          <button type="button" id="nav-sign-in-btn" class="nav-auth-btn">
-            <Fragment set:html={userIconSvg} />
-            Account
-          </button>
-          <button type="button" id="nav-account-btn" class="nav-auth-btn" style="display:none">
+          <button type="button" id="nav-account-btn" class="nav-auth-btn" data-clerk-key={clerkPublishableKey}>
             <Fragment set:html={userIconSvg} />
             Account
           </button>
@@ -81,94 +79,153 @@ const currentPath = Astro.url.pathname;
     }
   });
 
-  // ---- Clerk integration (vanilla JS, no Astro components) ----
+  // ---- Clerk integration (vanilla JS, lazy-loaded on click) ----
   (function () {
-    var poll = setInterval(function () {
-      if (!window.Clerk) return;
-      clearInterval(poll);
+    var accountBtn = document.getElementById('nav-account-btn');
+    if (!accountBtn) return;
 
-      var signInBtn = document.getElementById('nav-sign-in-btn');
-      var accountBtn = document.getElementById('nav-account-btn');
+    var PUBLISHABLE_KEY = accountBtn.getAttribute('data-clerk-key') || '';
 
-      function updateAuthUI() {
-        var signedIn = !!window.Clerk.user;
-        if (signInBtn) signInBtn.style.display = signedIn ? 'none' : '';
-        if (accountBtn) accountBtn.style.display = signedIn ? '' : 'none';
+    // Derive the Frontend API hostname from the publishable key.
+    // The key is base64url-encoded "<frontend-api-hostname>$".  We decode
+    // it to build the correct script URL instead of hard-coding a CDN.
+    var FRONTEND_API = '';
+    try {
+      var raw = PUBLISHABLE_KEY.replace(/^pk_(test|live)_/, '');
+      var b64 = raw.replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4) b64 += '=';
+      var hostWithDollar = atob(b64);
+      FRONTEND_API = hostWithDollar.replace(/\$$/, '');
+    } catch (e) { /* fall back to empty; loadClerk will fail gracefully */ }
+    var CK_SCRIPT = FRONTEND_API
+      ? 'https://' + FRONTEND_API + '/npm/@clerk/clerk-js@5/dist/clerk.browser.js'
+      : '';
+
+    var clerkReady = false;      // script loaded AND Clerk.load() has resolved
+    var clerkLoading = false;    // script in-flight or Clerk.load() in-flight
+    var pendingCallbacks = [];   // queue while Clerk is loading/initialising
+
+    function whenClerkReady(cb) {
+      if (clerkReady) { cb(); return; }
+      pendingCallbacks.push(cb);
+      if (!clerkLoading) initClerk();
+    }
+
+    function initClerk() {
+      if (!CK_SCRIPT) {
+        flushCallbacks(new Error('Cannot derive Clerk script URL'));
+        return;
       }
+      clerkLoading = true;
+      accountBtn.disabled = true;
 
-      updateAuthUI();
-      window.Clerk.addListener(updateAuthUI);
+      var script = document.createElement('script');
+      script.async = true;
+      script.setAttribute('data-clerk-publishable-key', PUBLISHABLE_KEY);
+      script.src = CK_SCRIPT;
+      script.onload = function () {
+        // Clerk script is on the page, but components aren't ready yet.
+        // Call Clerk.load() to hydrate. On subsequent calls load() is a no-op.
+        window.Clerk.load({
+          appearance: {
+            variables: {
+              colorBackground: '#212126',
+              colorNeutral: 'white',
+              colorPrimary: '#ffffff',
+              colorPrimaryForeground: 'black',
+              colorForeground: 'white',
+              colorInputForeground: 'white',
+              colorInput: '#26262B'
+            },
+            elements: {
+              providerIcon__apple: { filter: 'invert(1)' },
+              providerIcon__github: { filter: 'invert(1)' }
+            }
+          }
+        })
+          .then(function () {
+            clerkReady = true;
+            clerkLoading = false;
+            accountBtn.disabled = false;
+            flushCallbacks();
+          })
+          .catch(function (err) {
+            clerkLoading = false;
+            accountBtn.disabled = false;
+            flushCallbacks(err);
+          });
+      };
+      script.onerror = function () {
+        clerkLoading = false;
+        accountBtn.disabled = false;
+        flushCallbacks(new Error('Failed to load Clerk JS'));
+      };
+      document.head.appendChild(script);
+    }
 
-      // Sign-in button opens Clerk's sign-in modal
-      if (signInBtn) {
-        signInBtn.addEventListener('click', function () {
+    function flushCallbacks(err) {
+      var cbs = pendingCallbacks;
+      pendingCallbacks = [];
+      cbs.forEach(function (cb) { cb(err); });
+    }
+
+    function openDashboard() {
+      accountBtn.disabled = true;
+      fetch('/admin/dashboard')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          accountBtn.disabled = false;
+          if (!data || !Array.isArray(data.tabs)) return;
+
+          var signOutHtml = '<button data-manage-account-sign-out class="tbr-btn tbr-btn-sm tbr-signout" onclick="window.Clerk.signOut({redirectUrl:\'/\'})">Sign out</button>';
+
+          var customPages = data.tabs.map(function (tab) {
+            var html = tab.html.replace(/\{\{SIGNOUT\}\}/g, signOutHtml);
+            return {
+              label: tab.label,
+              url: tab.url,
+              mount: function (el) { el.innerHTML = html; },
+              unmount: function (el) { el.innerHTML = ''; },
+              mountIcon: function (el) { el.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg>'; },
+              unmountIcon: function (el) { el.innerHTML = ''; }
+            };
+          });
+
+          window.Clerk.openUserProfile({ customPages: customPages });
+        })
+        .catch(function (err) {
+          accountBtn.disabled = false;
+          console.error('[nav] dashboard fetch error:', err);
+        });
+    }
+
+    accountBtn.addEventListener('click', function () {
+      whenClerkReady(function (err) {
+        if (err) { console.error('[nav]', err.message || err); return; }
+        if (window.Clerk.user) {
+          openDashboard();
+        } else {
           window.Clerk.openSignIn();
-        });
-      }
+        }
+      });
+    });
 
-      // Account button: fetch dashboard tabs, build customPages, open profile
-      if (accountBtn) {
-        accountBtn.addEventListener('click', function () {
-          accountBtn.disabled = true;
-          console.log('[nav] fetching /admin/dashboard...');
-          fetch('/admin/dashboard')
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (data) {
-              accountBtn.disabled = false;
-              console.log('[nav] dashboard response:', data);
-              if (!data || !Array.isArray(data.tabs)) {
-                console.log('[nav] no tabs array in response');
-                return;
-              }
-
-              console.log('[nav] tabs:', data.tabs.map(function(t) { return t.label; }));
-
-              var signOutHtml = '<button onclick="window.Clerk.signOut({redirectUrl:\'/\'})">Sign out</button>';
-
-              var customPages = data.tabs.map(function (tab) {
-                var html = tab.html.replace(/\{\{SIGNOUT\}\}/g, signOutHtml);
-                return {
-                  label: tab.label,
-                  url: tab.url,
-                  mount: function (el) { el.innerHTML = html; },
-                  unmount: function (el) { el.innerHTML = ''; },
-                  mountIcon: function (el) { el.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg>'; },
-                  unmountIcon: function (el) { el.innerHTML = ''; }
-                };
-              });
-
-              // Default to the Thumbrella tab.  ?tab=manage-usage overrides.
-              var params = new URLSearchParams(window.location.search);
-              var deepTab = params.get('tab') || 'manage-account';
-              var openProps = { customPages: customPages };
-              openProps.__experimental_startPath = '/user/' + deepTab;
-              if (deepTab !== 'manage-account') {
-                console.log('[nav] deep-linking to tab:', deepTab);
-              }
-
-              console.log('[nav] calling openUserProfile with', Object.keys(openProps));
-              window.Clerk.openUserProfile(openProps);
-              console.log('[nav] openUserProfile called');
-            })
-            .catch(function (err) {
-              accountBtn.disabled = false;
-              console.log('[nav] dashboard fetch error:', err);
-            });
-        });
-      }
-
-      // Auto-open on /account or ?open=account
-      if (accountBtn && window.Clerk.user) {
-        var searchParams = new URLSearchParams(window.location.search);
-        if (window.location.pathname === '/account' ||
-            searchParams.get('open') === 'account') {
-          accountBtn.click();
-          if (window.location.pathname === '/account') {
+    // Auto-open from /account, ?open=account, or ?signin=account
+    var path = window.location.pathname;
+    var search = window.location.search;
+    if (path === '/account' || search.indexOf('open=account') >= 0 || search.indexOf('signin=account') >= 0) {
+      whenClerkReady(function (err) {
+        if (err) { console.error('[nav]', err.message || err); return; }
+        if (window.Clerk.user) {
+          openDashboard();
+          if (path === '/account') {
             history.replaceState({}, '', '/');
           }
+        } else {
+          window.Clerk.openSignIn();
         }
-      }
-    }, 100);
+      });
+    }
   })();
 
   // Dashboard script re-activation shim.

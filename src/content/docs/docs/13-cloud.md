@@ -123,3 +123,22 @@ These platforms can also be integrated with Thumbrella Cloud to take advantage
 of thumbrella's server side caching. Look for the optional `token` parameter on
 these requests. The global Thumbrella Cloud cache can significantly reduce the
 processing needed on these platforms and speed up the results.
+
+
+## Privacy Policy
+
+Thumbrella Cloud avoids storing personally identifiable information. In practice
+this means.
+
+- All user information is handled through Clerk.
+  - Thumbrella only stores the internal Clerk account id. 
+    - No email, no user names, or any other PII.
+  - Clerk triggers Thumbrella web hooks when account status has changed.
+  - Clerk keeps a JWT cookie in the browser session.
+  - No Clerk scripts or components loaded until logging in.
+- Cache information is partitioned for each account.
+  - No sharing of cache information across accounts.
+  - Media served with "do not cache" or "private" http headers are not cached.
+  - Only sanitized urls are stored, no query parameters.
+- Cloudflare's "insights" analytics are used on the site.
+  - Excludes visitor information from the EU.
