@@ -183,17 +183,6 @@ It is possible for this cache value to be `null` when the remote server provides
 no caching information.
 
 
-## External Formats
-
-The thumbrella executable comes with support for a wide range of image, video,
-and other formats. These are built in statically and will work on any system
-in any kind of environment.
-
-Thumbrella also supports using sandboxed external programs to do processing.
-These are used for things like 3d renders, and even ffmpeg for some of the
-more advanced formats.
-
-
 ## Troubleshooting
 
 If the server fails to start or behaves unexpectedly, run the `check`
@@ -212,3 +201,31 @@ A running server can be checked by testing the /health endpoint.
 curl http://localhost:3114/health
 ```
 
+
+## External Formats
+
+The thumbrella executable comes with support for a wide range of image, video,
+and other formats. These are built in statically and will work on any system
+in any kind of environment.
+
+Thumbrella also supports using sandboxed external programs to do processing.
+These are used for things like 3d renders, and even ffmpeg for some of the
+more advanced formats.
+
+To enable these formats and features the following commands must be available
+in the environment that runs the server. Some of these tools will require
+access to things like hardware (or software) frame buffers and graphics 
+libraies. The server will check for the commands that they can run with
+basic arguments at startup.
+
+These external tools and libraries are entirely optional. The server will start
+and run without these. Use the `formats` and `check` subcommands on the 
+command line to get further details.
+
+| Dependency | Type | Tool | Formats       |
+|---------|------|--------------|---------------|
+| ffmpeg | CLI | Ffmpeg | Images and videos |
+| oiiotool | CLI | Open Image IO | image formats |
+| f3d | CLI | 3D Visualization | 3d geometry formats |
+| usd_core | Python | Usd library | 3d usd models |
+| bwrap | CLI | Bubblewrap | Linux sandboxing tool |

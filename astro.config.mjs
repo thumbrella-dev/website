@@ -34,7 +34,7 @@ export default defineConfig({
         Sidebar: './src/components/starlight/Sidebar.astro',
       },
       editLink: {
-        baseUrl: 'https://github.com/thumbrella-dev/web/edit/main/',
+        baseUrl: 'https://github.com/thumbrella-dev/website/edit/main/',
       },
       lastUpdated: true,
       tableOfContents: false,

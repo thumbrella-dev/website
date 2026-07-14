@@ -9,6 +9,7 @@ source Thumbrella server on managed infrastructure with a global edge cache and
 access to high-quality rendering backends. There is nothing to deploy or
 maintain.
 
+
 ## Auth Tokens
 
 When an account is created, it will immediately come with an authentication
@@ -19,21 +20,25 @@ the `TBR_CONNECT` environment variable.
 export TBR_CONNECT=tbr_e_3QnzBcWx7KpRmYT2vLfJdE9sMhXuoG6i
 ```
 
-All client libraries read `$TBR_CONNECT` automatically. They can also take the connect string directly.
+This token is the value to use as the connection string. Either assign it to
+`$TBR_CONNECT` or provide it as an optional argument when constructing a
+`Client` object.
 
 :::note
-It is discouraged to put authentication tokens directly into your
-source. Use your language's standard practice for getting secret
-values. This often is `.env` files or similar storage for secrets.
+It is discouraged to write authentication tokens directly into source code. Use
+your language's standard practice for fetching secret values. This often means
+`.env` files or similar handling of secrets.
 :::
 
-When making direct low-level requests to Thumbrella Cloud the authentication
-token is sent as the http header for a bearer authentication token. With
+When making direct HTTP requests to Thumbrella Cloud the authentication
+token is sent as a bearer authentication HTTP Header. With
 `curl` that will look like this.
 
 ```bash
-curl -H "Authorization: Bearer tbr_e_3QnzBcWx7KpRmYT2vLfJdE9sMhXuoG6i" \
-     "https://cloud.thumbrella.dev/thumb.jpeg?url=https://example.com/photo.jpg"
+curl -G "https://cloud.thumbrella.dev/thumb" \
+  --data-urlencode "url=https://demo.thumbrella.dev/media/golden-gate.exr" \
+  --header "Authorization: Bearer tbr_e_3QnzBcWx7KpRmYT2vLfJdE9sMhXuoG6i" \
+  --output thumb.jpeg
 ```
 
 
@@ -107,9 +112,8 @@ uvx thumbrella-client basic https://demo.thumbrella.dev/media/neon-block.png
 
 ## AI Platform Servers
 
-The Thumbrella server will be available on ai compute platforms like
-[fal.ai](https://fal.ai) and [Replicate](https://replicate.com). These platforms
-will charge their own usage rates.
+The Thumbrella server will be available on AI compute platforms, like
+[fal.ai](https://fal.ai) and [Replicate](https://replicate.com). 
 
 Platforms like this can be an excellent use case for applications already
 written on these platforms. Thumbrella runs without the GPU hosts these
@@ -119,10 +123,47 @@ Thumbrella does not collect any payment for usage on these platforms. The
 The Thumbrella Cloud platform is designed to be more cost-efficient than these
 platforms.
 
-These platforms can also be integrated with Thumbrella Cloud to take advantage
-of thumbrella's server side caching. Look for the optional `token` parameter on
+These platforms can also be extended with Thumbrella Cloud to take advantage
+of additional server side caching. Look for the optional `token` parameter on
 these requests. The global Thumbrella Cloud cache can significantly reduce the
 processing needed on these platforms and speed up the results.
+
+
+## Terms of Service
+
+Thumbrella Cloud is provided on a best-effort basis. Uptime depends on upstream
+infrastructure and is not guaranteed.
+
+Administrators may throttle, suspend, or permanently disable accounts at their
+discretion. This includes accounts that intentionally abuse the service, degrade
+performance for other users, or attempt to circumvent limits by creating
+multiple accounts. Users who repeatedly create accounts after suspension may be
+blocked from creating new accounts through IP ranges, email patterns, or other
+technical measures.
+
+Free accounts share pooled resources and may experience delays or cold starts
+under load. 
+
+Usage is subject to hourly and daily limits. Requests are gradually throttled
+as limits are approached. The dashboard shows daily usage, which may be delayed
+up to a day.
+
+Paid accounts subscribe monthly for extended quotas and priority access. Upon
+subscription, quotas increase immediately. Cancellations remain active through
+the end of the current pay period, after which accounts return to free-tier
+limits.
+
+Extended outages that materially impact service may, at administrator
+discretion, result in account credits toward future payments. Credits will not
+exceed the current period's subscription amount. Refunds are not provided;
+credits are the sole remedy for service interruptions.
+
+The service may need to disable file formats or features that pose risk to the
+platform. While the goal is to expand supported formats over time, no specific
+format is guaranteed to remain available.
+
+These terms and the privacy policy may be updated at any time. Continued use
+of the service after changes constitutes acceptance.
 
 
 ## Privacy Policy
