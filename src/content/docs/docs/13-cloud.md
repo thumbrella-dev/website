@@ -57,10 +57,7 @@ See the [pricing page](../pricing/) for current quotas and limits on cloud
 account types.
 
 **Render** counts track freshly generated thumbnails. Results served from the
-edge cache or returned as `not_modified` do not consume render quota.
-Applications with a stable set of URLs naturally converge toward zero new
-renders per day once the initial population is cached. See [Pricing](../pricing)
-for the complete feature comparison.
+edge cache do not consume render quota. 
 
 **Cache** limits describe how much thumbnail data Thumbrella stores in its
 global edge network. Thumbnails served from the edge are instant worldwide.
@@ -69,6 +66,27 @@ When the render quota is exhausted the server continues to return thumbnails —
 placeholder images rather than hard errors. Results still arrive in the same
 shape; only the `source` field and image content change. Applications do not
 need special handling for quota exhaustion.
+
+
+### Limits
+
+Accounts have a daily usage limit. This limit only counts against rendered
+thumbnails. Cached, missing, or simple requests do not count towards this
+quota. Part of the daily limit will also be used to restrict the number of
+thumbnails an account can generate within any given hour and minute.
+
+When accounts reach their limit for a given time period they begin returning
+only placeholder results for their media. They can continue to return precached
+results without consuming quota.
+
+The Thumbrella API encourages batching multiple requests into a single HTTP
+operation. The usage and quota tracking is based on each thumbnail requested,
+not the number of HTTP operations. See the [HTTP API](/docs/client/#http-thumbnail-api)
+for batch request details.
+
+The cloud will slow down requests happening at a rate approximately 1/50 of the
+daily total each minute. These requests will still run normally, only taking
+longer than normal.
 
 
 ## Global Cache

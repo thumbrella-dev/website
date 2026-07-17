@@ -14,72 +14,95 @@ stabilize, only free accounts with reduced limits are available.
 
 ### Thumbrella Cloud
 
-The online cloud service is an easy, optional way to use Thumbrella. The online
-service is designed to be the simplest way to get started, it also provides
-additional value to self hosted or other ways to run the service.
+Use the **free** [Thumbrella Cloud](/docs/cloud/) services. They include an
+amazing worldwide CDN and support all formats and features of the Thumbrella
+server. No infrastructure to manage, no servers to maintain.
+
+If you need unlimited usage or offline capability, see [self-hosting your own
+server](/docs/server/) — also free and open source.
 
 
 <div class="card-grid">
-  <PricingCard title="Free" price="$0" href="/account">
-    The primary use of Thumbrella Cloud is intended to be free and immediately
-    useful.
+  <PricingCard title="Cloud Free" price="$0" href="/account">
 
-    No payment information. Connect your existing developer account 
-    in 2 clicks. Get your authentication token immediately.
+    No payment information required. Connect your existing developer account
+    in two clicks. Get your authentication token immediately.
 
-    **Cache**
-    - Data: 10 MB
-    - TTL: 5 days
+    | Limits | |
+    |--------|-|
+    | Per Day | 10,000 |
+    | Per Hour | 2,000 |
+    | Cache Size | 10 MB |
+    | Cache TTL | 5 days |
 
-    **Render**
-    - Hourly: 500
-    - Daily: 1,000
-    - Monthly: 10,000
-  </PricingCard>
-  <PricingCard title="Paid" price="$5/month" href="/account">
-    Paid accounts run on dedicated servers for faster responses. Accounts get 
-    vastly expanded usage quotas.
+    Great for personal projects, prototypes, and low-traffic production apps.
 
-    Paid accounts can subdivide their usage into separate authentication tokens
-    with their own limits and permissions.
+  </PricingCard><PricingCard title="Cloud Paid" price="$5/month" href="/account">
 
-    **Cache**
-    - Data: 200 MB
-    - TTL: 30 days
+    Paid accounts run on dedicated servers for faster responses. Accounts get
+    vastly expanded rendering and caching limits.
 
-    **Render**
-    - Hourly: 5,000
-    - Daily: 10,000
-    - Monthly: 100,000
+    | Limits | |
+    |--------|-|
+    | Per Day | 50,000 |
+    | Per Hour | 8,000 |
+    | Cache Size | 200 MB |
+    | Cache TTL | 30 days |
+
+    Ideal for production applications with moderate traffic.
+
+  </PricingCard><PricingCard title="Sponsor" price="$50/month" href="/account">
+
+    Help drive the future of Thumbrella. This also provides access to the
+    sponsored Docker container providing full functionality out of the box.
+
+    | Limits | |
+    |--------|-|
+    | Per Day | 1,000,000 |
+    | Per Hour | 200,000 |
+    | Cache Size | 1,000 MB |
+    | Cache TTL | 30 days |
+
+    For high-traffic services and organizations that want to support development.
+
   </PricingCard>
 </div>
 
-There are two measurements of a Thumbrella Cloud account.
+There are two measurements of a Thumbrella Cloud account:
 
-- **Cache** - the amount and lifetime of preserved thumbnails in the global,
-  distributed edge caching.
-- **Render** - the amount of thumbnails processed by the server. Quotas
-  prevent new thumbnails from generating for media. Although Thumbrella always
-  provides placeholder thumbnails for any request, even over quota.
+- **Cache** — the amount and lifetime of preserved thumbnails in the global,
+  distributed edge cache. More cache means more thumbnails served instantly.
+- **Render** — the number of thumbnails processed by the server. Cached results
+  do not count against render limits.
 
-Each thumbnail is usually between 5kb - 10kb in size. Not all thumbnails are
-charged at the same rate. See the [cloud](../cloud/) pages for more details.
+Each thumbnail is usually between 5 KB and 10 KB in size. Not all thumbnails are
+charged at the same rate. See the [cloud limits](/docs/cloud/#limits) page for
+more details.
 
 
-### Other Options
+### Self-Hosted
 
-- Thumbrella is easy to serve and host on your own. The open source server is
-  ready to run immediately with a single command. See the [server
-  documentation](../server) for details.
+Thumbrella is easy to serve and host on your own. The open source server is
+ready to run immediately with a single command. There are **no limits** on
+renders, cache size, or usage when self-hosting. See the [server
+documentation](/docs/server/) for details.
 
-- AI platforms __(coming soon)__. Specially deployed Thumbrella servers are
-  available on hosted platforms like [fal.ai](https://fal.ai) and
-  [Replicate](https://replicate.com). Run on these platforms using your existing
-  accounts at no additional cost. 
+### AI Platform Servers (coming soon)
 
-- Project supporters get access to significantly higher resources and custom
-  Docker images with custom functionality. See the [supporter](../supporter/)
-  page for details.
+Specially deployed Thumbrella servers will be available on hosted platforms
+like [fal.ai](https://fal.ai) and [Replicate](https://replicate.com). Run on
+these platforms using your existing accounts at no additional cost beyond the
+platform's compute pricing. Combine with a [Thumbrella Cloud token](/docs/cloud/#auth-tokens)
+for access to the shared global cache.
 
-- The [demo gallery](https://demo.thumbrella.dev) has a collection of media
-  and can be used as a free server for the media it hosts.
+### Sponsor Edition
+
+Project supporters get access to significantly higher cloud resources and a
+custom [Docker](https://docker.com) image with all optional renderers
+pre-configured. See the [sponsors page](/docs/sponsor/) for details.
+
+### Demo Server
+
+The [demo gallery](https://demo.thumbrella.dev) has a collection of media
+and can be used as a free server for the media it hosts. No account needed —
+point any client at `https://demo.thumbrella.dev`.

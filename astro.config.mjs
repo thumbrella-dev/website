@@ -33,6 +33,22 @@ export default defineConfig({
         Footer: './src/components/starlight/Footer.astro',
         Sidebar: './src/components/starlight/Sidebar.astro',
       },
+      sidebar: [
+        {
+          label: 'Docs',
+          items: [
+            { slug: 'docs' },
+            { slug: 'docs/project' },
+            { slug: 'docs/pricing' },
+            { slug: 'docs/sponsor' },
+            { slug: 'docs/faq' },
+            { slug: 'docs/client' },
+            { slug: 'docs/server' },
+            { slug: 'docs/cloud' },
+            { slug: 'docs/development' },
+          ],
+        },
+      ],
       editLink: {
         baseUrl: 'https://github.com/thumbrella-dev/website/edit/main/',
       },

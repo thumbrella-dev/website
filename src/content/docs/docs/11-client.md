@@ -4,19 +4,22 @@ description: Making requests with client libraries
 slug: docs/client
 ---
 
-Thumbrella provides client libraries for TypeScript/JavaScript, Python, Rust.
-Support for Go, Ruby, PHP, and more will be coming soon. These libraries handle
-caching, streaming, error recovery, and other conveniences on top of the core
-HTTP API.
+Thumbrella provides client libraries for [TypeScript](https://www.npmjs.com/package/@thumbrella/client),
+[Python](https://pypi.org/project/thumbrella/), and
+[Rust](https://crates.io/crates/thumbrella). Support for
+[Go](https://go.dev), [Ruby](https://www.ruby-lang.org), [PHP](https://php.net),
+and more will be coming soon. These libraries handle caching, streaming, error
+recovery, and other conveniences on top of the core HTTP API.
 
 There are also higher level clients that provide simple web components like
 `<Thumbnail src="/media/welcome.pdf">`. These are the preferred way to integrate
 Thumbrella into web based applications. At launch, these components are available
-for React and Astro.
+for [React](https://react.dev) and [Astro](https://astro.build).
 
 A client library is not required to use Thumbrella. The [HTTP API](#http-thumbnail-api) is
 intentionally simple and works with any tool that can make an HTTP request —
-curl, fetch, or the standard library of any language.
+[curl](https://curl.se), [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API),
+or the standard library of any language.
 
 ## Connect
 
@@ -122,10 +125,12 @@ img = Image.open(m.thumbnail.io)
 print(img.mode, img.width, img.height)
 ```
 
-The Python client provides both a synchronous API (using `requests`) and an
-async streaming interface (using `aiohttp`). The `thumbnail.io` property
-returns a file-like `BytesIO` object, so image libraries like Pillow and
-OpenCV can load thumbnails without writing to disk.
+The Python client provides both a synchronous API (using [requests](https://pypi.org/project/requests/))
+and an async streaming interface (using [aiohttp](https://pypi.org/project/aiohttp/)).
+The `thumbnail.io` property returns a file-like
+[BytesIO](https://docs.python.org/3/library/io.html#io.BytesIO) object, so image
+libraries like [Pillow](https://pillow.readthedocs.io) and
+[OpenCV](https://opencv.org) can load thumbnails without writing to disk.
 
 ### Rust
 
@@ -268,11 +273,13 @@ results and returns them after every thumbnail has completed.
 This can be convenient because each result is returned in the same order
 as the requested urls.
 
-The streaming mode is enabled with `Accepts: application/ndjson` or `Accepts: xss-...`.
-In this mode, the server does two additional things.
+The streaming mode is enabled with `Accept: application/x-ndjson`.
+In this mode, the server does two additional things:
 
-- Individual Results are provided the moment they are ready, in arbitrary order.
-- Intermediate results can be provided after a file has been identified but before using a complicated renderer for the item. These will use the `status: "intermediate"` value in the Result.
+- Individual results are provided the moment they are ready, in arbitrary order.
+- Intermediate results can be provided after a file has been identified but
+  before using a complicated renderer for the item. These will use the
+  `status: "intermediate"` value in the Result.
 
 
 ```ts
@@ -455,6 +462,7 @@ The `"thumbrella"` field contains the major version of the Thumbrella server.
 
 The Thumbrella Cloud server provides an additional `"token": boolean` field to
 this object. This will confirm if the provided authentication token is valid.
+This health call will work even without a valid authentication token.
 
 When running a custom server with a `TBR_HANDSHAKE` defined, this url
 will respond with status 4XX when the handshake is invalid.

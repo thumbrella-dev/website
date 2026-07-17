@@ -35,11 +35,9 @@ const pages = docs.map((entry) => {
   return { slug, title: entry.data.title, h2s };
 });
 
-// Explicit sidebar order.
-// We tried sorting by filename prefix and by frontmatter `order` —
-// neither works because entry.id is the frontmatter slug, not the file path.
-// This list is the source of truth; keep it synced with the files in
-// src/content/docs/docs/ when adding or reordering pages.
+// Sidebar page order. Must match the `sidebar.items` array in astro.config.mjs.
+// Changes to this list will break prev/next pagination unless the config is
+// updated too. When adding or reordering pages, update both locations.
 const slugOrder = [
   'docs',
   'docs/project',

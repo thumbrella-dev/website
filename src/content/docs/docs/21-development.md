@@ -18,31 +18,35 @@ repositories.
 
 Code contributions are welcomed and encouraged. There is a bottomless
 list of features and cleanups for this project. The repositories for
-this website and the clients also welcome these additions.
+[this website](https://github.com/thumbrella-dev/website) and the
+[clients](https://github.com/thumbrella-dev/clients) also welcome additions.
 
-Submit Github pull requests any of the Thumbrella repositories. They
+Submit GitHub pull requests to any of the Thumbrella repositories. They
 will be reviewed and accepted once they are ready.
 
 There are no policies against AI contributions. Clean code and improvements
 are always welcome, regardless of the source.
 
 Changes to the server must follow the description and requirements of
-the Architecture, Tiers, and other sections of this document.
+the [Architecture](#architecture), [Tiers](#architecture), and other sections
+of this document.
 
 
 ## Roadmap
 
-There is no longer term roadmap for the project. The immediate development
-is focused on stabilizing and completing features for the server. Tasks
-Tasks that will always need future development:
+There is no long-term roadmap for the project. Immediate development
+is focused on stabilizing and completing features for the server. Areas
+that will always need future development:
 
-- new file formats and renderers
-- performance and efficiency improvements
-- additional client languages and components
-- improved documentation and website features
-- unit and system tests
+- New file formats and renderers
+- Performance and efficiency improvements
+- Additional client languages and components
+- Improved documentation and website features
+- Unit and system tests
 
-So, basically, everything.
+So, basically, everything. If you're wondering what to work on, check the
+[GitHub issues](https://github.com/thumbrella-dev/thumbrella/issues) or
+[start a discussion](https://github.com/orgs/thumbrella-dev/discussions).
 
 
 ## Architecture
@@ -58,14 +62,15 @@ the executable built by Tier 3.
   definitions. This implements the entire HTTP API with a minimal set of
   supported formats. This base tier also provides several simple cache backends.
 
-  Tier 1 can use only Rust dependencies and must be able to build for the WASM
-  architecture. It must also run without threading, which limits some async
-  use cases.
+  Tier 1 can use only Rust dependencies and must be able to build for the
+  [WASM](https://webassembly.org) architecture (`wasm32-unknown-unknown`).
+  It must also run without threading, which limits some async use cases.
 
 - **Tier 2** adds formats that can be compiled statically into the server. There
   are no external shared libraries or tools allowed for tier 2. This creates a
   lightweight executable that is self contained. This uses a mixture of static
-  `libavformat` and various rust media dependencies.
+  [FFmpeg libavformat](https://ffmpeg.org/libavformat.html) and various Rust
+  media dependencies.
 
 - **Tier 3** can use optional external tools and executables to create
   thumbnails. It is able to run tools like `ffmpeg` and `f3d` and run them
@@ -119,10 +124,24 @@ skipping forward without caching the entire file contents into memory.
 
 Creating a thumbnail goes through several steps in a process called the pipeline.
 
-1. **connect**. A connection to the server is made. This can use cache related fields when the remote url has been visited before.
-1. **cache**. If the server reports cached data is unmodified then previously cached results will be used. No http data will be streamed from the server.
-1. **inspect**. The first parts of the file. This will use the filename and data found in the file to determine the `kind`, `extension` and `mime` for the remote media.
-1. **shortcut**. Some formats contain an embedded thumbnail image. In these cases a shortcut handler knows how to extract the embedded image data, without really understanding how to interpret the file contents. Several of the most basic images can also be handled here in the shortcut handler, if their contents are small.
-1. **render**. Generate an image for the given file. This could simply be reading and resampling image pixel data, or it could be generating a fully raytraced image with shaders. This step likely involves handing off to other tiers.
-1. **deliver**. The above processes must deliver image data within approximately a power-of-2 of the target thumbnail size, usually less than 512x512. The deliver step performs final resizing and cropping, visual enhancement, and encodes the result as a low-quality JPEG.
+1. **connect**. A connection to the server is made. This can use cache related
+   fields when the remote url has been visited before.
+1. **cache**. If the server reports cached data is unmodified then previously
+   cached results will be used. No http data will be streamed from the server.
+1. **inspect**. The first parts of the file. This will use the filename and data
+   found in the file to determine the `kind`, `extension` and `mime` for the
+   remote media.
+1. **shortcut**. Some formats contain an embedded thumbnail image. In these
+   cases a shortcut handler knows how to extract the embedded image data,
+   without really understanding how to interpret the file contents. Several of
+   the most basic images can also be handled here in the shortcut handler, if
+   their contents are small.
+1. **render**. Generate an image for the given file. This could simply be
+   reading and resampling image pixel data, or it could be generating a fully
+   raytraced image with shaders. This step likely involves handing off to other
+   tiers.
+1. **deliver**. The above processes must deliver image data within approximately
+   a power-of-2 of the target thumbnail size, usually less than 512x512. The
+   deliver step performs final resizing and cropping, visual enhancement, and
+   encodes the result as a low-quality JPEG.
 

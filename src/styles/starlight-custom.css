@@ -22,8 +22,6 @@
   --sl-font: 'IBM Plex Mono', 'JetBrains Mono', 'Fira Code', monospace;
   --sl-font-system: 'Inter', system-ui, sans-serif;
   --sl-font-system-mono: 'IBM Plex Mono', monospace;
-
-  /* --sl-sidebar-width: 16rem; */
 }
 
 /* Backdrop blur for nav */
@@ -53,19 +51,19 @@ starlight-theme-select { display: none; }
   color: #dba95e;
 }
 
-/* Active sidebar link — dark purple bg instead of orange-on-orange */
+/* Active sidebar link - dark purple bg instead of orange-on-orange */
 .sidebar-content a[aria-current='page'],
 .sidebar-content a[aria-current='page']:hover {
   background-color: #2e2540;
   color: var(--sl-color-white);
 }
 
-/* Code blocks — left accent border to distinguish from monospace body prose */
+/* Code blocks - left accent border to distinguish from monospace body prose */
 .expressive-code figure {
   border-left: 3px solid rgba(200, 149, 78, 0.45) !important;
 }
 
-/*  Asides — dark, low-saturation, brown/purple family ─ */
+/*  Asides - dark, low-saturation, brown/purple family */
 
 .starlight-aside {
   background-color: var(--sl-color-gray-6) !important;
@@ -80,7 +78,7 @@ starlight-theme-select { display: none; }
   color: var(--sl-color-accent-high) !important;
 }
 
-/*  Page footer wrapper ─ */
+/*  Page footer wrapper */
 
 .sl-page-footer {
   margin-top: 3rem;
@@ -88,25 +86,25 @@ starlight-theme-select { display: none; }
   border-top: 1px solid var(--sl-color-hairline-light);
 }
 
-/*  Pricing card grid ─ */
+/*  Pricing card grid */
 
 .card-grid {
   display: grid;
   grid-template-columns: 100%;
   gap: 1.5rem;
   margin: 2rem 0;
-  align-items: start;
+  align-items: stretch;
 }
 
 @media (min-width: 50rem) {
   .card-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
 
 /*  Table styling
 
-   Starlight ships minimal table styles — header cells get white
+   Starlight ships minimal table styles - header cells get white
    text but no background, and rows have no alternating shading.
    We match the code-block aesthetic: purplish header bar (#1e1530,
    same as Expressive Code terminal titlebar), 8px rounded corners,
@@ -195,7 +193,7 @@ starlight-theme-select { display: none; }
   color: var(--sl-color-accent-high);
 }
 
-/* Pagination links — dark purple bg matching active sidebar */
+/* Pagination links - dark purple bg matching active sidebar */
 .pagination-links a {
   background: #2e2540;
   border: 1px solid rgba(200, 149, 78, 0.12);

@@ -5,13 +5,14 @@ slug: docs/server
 ---
 
 The Thumbrella executable is the server. It can be downloaded directly from
-releases or built from source. For most users, the easiest path is to run
-it through a prebuilt package. The server runs on Windows, macOS, and
-Linux — anywhere Rust can produce a runnable binary.
+[releases](https://github.com/thumbrella-dev/thumbrella/releases) or built from
+source. For most users, the easiest path is to run it through a prebuilt
+package. The server runs on Windows, macOS, and Linux — anywhere
+[Rust](https://rust-lang.org) can produce a runnable binary.
 
 ```bash
 # Run with npx (Node)
-npx thumbrella/server serve
+npx @thumbrella/server serve
 
 # Run with uvx (Python)
 uvx thumbrella-server serve
@@ -71,8 +72,8 @@ most self hosted services.
 
 | Specialized Variable | Default Value | Description |
 |---|---|---|
-| `TBR_TIER2` | <none> | Connection string to contact a separate Thumbrella server for tier2. |
-| `TBR_TIER3` | <none> | Connection string to contact a separate Thumbrella server for tier3. |
+| `TBR_TIER2` | <none> | Connection string to a separate Thumbrella server for tier2. |
+| `TBR_TIER3` | <none> | Connection string to a separate Thumbrella server for tier3. |
 
 
 ## Handshake
@@ -107,12 +108,12 @@ confusion about where each kind of credential belongs.
 ## Caching
 
 The server includes a **short-term sticky cache** (5 seconds) with
-**request coalescing** built in.  When two identical requests arrive
+**request coalescing** built in. When two identical requests arrive
 within 5 seconds, only one fetches the remote source — the second is
-served from the sticky cache.  This is always active.
+served from the sticky cache. This is always active.
 
 With default settings the server also enables a 100 MB in-memory LRU
-cache.  Set `TBR_CACHE` to customise or disable it.
+cache. Set `TBR_CACHE` to customise or disable it.
 
 Thumbrella respects upstream HTTP caching:
 - `Cache-Control: no-store` and `private` responses are **not** stored
@@ -124,26 +125,22 @@ Thumbrella respects upstream HTTP caching:
 
 `$TBR_CACHE` selects a single cache backend:
 
-- **Memory** (`mem:`)
-  Not persistent.  Size: `mem:200mb`, `mem:2gb`, `mem:500` (entries).
-  Defaults to 100 MB (just `mem:`).
+| Backend | Format | Persistence | Examples |
+|---|---|---|---|
+| **Memory** | `mem:` | No | `mem:`, `mem:200mb`, `mem:2gb`, `mem:500` (entries) |
+| **[SQLite](https://sqlite.org)** | `sqlite:` | Yes | `sqlite:cache.db`, `sqlite:/var/cache.db#1gb` |
+| **Cloud** | `cloud:` | Yes (shared) | `cloud:tbr_s_AbCd...` — your cloud API token |
+| **None** | `none:` | — | Disables all caching |
 
-- **SQLite** (`sqlite:`)
-  Persistent.  `sqlite:cache.db`, `sqlite:/var/cache.db#1gb`.
-  Oldest entries evicted automatically when over the byte limit;
-  expired entries purged on each write.  No manual maintenance needed.
+Any cache backend can be sized by appending a limit: `mem:500mb`, `sqlite:db#2gb`.
+Memory cache defaults to 100 MB. SQLite evicts oldest entries when over the byte
+limit and purges expired entries on write — no manual maintenance needed. See
+the [Cloud docs](/docs/cloud/#global-cache) for details on the cloud cache
+backend.
 
-- **Cloud** (`cloud:`)
-  Uses the Thumbrella cloud service as a distributed cache.
-  `cloud:tbr_s_AbCd...` — your cloud API token.
-  Size and TTL are managed by the cloud.
-
-- **None** (`none:`)
-  Disables all caching.  Takes no parameters.
-
-Every cache entry has an expiration timestamp.  By default upstream
+Every cache entry has an expiration timestamp. By default upstream
 `Cache-Control: max-age` / `s-maxage` sets the TTL, capped at 7 days
-(`TBR_CACHE_MAX_TTL`).  When the upstream provides no hints, entries
+(`TBR_CACHE_MAX_TTL`). When the upstream provides no hints, entries
 default to 1 hour (`TBR_CACHE_DEFAULT_TTL`).
 
 
@@ -156,9 +153,9 @@ this.
 6a46337d:AAAkIjE2ODcxOTc4MTcuMzY0NjkzLTEzMjA2OC01MTI5NTY2MDkiAA
 ```
 
-The data is broken into two parts, separated by the first colon.
-The string will always have at least one colon with some characters before
-and after.
+The data is broken into two parts, separated by the first colon. The cache
+string will always have at least one colon with some characters before and
+after.
 
 - The first part represents a hexadecimal timestamp (utc time) that represents
   when the cache freshness will expire. Any time before the expiration is
@@ -189,43 +186,61 @@ If the server fails to start or behaves unexpectedly, run the `check`
 subcommand first. It evaluates the environment variables that configure the
 server and reports whether each value is valid.
 
-Look at the server's printed output. It will often contain hints and details
-on why certain requests are failing.
+```bash
+thumbrella check
+```
 
-The server defaults to port 3114. If that port is unavailable the `serve`
-and `check` commands will report it. Set `$TBR_PORT` to a different value.
+Common issues and solutions:
 
-A running server can be checked by testing the /health endpoint.
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| "address in use" | Port `3114` already bound | Set `TBR_PORT` to a different port |
+| Rejected requests | Missing [handshake](#handshake) | Include handshake in client connect string |
+| Missing formats | External tools not installed | Install `ffmpeg`, `f3d`, etc.; run `thumbrella formats` |
+| Repeated rerendering | Default cache is small | Set `TBR_CACHE=mem:200mb` for a larger memory cache. Also consider `sqlite:` to make the cache persistent. |
+| File paths blocked | Configuration not allowed by default | Set `TBR_ALLOW_LOCAL=1` to allow `file://` URLs |
+
+A running server can be checked by testing the `/health` endpoint:
 
 ```bash
 curl http://localhost:3114/health
+# {"status": "ok", "thumbrella": 1}
 ```
+
+### Docker troubleshooting
+
+When running in Docker, the server cannot access `localhost` on the host.
+Use `host.docker.internal` (Docker Desktop) or `--network host` (Linux) to
+reach services on the host. The scratch directory (`TBR_SCRATCH`) should be
+a mounted volume for temporary file storage.
+
+External tools like `oiiotool` and `f3d` are not included in the base Docker
+image. Use the [sponsor edition](/docs/sponsor/) Docker image for a
+pre-configured environment with all optional renderers.
 
 
 ## External Formats
 
-The thumbrella executable comes with support for a wide range of image, video,
+The Thumbrella executable comes with support for a wide range of image, video,
 and other formats. These are built in statically and will work on any system
 in any kind of environment.
 
 Thumbrella also supports using sandboxed external programs to do processing.
-These are used for things like 3d renders, and even ffmpeg for some of the
-more advanced formats.
+These are used for 3D renders, and even [FFmpeg](https://ffmpeg.org) for some
+of the more advanced video formats.
 
 To enable these formats and features the following commands must be available
 in the environment that runs the server. Some of these tools will require
-access to things like hardware (or software) frame buffers and graphics 
-libraies. The server will check for the commands that they can run with
-basic arguments at startup.
+access to hardware (or software) frame buffers and graphics libraries. The
+server will check for the commands at startup and report which are available.
 
 These external tools and libraries are entirely optional. The server will start
-and run without these. Use the `formats` and `check` subcommands on the 
-command line to get further details.
+and run without them. Use the `formats` and `check` subcommands to get further
+details.
 
-| Dependency | Type | Tool | Formats       |
+| Dependency | Type | Tool | Formats |
 |---------|------|--------------|---------------|
-| ffmpeg | CLI | Ffmpeg | Images and videos |
-| oiiotool | CLI | Open Image IO | image formats |
-| f3d | CLI | 3D Visualization | 3d geometry formats |
-| usd_core | Python | Usd library | 3d usd models |
-| bwrap | CLI | Bubblewrap | Linux sandboxing tool |
+| [FFmpeg](https://ffmpeg.org) | CLI | `ffmpeg` | Additional images and videos |
+| [OpenImageIO](https://openimageio.org) | CLI | `oiiotool` | Extended image formats |
+| [F3D](https://f3d.app) | CLI | `f3d` | 3D geometry formats |
+| [OpenUSD](https://openusd.org) | Python | `usd_core` | 3D USD models |
