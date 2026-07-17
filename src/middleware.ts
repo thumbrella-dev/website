@@ -67,7 +67,12 @@ export const onRequest: import('astro').MiddlewareHandler = async (context, next
     return new Response(resp.body, { status: resp.status, headers: safeHeaders });
   }
 
-  // /account, /account/:tab, /user/* — pass through. Client-side Navbar
-  // JS handles Clerk auth (sign-in modal vs account profile).
+  // /account[/] — rewrite to home page. Navbar JS detects /account URL and
+  // auto-opens Clerk profile. When the modal closes, JS restores URL to /.
+  if (context.url.pathname === '/account' || context.url.pathname === '/account/') {
+    return context.rewrite('/');
+  }
+
+  // /user/* — pass through.
   return next();
 };
