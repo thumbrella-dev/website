@@ -84,7 +84,7 @@ Each tier of the server performs a hand off to the higher tiers. There are
 two strategies used to handoff processing.
 
 - **Inline Handoff** uses a function, registered at startup, to
-  perform additional processing. This can use all the same in-memory
+  perform rendering in-process. This can use all the same in-memory
   structures and network streams as the tier that started the request.
 
 - **Remote Handoff** is a way any Thumbrella server can handoff to a
@@ -96,13 +96,13 @@ able to handle which formats. Generally there is a single tier for
 each type of file.
 
 Some formats can contain optional, complicated codecs. Sometimes these
-will be attempted in Tier 2, but fall back on Tier 3 if the simpler
+will be attempted in Tier 1 or 2, but fall back on Tier 3 if the simpler
 tier cannot handle the necessary features.
 
 
 ## HTTP Buffer
 
-All media handling is routed through a special `HttpBuffer` container. This
+All data handling is routed through an internal `HttpBuffer` container. This
 maintains a streaming connection to the remote server, but allows random access
 and caching of the file contents. This allows the different tiers to coordinate
 and inspect the same data without restarting the remote connection.
@@ -110,7 +110,7 @@ and inspect the same data without restarting the remote connection.
 The HTTP Buffer has a special feature that allows end-of-file reads. Several
 formats place important indices or offsets at the end of their contents. To
 access the end of a large file, a second range request is made to provide the
-later parts of the file.
+later parts of the file. When supported by the media's HTTP server.
 
 Other than that, all random access reads must stream through the original https
 stream to access the needed data.
@@ -122,10 +122,12 @@ skipping forward without caching the entire file contents into memory.
 
 ## Pipeline
 
-Creating a thumbnail goes through several steps in a process called the pipeline.
+Creating a thumbnail goes through several steps in a process tracked in a 
+`Cook` data structure.
 
-1. **connect**. A connection to the server is made. This can use cache related
-   fields when the remote url has been visited before.
+1. **connect**. A connection to the server is made. This can use cache-related
+   headers when the remote url has been visited before. While the http connection
+   is made, no data is immediately transferred.
 1. **cache**. If the server reports cached data is unmodified then previously
    cached results will be used. No http data will be streamed from the server.
 1. **inspect**. The first parts of the file. This will use the filename and data
@@ -133,13 +135,12 @@ Creating a thumbnail goes through several steps in a process called the pipeline
    remote media.
 1. **shortcut**. Some formats contain an embedded thumbnail image. In these
    cases a shortcut handler knows how to extract the embedded image data,
-   without really understanding how to interpret the file contents. Several of
-   the most basic images can also be handled here in the shortcut handler, if
-   their contents are small.
+   and skip the regular file contents. Several of the most basic images can 
+   also be handled here in the shortcut handler, if their contents are small.
 1. **render**. Generate an image for the given file. This could simply be
    reading and resampling image pixel data, or it could be generating a fully
    raytraced image with shaders. This step likely involves handing off to other
-   tiers.
+   tiers, usually still handled in-process.
 1. **deliver**. The above processes must deliver image data within approximately
    a power-of-2 of the target thumbnail size, usually less than 512x512. The
    deliver step performs final resizing and cropping, visual enhancement, and

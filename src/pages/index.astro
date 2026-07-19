@@ -8,6 +8,8 @@ import { fetchDemoGallery, shuffleGallery } from '../lib/demo-gallery';
 import ClientTabs from '../components/ClientTabs.astro';
 import HostingTabs from '../components/HostingTabs.astro';
 import NewsSection from '../components/NewsSection.astro';
+import { Code } from 'astro:components';
+
 
 // Seed with a few items so the carousel has content before the full index loads
 const SEED_FILES = [
@@ -109,6 +111,17 @@ if (carouselItems.length > 0) {
           <FormatChip icon="📄" title="Documents" count="6">Documents are usually multi-page collections of styled text and media.<br>DOCX, PPTX, ODT, XLSX, ODS, ODP, PDF (soon).</FormatChip>
           <FormatChip icon="📦" title="And more" count="10">Vector graphics are rendered in high quality. Even audio formats commonly provide cover art to view. And more on the way.<br>SVG, MP3, FLAC, OGG, M4A, AAC...</FormatChip>
         </div>
+
+        <br>
+        <Code code={`# 1. Spin up a Docker server locally (or run the cross platform binaries)
+docker run --name tbr --publish 3114:3114 --rm thumbrella/server:prerelease
+
+# 2. From another terminal, use a client library
+export TBR_CONNECT=http://localhost:3114
+uvx thumbrella-client basic https://demo.thumbrella.dev/media/math-guide.odt
+
+# 3. Or use CLI commands to generate a thumbnail from any URL or path
+npx @thumbrella/server thumb https://demo.thumbrella.dev/media/harbor-trucks.mp4 out.jpg`} lang="bash" />
 
       </div>
     </div>

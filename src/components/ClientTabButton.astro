@@ -4,7 +4,7 @@ interface Props {
   id: string;
   label: string;
   active?: boolean;
-  /** Namespace prefix — panel id becomes '{prefix}-{id}'. Defaults to 'cgs'. */
+  /** Namespace prefix - panel id becomes '{prefix}-{id}'. Defaults to 'cgs'. */
   prefix?: string;
 }
 const { id, label, active = false, prefix = 'cgs' } = Astro.props;

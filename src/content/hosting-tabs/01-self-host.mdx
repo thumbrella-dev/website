@@ -6,23 +6,15 @@ Self hosting your own Thumbrella server is designed to be straightforward
 and simple. Find the prepackaged option that best fits your environment.
 
 ```sh
+# Run through packaged npm servers  (uvx package also available)
+npx @thumbrella/server serve
+
+# Docker container
+docker run --name tbr --publish 3114:3114 --rm thumbrella/server
+
 # Download binaries for your platform (statically linked, no difficulties)
 wget http://github.com/thumbrella-dev/thumbrella/releases/latest/thumbrella-win64.exe
 thumbrella-win64 serve
-
-
-# Run through packaged npm servers
-npx @thumbrella/server serve
-
-
-# Docker container
-docker run -itp 3114:3114 --rm thumbrella/server
-
-
-# Download binary
-cargo install thumbrella-server
-thumbrella serve
-
 ```
 
 By default the server will listen on port `3114`. This can be override by 
@@ -31,25 +23,6 @@ settings also managed by environment variables. These can be validated
 by running `thumbrella check` for a simple report and diagnostics.
 
 See the [Server Documentation](https://thumbrella.dev/docs/server/) 
-for more commands and configurations.
-
-## Formats
-
-The server executable comes with a significant number of formats built in
-statically. This can be examined by running `thumbrella formats`.
-
-Thumbrella optionally uses external applications to handle the more 
-complicated file formats. If the commands aren't available those file
-formats will get a simple placeholder thumbnail.
-
-## Build yourself
-
-The Rust server is designed to be simple to build from source. The user will
-need to either set `$FFMPEG_DIR` to an ffmpeg build path, or use one of the
-provided ffmpeg build scripts for your platform.
-
-```sh
-git clone https://github.com/thumbrella-dev/thumbrella && cd thumbrella
-bash ffs/build-linux.sh  (or `powershell -File ffs/build-windows.ps1` on Win)
-cargo run --release
-```
+for more commands and configurations. Including how different media formats
+are handled. This also has instructions on optionally compiling Thumbrella
+for yourself.

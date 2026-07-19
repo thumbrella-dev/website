@@ -28,7 +28,7 @@ const { items } = Astro.props;
     href="https://demo.thumbrella.dev"
     target="_blank"
     rel="noopener"
-  >Full gallery at demo.thumbrella.dev &rarr;</a>
+  >Gallery details at demo.thumbrella.dev &rarr;</a>
   <div class="carousel-track-wrap" aria-label="Sample media thumbnails">
     <ul class="carousel-track" id="carousel-track" role="list">
       {[0, 1, 2].flatMap(() => items).map((item, i) => {
@@ -101,6 +101,7 @@ const { items } = Astro.props;
 
   .carousel-demo-link:hover {
       color: var(--accent-strong);
+      text-decoration: underline;
   }
 
   /* fade edges */
@@ -209,7 +210,7 @@ const { items } = Astro.props;
       filter: grayscale(0.2);
   }
 
-  /* spinner badge — small rotating ring in bottom-right */
+  /* spinner badge - small rotating ring in bottom-right */
   .ctile__spinner {
       position: absolute;
       bottom: 6px;
@@ -386,7 +387,7 @@ const { items } = Astro.props;
   const popup = document.getElementById('cpopup') as HTMLElement | null;
   if (track) {
     const allTiles = Array.from(track.children) as HTMLElement[];
-    // Tiles are rendered 3× server-side — one set width for modulo wrapping
+    // Tiles are rendered 3× server-side - one set width for modulo wrapping
     const setCount = allTiles.length / 3;
     const oneSetWidth = allTiles.slice(0, setCount).reduce((w, el) => w + el.offsetWidth + 120 /* gap */, 0);
 
@@ -398,7 +399,7 @@ const { items } = Astro.props;
         const ratio = entry.intersectionRatio;
 
         if (ratio >= 0.99) {
-          // Fully on screen — start the load simulation
+          // Fully on screen - start the load simulation
           if (el.classList.contains('is-pending') || el.classList.contains('is-loaded')) return;
           const src = el.dataset.thumbSrc ?? '';
           const procMs = parseInt(el.dataset.proc ?? '0', 10);
@@ -421,7 +422,7 @@ const { items } = Astro.props;
             setTimeout(loadThumb, holdMs);
           }
         } else if (ratio === 0) {
-          // Fully off screen — reset for next loop cycle
+          // Fully off screen - reset for next loop cycle
           el.classList.remove('is-pending', 'is-loaded', 'is-error');
           const img = el.querySelector<HTMLImageElement>('.ctile__img');
           if (img) img.removeAttribute('src');
@@ -440,7 +441,7 @@ const { items } = Astro.props;
     let pos = 0;
     let lastTime: number | null = null;
 
-    // Frame-rate monitor — disable animation if the browser can't keep up
+    // Frame-rate monitor - disable animation if the browser can't keep up
     // (common in embedded VS Code browser and low-power devices).
     let slowFrames = 0;
     const SLOW_THRESHOLD_MS = 80;   // frame delta above this is "slow"

@@ -19,7 +19,7 @@ amazing worldwide CDN and support all formats and features of the Thumbrella
 server. No infrastructure to manage, no servers to maintain.
 
 If you need unlimited usage or offline capability, see [self-hosting your own
-server](/docs/server/) — also free and open source.
+server](/docs/server/) which is free, open-source, and fully featured.
 
 
 <div class="card-grid">
@@ -28,12 +28,11 @@ server](/docs/server/) — also free and open source.
     No payment information required. Connect your existing developer account
     in two clicks. Get your authentication token immediately.
 
-    | Limits | |
-    |--------|-|
-    | Per Day | 5,000 |
-    | Per Hour | 500 |
-    | Cache Size | 10 MB |
-    | Cache TTL | 5 days |
+    <table width="100%">
+    <tr><td>Daily&nbsp;Thumbnails</td><td>5,000</td></tr>
+    <tr><td>Hourly&nbsp;Thumbnails</td><td>500</td></tr>
+    <tr><td>Cache&nbsp;Limit</td><td>10 MB</td></tr>
+    </table>
 
     Great for personal projects, prototypes, and low-traffic production apps.
 
@@ -42,26 +41,24 @@ server](/docs/server/) — also free and open source.
     Paid accounts run on dedicated servers for faster responses. Accounts get
     vastly expanded rendering and caching limits.
 
-    | Limits | |
-    |--------|-|
-    | Per Day | 25,000 |
-    | Per Hour | 2,500 |
-    | Cache Size | 200 MB |
-    | Cache TTL | 30 days |
+    <table width="100%">
+    <tr><td>Daily&nbsp;Thumbnails</td><td>25,000</td></tr>
+    <tr><td>Hourly&nbsp;Thumbnails</td><td>2,500</td></tr>
+    <tr><td>Cache&nbsp;Limit</td><td>200 MB</td></tr>
+    </table>
 
-    Ideal for production applications with moderate traffic.
+    Ideal for production applications with hundreds of users.
 
   </PricingCard><PricingCard title="Sponsor" price="$50/month" href="/account">
 
     Help drive the future of Thumbrella. This also provides access to the
     sponsored Docker container providing full functionality out of the box.
 
-    | Limits | |
-    |--------|-|
-    | Per Day | 500,000 |
-    | Per Hour | 50,000 |
-    | Cache Size | 1,000 MB |
-    | Cache TTL | 30 days |
+    <table width="100%">
+    <tr><td>Daily&nbsp;Thumbnails</td><td>500,000</td></tr>
+    <tr><td>Hourly&nbsp;Thumbnails</td><td>50,000</td></tr>
+    <tr><td>Cache&nbsp;Limit</td><td>1,000 MB</td></tr>
+    </table>
 
     For high-traffic services and organizations that want to support development.
 
@@ -70,24 +67,29 @@ server](/docs/server/) — also free and open source.
 
 There are two measurements of a Thumbrella Cloud account:
 
-- **Cache** — the amount and lifetime of preserved thumbnails in the global,
+- **Cache** the amount and lifetime of preserved thumbnails in the global,
   distributed edge cache. More cache means more thumbnails served instantly.
-- **Render** — the number of thumbnails processed by the server. Cached results
-  do not count against render limits.
+- **Render** the number of thumbnails processed by the server. Cached results
+  do not count against this limit. Each account can use up to 10% of it's
+  daily limit within any single 60 minute period. More aggressive use of the
+  service will be throttled, and eventually be stopped by `429` results.
 
-Each thumbnail is usually between 5 KB and 10 KB in size. Not all thumbnails are
-charged at the same rate. See the [cloud limits](/docs/cloud/#limits) page for
-more details.
+Each thumbnail is usually between 5 KB and 10 KB in size. 
+See the [cloud limits](/docs/cloud/#limits) page for more details.
 
 
 ### Self-Hosted
 
 Thumbrella is easy to serve and host on your own. The open source server is
 ready to run immediately with a single command. There are **no limits** on
-renders, cache size, or usage when self-hosting. See the [server
-documentation](/docs/server/) for details.
+renders, cache sizes, or number of processors, when self-hosting. See the 
+[server documentation](/docs/server/) for details.
 
-### AI Platform Servers (coming soon)
+### AI Platform Servers
+
+:::note 
+Still coming soon
+:::
 
 Specially deployed Thumbrella servers will be available on hosted platforms
 like [fal.ai](https://fal.ai) and [Replicate](https://replicate.com). Run on
@@ -104,5 +106,5 @@ pre-configured. See the [sponsors page](/docs/sponsor/) for details.
 ### Demo Server
 
 The [demo gallery](https://demo.thumbrella.dev) has a collection of media
-and can be used as a free server for the media it hosts. No account needed —
+and can be used as a free server for the media it hosts. No account needed,
 point any client at `https://demo.thumbrella.dev`.

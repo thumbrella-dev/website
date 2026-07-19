@@ -1,6 +1,6 @@
 /**
  * Fetches and maps demo gallery data from demo.thumbrella.dev.
- * Runs server-side (SSR) — fetch is available in both Node 18+ and CF Workers.
+ * Runs server-side (SSR), fetch is available in both Node 18+ and CF Workers.
  *
  * Uses the index.json template URLs (media/thumb/data) to construct paths
  * instead of manually assembling them.  Timing and kind data are now in the
@@ -94,7 +94,7 @@ function mapIndexFile(file: DemoIndexFile, thumbTemplate: string, dataTemplate: 
     codec: ext.toUpperCase(),
     type: file.kind ?? 'unknown',
     kind: file.kind,
-    duration: '',      // media duration (not in index — in result JSON only)
+    duration: '',      // media duration (not in index, in result JSON only)
     size: formatSize(file.size),
     procMs: Math.round((file.duration || 0) * 1000),
     link: file.link || '',
@@ -108,7 +108,7 @@ function mapIndexFile(file: DemoIndexFile, thumbTemplate: string, dataTemplate: 
 /**
  * Fetches the demo gallery index and maps to CarouselItem[].
  *
- * Only one HTTP request — the new index.json includes kind, extension, and
+ * Only one HTTP request, the new index.json includes kind, extension, and
  * duration so we don't need to fetch individual result JSONs for basic tile
  * data.  Per-result JSON is fetched lazily on the client when the popup opens.
  *

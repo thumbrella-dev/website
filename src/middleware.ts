@@ -1,6 +1,6 @@
 /**
  * Extract the Clerk user ID from the __session cookie JWT.
- * Does NOT verify the signature — the admin worker re-verifies on its end.
+ * Does NOT verify the signature - the admin worker re-verifies on its end.
  */
 function getUserIdFromCookie(cookieHeader: string | null): string | null {
   if (!cookieHeader) return null;
@@ -67,12 +67,12 @@ export const onRequest: import('astro').MiddlewareHandler = async (context, next
     return new Response(resp.body, { status: resp.status, headers: safeHeaders });
   }
 
-  // /account[/] — rewrite to home page. Navbar JS detects /account URL and
+  // /account[/] - rewrite to home page. Navbar JS detects /account URL and
   // auto-opens Clerk profile. When the modal closes, JS restores URL to /.
   if (context.url.pathname === '/account' || context.url.pathname === '/account/') {
     return context.rewrite('/');
   }
 
-  // /user/* — pass through.
+  // /user/* - pass through.
   return next();
 };

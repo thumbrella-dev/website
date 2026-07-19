@@ -26,7 +26,7 @@ This token is the value to use as the connection string. Either assign it to
 
 :::note
 It is discouraged to write authentication tokens directly into source code. Use
-your language's standard practice for fetching secret values. This often means
+standard practices for fetching secret values. This often means
 `.env` files or similar handling of secrets.
 :::
 
@@ -42,11 +42,11 @@ curl -G "https://cloud.thumbrella.dev/thumb" \
 ```
 
 
-### Project Tokens
+### Multiple Tokens
 
 Paid accounts can create additional project tokens, each with its own quota
 limits and permissions. This is useful for isolating usage across applications,
-teams, or environments — a staging token can be given a low hourly cap while
+teams, or environments, a staging token can be given a low hourly cap while
 production tokens run with the full allocation. Token management is available
 in the account dashboard.
 
@@ -62,7 +62,7 @@ edge cache do not consume render quota.
 **Cache** limits describe how much thumbnail data Thumbrella stores in its
 global edge network. Thumbnails served from the edge are instant worldwide.
 
-When the render quota is exhausted the server continues to return thumbnails —
+When the render quota is exhausted the server continues to return thumbnails,
 placeholder images rather than hard errors. Results still arrive in the same
 shape; only the `source` field and image content change. Applications do not
 need special handling for quota exhaustion.
@@ -72,28 +72,33 @@ need special handling for quota exhaustion.
 
 Accounts have a daily usage limit. This limit only counts against rendered
 thumbnails. Cached, missing, or simple requests do not count towards this
-quota. Part of the daily limit will also be used to restrict the number of
-thumbnails an account can generate within any given hour and minute.
+quota. 
+
+Ten percent of the daily limit will also be used to restrict the number of
+thumbnails an account can generate within any given hour.
 
 When accounts reach their limit for a given time period they begin returning
-only placeholder results for their media. They can continue to return precached
+simple placeholder results for their media. They can continue to return precached
 results without consuming quota.
 
-The Thumbrella API encourages batching multiple requests into a single HTTP
+The API encourages batching multiple requests into a single HTTP
 operation. The usage and quota tracking is based on each thumbnail requested,
 not the number of HTTP operations. See the [HTTP API](/docs/client/#http-thumbnail-api)
 for batch request details.
 
-The cloud will slow down requests happening at a rate approximately 1/50 of the
-daily total each minute. These requests will still run normally, only taking
-longer than normal.
+When the cloud server notices an account rapidly generating requests it will
+throttle the requests. Slowing them down so they do not run into the hourly
+or daily limits unintentionally.
+
+Accounts that continue to overload the server will eventually start receiving
+HTTP 429 results, meaning the server is "Too Busy" to handle additional requests.
 
 
 ## Global Cache
 
 Thumbrella Cloud maintains a distributed edge cache shared across all users.
 When any client requests a thumbnail for a URL that has already been rendered,
-the cached result returns immediately from a nearby edge node — no download or
+the cached result returns immediately from a nearby edge node, no download or
 render required, and no render quota consumed.
 
 This shared pool means popular URLs benefit most. A widely used CDN asset might
@@ -106,9 +111,9 @@ thumbnail without re-checking the origin. Once expired, Thumbrella revalidates
 the remote URL and re-renders only if the content has changed. Media that hasn't
 changed returns as `not_modified` at no render cost.
 
-Client libraries add a second local cache layer on top of the server cache, so
-frequently accessed URLs can resolve without any network call at all. See the
-[Client docs](../client/#caching) for details.
+Client libraries provide an additional local cache layer on top of the server
+cache, so frequently accessed URLs can resolve without any network call at all.
+See the [Client docs](../client/#caching) for details.
 
 
 ## Demo Server
@@ -129,6 +134,10 @@ uvx thumbrella-client basic https://demo.thumbrella.dev/media/neon-block.png
 
 
 ## AI Platform Servers
+
+:::note
+Coming soon
+:::
 
 The Thumbrella server will be available on AI compute platforms, like
 [fal.ai](https://fal.ai) and [Replicate](https://replicate.com). 
@@ -163,18 +172,19 @@ Free accounts share pooled resources and may experience delays or cold starts
 under load. 
 
 Usage is subject to hourly and daily limits. Requests are gradually throttled
-as limits are approached. The dashboard shows daily usage, which may be delayed
-up to a day.
+as limits are approached. The dashboard shows daily usage, but results may
+be delayed by several minutes before appearing.
 
-Paid accounts subscribe monthly for extended quotas and priority access. Upon
-subscription, quotas increase immediately. Cancellations remain active through
-the end of the current pay period, after which accounts return to free-tier
-limits.
+Paid accounts subscribe monthly. The allows extended quotas and priority access.
+Upon subscription, quotas increase within minutes. Cancellations remain active
+through the end of the current pay period, after which accounts return to
+free-tier limits.
 
 Extended outages that materially impact service may, at administrator
-discretion, result in account credits toward future payments. Credits will not
-exceed the current period's subscription amount. Refunds are not provided;
-credits are the sole remedy for service interruptions.
+discretion, result in account credits toward future payments. An account's
+credits will not exceed the current period's subscription amount. Refunds are
+not provided; credits are the sole remedy for service interruptions if 
+necessary.
 
 The service may need to disable file formats or features that pose risk to the
 platform. While the goal is to expand supported formats over time, no specific
@@ -191,13 +201,14 @@ this means.
 
 - All user information is handled through Clerk.
   - Thumbrella only stores the internal Clerk account id. 
-    - No email, no user names, or any other PII.
-  - Clerk triggers Thumbrella web hooks when account status has changed.
+    - No email, no user names, or any other PII stored by Thumbrella Cloud.
+  - Clerk triggers webhooks when account status has changed.
   - Clerk keeps a JWT cookie in the browser session.
-  - No Clerk scripts or components loaded until logging in.
+  - No Clerk scripts or components will be loaded until login actions are made.
 - Cache information is partitioned for each account.
   - No sharing of cache information across accounts.
-  - Media served with "do not cache" or "private" http headers are not cached.
-  - Only sanitized urls are stored, no query parameters.
-- Cloudflare's "insights" analytics are used on the site.
+  - Media served with "do not cache" or "private" HTTP headers are not cached.
+  - Only sanitized urls are stored, no query parameters tracked.
+- Cloudflare's "insights analytics" are used on the site.
   - Excludes visitor information from the EU.
+  - Information is anonymous and not associated with any accounts or api usage.

@@ -194,7 +194,7 @@ pre {
     image-rendering: crisp-edges;
 }
 
-/* Start invisible — JS removes this state and manages opacity from there */
+/* Start invisible, JS removes this state and manages opacity from there */
 .brand__logo[data-logo-hidden] {
     opacity: 0;
 }
@@ -683,7 +683,7 @@ pre {
     padding: 1.25rem 1.8rem 1.5rem;
 }
 
-/* Tab panels — cgs- prefix (client tabs) and hst- prefix (hosting tabs) share all rules */
+/* Tab panels, cgs- prefix (client tabs) and hst- prefix (hosting tabs) share all rules */
 .client-panel,
 .hosting-panel {
     display: none;
@@ -792,7 +792,7 @@ pre {
     font-size: 0.88em;
 }
 
-/*  Starlight <Tabs> inside homepage prose — styled to match .client-tabs  */
+/*  Starlight <Tabs> inside homepage prose, styled to match .client-tabs  */
 .hp-prose starlight-tabs {
     display: block;
     margin-top: 0.5rem;

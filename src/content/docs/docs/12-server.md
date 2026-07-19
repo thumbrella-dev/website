@@ -7,7 +7,7 @@ slug: docs/server
 The Thumbrella executable is the server. It can be downloaded directly from
 [releases](https://github.com/thumbrella-dev/thumbrella/releases) or built from
 source. For most users, the easiest path is to run it through a prebuilt
-package. The server runs on Windows, macOS, and Linux — anywhere
+package. The server runs on Windows, macOS, and Linux, or anywhere
 [Rust](https://rust-lang.org) can produce a runnable binary.
 
 ```bash
@@ -83,7 +83,7 @@ variable. Clients must provide this value with every request. It helps mitigate
 unwanted traffic on directly exposed Thumbrella servers.
 
 Consider a command like `openssl rand -base64 24` to generate a secure
-random token. Or just pick your favorite word — it's your handshake. The server will
+random token. Or just pick your favorite word, it's your handshake. The server will
 reject any request that does not include this value as a custom HTTP header.
 
 Clients will need to include this handshake in their connect string to access
@@ -109,7 +109,7 @@ confusion about where each kind of credential belongs.
 
 The server includes a **short-term sticky cache** (5 seconds) with
 **request coalescing** built in. When two identical requests arrive
-within 5 seconds, only one fetches the remote source — the second is
+within 5 seconds, only one fetches the remote source, the second is
 served from the sticky cache. This is always active.
 
 With default settings the server also enables a 100 MB in-memory LRU
@@ -129,12 +129,12 @@ Thumbrella respects upstream HTTP caching:
 |---|---|---|---|
 | **Memory** | `mem:` | No | `mem:`, `mem:200mb`, `mem:2gb`, `mem:500` (entries) |
 | **[SQLite](https://sqlite.org)** | `sqlite:` | Yes | `sqlite:cache.db`, `sqlite:/var/cache.db#1gb` |
-| **Cloud** | `cloud:` | Yes (shared) | `cloud:tbr_s_AbCd...` — your cloud API token |
+| **Cloud** | `cloud:` | Yes (shared) | `cloud:tbr_s_AbCd...` (your cloud API token) |
 | **None** | `none:` | — | Disables all caching |
 
 Any cache backend can be sized by appending a limit: `mem:500mb`, `sqlite:db#2gb`.
 Memory cache defaults to 100 MB. SQLite evicts oldest entries when over the byte
-limit and purges expired entries on write — no manual maintenance needed. See
+limit and purges expired entries on write, no manual maintenance needed. See
 the [Cloud docs](/docs/cloud/#global-cache) for details on the cloud cache
 backend.
 
@@ -244,3 +244,17 @@ details.
 | [OpenImageIO](https://openimageio.org) | CLI | `oiiotool` | Extended image formats |
 | [F3D](https://f3d.app) | CLI | `f3d` | 3D geometry formats |
 | [OpenUSD](https://openusd.org) | Python | `usd_core` | 3D USD models |
+
+
+## Build yourself
+
+The Rust server is designed to be simple to build from source. The user will
+need to either set `$FFMPEG_DIR` to an ffmpeg build path, or use one of the
+provided ffmpeg build scripts for your platform.
+
+```sh
+git clone https://github.com/thumbrella-dev/thumbrella && cd thumbrella
+bash ffs/build-linux.sh  (or `powershell -File ffs/build-windows.ps1` on Win)
+cargo run --release
+```
+

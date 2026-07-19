@@ -16,7 +16,7 @@ Thumbrella for all users.
 
 Supporters also get access to the enhanced [Docker](https://docker.com) image.
 This contains the open source Thumbrella server running in an environment with
-all optional renderers enabled and optimized to work together — matching what
+all optional renderers enabled and optimized to work together, matching what
 powers [Thumbrella Cloud](/docs/cloud/). The sponsor edition also extends the
 server with locally controlled cache management backends. The full environment
 can run offline in a standalone Docker image.
@@ -43,7 +43,7 @@ offline capability, and priority support.
 | Cloud quotas | Optional: access [Thumbrella Cloud](/docs/cloud/) with elevated quotas |
 | Cache caching | [Redis](https://redis.io) and other backends with maintenance tooling |
 
-Unlimited renders on your server — no daily caps, no rate throttling.
+Unlimited renders on your server, no daily caps, no rate throttling.
 
 ---
 

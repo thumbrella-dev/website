@@ -16,7 +16,7 @@ async function fetchNewsFromAtom(): Promise<NewsItem[]> {
     if (!res.ok) return [];
     const text = await res.text();
 
-    // Simple XML parse — Atom entries have <entry> with <title>, <link>, <updated>, <content>
+    // Simple XML parse - Atom entries have <entry> with <title>, <link>, <updated>, <content>
     const entries: NewsItem[] = [];
     const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
     let match;

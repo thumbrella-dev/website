@@ -17,7 +17,7 @@ Thumbrella into web based applications. At launch, these components are availabl
 for [React](https://react.dev) and [Astro](https://astro.build).
 
 A client library is not required to use Thumbrella. The [HTTP API](#http-thumbnail-api) is
-intentionally simple and works with any tool that can make an HTTP request —
+intentionally simple and works with any tool that can make an HTTP request;
 [curl](https://curl.se), [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API),
 or the standard library of any language.
 
@@ -27,7 +27,7 @@ Every client is configured through a **connect string**. The simplest form is a
 Thumbrella Cloud token or a server URL:
 
 ```bash
-# Cloud token — routes to Thumbrella Cloud automatically
+# Cloud token (routes to Thumbrella Cloud automatically)
 export TBR_CONNECT=tbr_a_3QnzBcWx7KpRmYT2vLfJdE9sMhXuoG6i
 
 # Self-hosted server
@@ -36,7 +36,7 @@ export TBR_CONNECT=http://localhost:3114
 # Self-hosted server with a handshake secret
 export TBR_CONNECT=http://localhost:3114,wafflecones
 
-# Demo server — free, no account needed
+# Demo server (free, no account needed)
 export TBR_CONNECT=https://demo.thumbrella.dev
 ```
 
@@ -94,7 +94,7 @@ writeFileSync("thumb.jpg", m.thumbnail.bytes);
 
 The `Client` constructor accepts an optional `connect` string. Without it the
 client reads `$TBR_CONNECT`. `verify()` confirms the server is reachable before
-making any thumbnail requests — useful at startup to catch misconfiguration
+making any thumbnail requests, useful at startup to catch misconfiguration
 early.
 
 ### Python
@@ -185,13 +185,13 @@ side cache will want to preserve.
 | `status` | string | Outcome of this request. (`success` `failed` `overloaded` `intermediate`) |
 | `source` | string | How the thumbnail was produced. (`render` `shortcut` `cache` `not_modified` `fallback` `placeholder`) |
 | `message` | string | Human-readable detail, usually only set on failure. |
-| `duration` | number | Wall-clock seconds to produce this result (fractional, e.g. `.0015`). |
+| `duration` | number | Wall-clock seconds to produce this result (fractional, e.g. `0.15`). |
 | `downloadSize` | number | Bytes fetched from the upstream source. |
 | `httpStatus` | number | HTTP status returned by the upstream source, if fetched. |
 | `media` | object | The thumbnail and its metadata. `null` on total failure. |
 
 The `media` object carries the stable, cacheable payload. Two results for the
-same file share the same `media` — clients can compare fields to deduplicate.
+same file share the same `media`, clients can compare fields to deduplicate.
 
 | Field | Type | Description |
 |---|---|---|
@@ -202,7 +202,7 @@ same file share the same `media` — clients can compare fields to deduplicate.
 | `mime` | string | Sniffed MIME type (e.g. `image/jpeg`). |
 | `fileSize` | number | `Content-Length` from the upstream server, or 0. |
 | `placeholder` | string | Non-empty when the thumbnail is a fallback icon. Clients can compare this to deduplicate placeholder images. |
-| `cache` | string | Cache token for round-tripping. Format: `<hex_epoch>:<base64>`. Empty means do not cache. |
+| `cache` | string | Cache token for round-tripping in an encoded format, empty means do not cache. |
 | `properties` | object | Format-specific metadata. See below. |
 
 `source` describes how the thumbnail was produced. `render` means a fresh
@@ -283,7 +283,7 @@ In this mode, the server does two additional things:
 
 
 ```ts
-// TypeScript — stream multiple thumbnails with live progress
+// TypeScript, stream multiple thumbnails with live progress
 const tbr = await new Client().verify();
 
 const urls = [
@@ -302,7 +302,7 @@ for await (const result of tbr.stream(urls)) {
 ```
 
 ```python
-# Python — async streaming
+# Python, async streaming
 import asyncio, thumbrella
 
 async def main():
@@ -338,7 +338,7 @@ section on ways to interact with these caches directly. Client libraries will
 handle all this automatically.
 
 ```python
-# Python — persist cache strings across runs with a JSON file
+# Python, persist cache strings across runs with a JSON file
 import json, asyncio, thumbrella
 from pathlib import Path
 
@@ -473,9 +473,9 @@ will respond with status 4XX when the handshake is invalid.
 Higher-level components are available for browser environments that wrap the
 client library and integrate with framework conventions.
 
-- **Astro** — an `<Image>` component that requests thumbnails at build time or
+- **Astro** an `<Image>` component that requests thumbnails at build time or
   on the edge and renders them inline.
-- **React** — a `<Thumbnail>` component that lazily fetches thumbnails from a
+- **React** a `<Thumbnail>` component that lazily fetches thumbnails from a
   Thumbrella server and handles loading and error states.
 
 These components are in the [clients repository](https://github.com/thumbrella-dev/clients)
