@@ -20,6 +20,25 @@ function getUserIdFromCookie(cookieHeader: string | null): string | null {
 }
 
 export const onRequest: import('astro').MiddlewareHandler = async (context, next) => {
+  // --- /api/clerk-config: public, no auth — proxies to admin worker ---
+  if (context.url.pathname === '/api/clerk-config') {
+    try {
+      const { env } = await import('cloudflare:workers');
+      const adminWorker = env.ADMIN_WORKER;
+      if (!adminWorker) {
+        return Response.json({ ok: false, error: 'Admin service not connected.' }, { status: 503 });
+      }
+      const upstream = new Request('http://admin.internal/api/clerk-config', {
+        method: 'GET',
+      });
+      return adminWorker.fetch(upstream);
+    } catch {
+      // Running outside the Workers runtime (e.g. astro dev).
+      // The Account button will show “not available” quietly.
+      return Response.json({ ok: false, error: 'Not available in this environment.' }, { status: 503 });
+    }
+  }
+
   // --- /admin/* proxy to admin worker via service binding ---
   if (context.url.pathname.startsWith('/admin/')) {
     const cookieHeader = context.request.headers.get('cookie');
@@ -32,7 +51,7 @@ export const onRequest: import('astro').MiddlewareHandler = async (context, next
     const { env } = await import('cloudflare:workers');
     const adminWorker = env.ADMIN_WORKER;
     if (!adminWorker) {
-      return Response.json({ ok: false, error: 'Admin service not available.' }, { status: 503 });
+      return Response.json({ ok: false, error: 'Admin service not connected.' }, { status: 503 });
     }
 
     const route = context.url.pathname.replace('/admin/', '');

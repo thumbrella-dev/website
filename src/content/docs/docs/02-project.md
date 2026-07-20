@@ -111,6 +111,9 @@ intended to look good but are low resolution with low quality compression.
 It is not a media viewing toolset, it provides no interactive or
 optimized viewing of the media itself.
 
+Thumbrella does not generate thumbnails for websites. This would be an ideal
+target for the future, but there are no immediate plans to support this.
+
 Thumbrella runs as a standalone server. It cannot be run inside a browser
 environment.
 

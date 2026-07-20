@@ -2,18 +2,16 @@
 export interface Props {
   title: string;
   price: string;
-  href: string;
-  featured?: boolean;
+  period?: string;
 }
 
-const { title, price, href, featured = false } = Astro.props;
+const { title, price, period } = Astro.props;
 ---
 
-<article class:list={['pricing-card', { featured }]}>
+<article class:list={['pricing-card']}>
   <div class="card-header">
     <h3 class="title">{title}</h3>
-    <span class="price">{price}</span>
-    <a href={href} class="signup-btn">Sign Up</a>
+    <span class="price"><b>{price}</b>{period}</span>
   </div>
   <div class="card-body">
     <slot />
@@ -24,7 +22,6 @@ const { title, price, href, featured = false } = Astro.props;
   .pricing-card {
     display: flex;
     flex-direction: column;
-    height: 100%;
     border: 1px solid rgba(200, 149, 78, 0.5);
     border-top-style: 3px solid rgba(200, 149, 78, 0.5);
     border-radius: 12px;
@@ -34,6 +31,11 @@ const { title, price, href, featured = false } = Astro.props;
     transition: border-color 0.25s, box-shadow 0.25s;
   }
 
+  b {
+    font-size: 200%;
+    font-weight: normal;
+  }
+
   .pricing-card:hover {
     border-color: rgba(223, 171, 97, 0.648);
     box-shadow: 0 4px 24px rgba(200, 149, 78, 0.08);
@@ -41,10 +43,6 @@ const { title, price, href, featured = false } = Astro.props;
 
   .card-header {
     padding: 1.75rem 1.75rem 0 1.75rem;
-  }
-
-  table {
-    width: 100%;
   }
 
   .title {
@@ -60,39 +58,22 @@ const { title, price, href, featured = false } = Astro.props;
     font-size: var(--sl-text-lg);
     color: var(--sl-color-accent-high);
     font-weight: 600;
-    margin-bottom: 1rem;
-  }
-
-  .signup-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 0.6rem 1.5rem;
-    font-size: var(--sl-text-sm);
-    font-weight: 900;
-    color: #f0e8d8;
-    background: linear-gradient(135deg, #7c5cbf 0%, #5e3fa0 100%);
-    border: 1px solid rgba(124, 92, 191, 0.35);
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.25s ease;
-    cursor: pointer;
-  }
-
-  .signup-btn:hover {
-    background: linear-gradient(135deg, #9b7bd4 0%, #7c5cbf 100%);
-    border-color: rgba(169, 140, 214, 0.55);
-    box-shadow: 0 4px 16px rgba(124, 92, 191, 0.3);
-    color: #f0e8d8;
-    text-decoration: none;
   }
 
   .card-body {
     flex: 1;
-    padding: 0 1.75rem 0 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 0.5rem 1.75rem 1.75rem 1.75rem;
     font-size: var(--sl-text-sm);
     color: var(--sl-color-gray-2);
+    line-height: 1.65;
+  }
+
+  .card-body > :first-child {
+    margin-top: 0.25rem;
+  }
     line-height: 1.7;
   }
 

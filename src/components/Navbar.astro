@@ -1,7 +1,6 @@
 ---
 const userIconSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
-const clerkPublishableKey = import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY ?? '';
 
 const links = [
   {
@@ -43,7 +42,7 @@ const currentPath = Astro.url.pathname;
           </li>
         ))}
         <li class="nav-auth-group">
-          <button type="button" id="nav-account-btn" class="nav-auth-btn" data-clerk-key={clerkPublishableKey}>
+          <button type="button" id="nav-account-btn" class="nav-auth-btn">
             <Fragment set:html={userIconSvg} />
             Account
           </button>
@@ -84,22 +83,10 @@ const currentPath = Astro.url.pathname;
     var accountBtn = document.getElementById('nav-account-btn');
     if (!accountBtn) return;
 
-    var PUBLISHABLE_KEY = accountBtn.getAttribute('data-clerk-key') || '';
-
-    // Derive the Frontend API hostname from the publishable key.
-    // The key is base64url-encoded "<frontend-api-hostname>$".  We decode
-    // it to build the correct script URL instead of hard-coding a CDN.
-    var FRONTEND_API = '';
-    try {
-      var raw = PUBLISHABLE_KEY.replace(/^pk_(test|live)_/, '');
-      var b64 = raw.replace(/-/g, '+').replace(/_/g, '/');
-      while (b64.length % 4) b64 += '=';
-      var hostWithDollar = atob(b64);
-      FRONTEND_API = hostWithDollar.replace(/\$$/, '');
-    } catch (e) { /* fall back to empty; loadClerk will fail gracefully */ }
-    var CK_SCRIPT = FRONTEND_API
-      ? 'https://' + FRONTEND_API + '/npm/@clerk/clerk-js@5/dist/clerk.browser.js'
-      : '';
+    // Clerk config is fetched at runtime from the admin worker.
+    // No build-time key; dev/prod switching is handled server-side.
+    var clerkConfig = null;       // { publishableKey, frontendApi } from /api/clerk-config
+    var clerkConfigLoading = false;
 
     var clerkReady = false;      // script loaded AND Clerk.load() has resolved
     var clerkLoading = false;    // script in-flight or Clerk.load() in-flight
@@ -120,59 +107,105 @@ const currentPath = Astro.url.pathname;
     function whenClerkReady(cb) {
       if (clerkReady) { cb(); return; }
       pendingCallbacks.push(cb);
-      if (!clerkLoading) initClerk();
+      if (!clerkLoading && !clerkConfigLoading) initClerk();
+    }
+
+    function loadClerkConfig(cb) {
+      if (clerkConfig) { cb(null); return; }
+      if (clerkConfigLoading) {
+        // Already loading; poll until done.
+        var check = function () {
+          if (clerkConfig) { cb(null); }
+          else if (clerkConfigLoading) { setTimeout(check, 50); }
+          else { cb(new Error('Clerk config not available')); }
+        };
+        setTimeout(check, 50);
+        return;
+      }
+      clerkConfigLoading = true;
+      btnLoading(true);
+      fetch('/api/clerk-config')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          clerkConfigLoading = false;
+          if (data && data.ok && data.publishableKey) {
+            clerkConfig = data;
+            // Keep loading visible; initClerk will clear it when Clerk.load() finishes.
+            cb(null);
+          } else {
+            btnLoading(false);
+            accountBtn.title = 'Account services not available';
+            cb(new Error('Clerk config not available'));
+          }
+        })
+        .catch(function (err) {
+          clerkConfigLoading = false;
+          btnLoading(false);
+          accountBtn.title = 'Account services not available';
+          cb(err);
+        });
     }
 
     function initClerk() {
-      if (!CK_SCRIPT) {
-        flushCallbacks(new Error('Cannot derive Clerk script URL'));
-        return;
-      }
-      clerkLoading = true;
-      btnLoading(true);
+      loadClerkConfig(function (err) {
+        if (err) {
+          flushCallbacks(err);
+          return;
+        }
+        var PUBLISHABLE_KEY = clerkConfig.publishableKey;
+        var FRONTEND_API = clerkConfig.frontendApi;
+        var CK_SCRIPT = FRONTEND_API
+          ? 'https://' + FRONTEND_API + '/npm/@clerk/clerk-js@5/dist/clerk.browser.js'
+          : '';
 
-      var script = document.createElement('script');
-      script.async = true;
-      script.setAttribute('data-clerk-publishable-key', PUBLISHABLE_KEY);
-      script.src = CK_SCRIPT;
-      script.onload = function () {
-        // Clerk script is on the page, but components aren't ready yet.
-        // Call Clerk.load() to hydrate. On subsequent calls load() is a no-op.
-        window.Clerk.load({
-          appearance: {
-            variables: {
-              colorBackground: '#212126',
-              colorNeutral: 'white',
-              colorPrimary: '#ffffff',
-              colorPrimaryForeground: 'black',
-              colorForeground: 'white',
-              colorInputForeground: 'white',
-              colorInput: '#26262B'
-            },
-            elements: {
-              providerIcon__apple: { filter: 'invert(1)' },
-              providerIcon__github: { filter: 'invert(1)' }
+        if (!CK_SCRIPT) {
+          flushCallbacks(new Error('Cannot derive Clerk script URL'));
+          return;
+        }
+        clerkLoading = true;
+
+        var ckScript = document.createElement('script');
+        ckScript.async = true;
+        ckScript.setAttribute('data-clerk-publishable-key', PUBLISHABLE_KEY);
+        ckScript.crossOrigin = 'anonymous';
+        ckScript.src = CK_SCRIPT;
+        ckScript.onload = function () {
+          window.Clerk.load({
+            appearance: {
+              variables: {
+                colorBackground: '#212126',
+                colorNeutral: 'white',
+                colorPrimary: '#ffffff',
+                colorPrimaryForeground: 'black',
+                colorForeground: 'white',
+                colorInputForeground: 'white',
+                colorInput: '#26262B'
+              },
+              elements: {
+                providerIcon__apple: { filter: 'invert(1)' },
+                providerIcon__github: { filter: 'invert(1)' }
+              }
             }
-          }
-        })
-          .then(function () {
-            clerkReady = true;
-            clerkLoading = false;
-            btnLoading(false);
-            flushCallbacks();
           })
-          .catch(function (err) {
-            clerkLoading = false;
-            btnLoading(false);
-            flushCallbacks(err);
-          });
-      };
-      script.onerror = function () {
-        clerkLoading = false;
-        btnLoading(false);
-        flushCallbacks(new Error('Failed to load Clerk JS'));
-      };
-      document.head.appendChild(script);
+            .then(function () {
+              clerkReady = true;
+              clerkLoading = false;
+              btnLoading(false);
+              flushCallbacks();
+            })
+            .catch(function (err) {
+              clerkLoading = false;
+              btnLoading(false);
+              flushCallbacks(err);
+            });
+        };
+        ckScript.onerror = function () {
+          clerkLoading = false;
+          btnLoading(false);
+          flushCallbacks(new Error('Failed to load Clerk JS'));
+        };
+        document.head.appendChild(ckScript);
+      });
     }
 
     function flushCallbacks(err) {
@@ -298,7 +331,7 @@ const currentPath = Astro.url.pathname;
 
     accountBtn.addEventListener('click', function () {
       whenClerkReady(function (err) {
-        if (err) { console.error('[nav]', err.message || err); return; }
+        if (err) { return; }
         openClerkPanel();
       });
     });

@@ -29,6 +29,99 @@ starlight-theme-select { display: none; }
 
 .main-pane a { text-decoration: underline !important; }
 
+
+/* Highlight Thumbrella columns in the pricing comparison table */
+#comparison table th:nth-child(2),
+#comparison table th:nth-child(3),
+#comparison table td:nth-child(2),
+#comparison table td:nth-child(3) {
+  color: #a98cd6;
+  font-weight: bold;
+  background:  rgba(124, 92, 191, 0.1);
+}
+
+/* Ensure comparison rows have a consistent minimum height.
+   The first-column label is wrapped in <strong> by the markdown parser. */
+#comparison table td:first-child strong {
+  display: flex;
+  align-items: center;
+  min-height: 2.8rem;
+  font-weight: inherit;
+  color: inherit;
+}
+
+
+/* Comparison table: vertical centering for all cells */
+#comparison table td,
+#comparison table th {
+  padding: 0.65rem 1rem;
+  vertical-align: middle;
+}
+
+/* All vendor columns get equal width; Thumbrella headers word-wrap */
+#comparison table th:not(:first-child) {
+  width: 8rem;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+#comparison em {
+  font-size: 90%;
+  opacity: .7;
+}
+
+/*  Pricing card stat rows — label : value pairs  */
+
+.card-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-top: auto;
+}
+
+.card-stats li {
+  display: flex;
+  justify-content: space-between;
+  align-items: first baseline;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(244, 228, 200, 0.06);
+}
+
+.card-stats li:last-child {
+  margin-top: 0;
+  border-bottom: none;
+}
+
+/* Remove the separator between a label/value pair and its continuation row
+   (e.g. "Thumbnails" → "100,000+ monthly" should feel like one block). */
+.card-stats .no-divider {
+  border-bottom: none;
+}
+
+.card-stats .stat-label {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.card-stats .stat-value {
+  color: #dba95e;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.card-stats .stat-value--secondary {
+  color: #dba95e;
+  font-size: 0.85em;
+  font-weight: 400;
+}
+
 .sl-container {
   max-width: 1200px;
 }
@@ -92,8 +185,38 @@ starlight-theme-select { display: none; }
   display: grid;
   grid-template-columns: 100%;
   gap: 1.5rem;
-  margin: 2rem 0;
   align-items: stretch;
+  margin-bottom: 2.5rem;
+}
+
+/* Single centered CTA button above the pricing cards */
+.pricing-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60%;
+  margin: 2rem 20% 1rem 20%;
+  padding: 0.75rem 1.5rem;
+  font-size: var(--sl-text-base);
+  font-weight: 700;
+  color: #f0e8d8;
+  background: linear-gradient(135deg, #7c5cbf 0%, #5e3fa0 100%);
+  border: 1px solid rgba(124, 92, 191, 0.35);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.pricing-cta:hover {
+  background: linear-gradient(135deg, #9b7bd4 0%, #7c5cbf 100%);
+  border-color: rgba(169, 140, 214, 0.55);
+  box-shadow: 0 4px 20px rgba(124, 92, 191, 0.3);
+  color: #f0e8d8;
+  text-decoration: none;
+}
+
+.card-grid > :first-child {
+  margin-top: 1rem;
 }
 
 @media (min-width: 50rem) {

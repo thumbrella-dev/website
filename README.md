@@ -7,12 +7,12 @@ to Cloudflare Workers.
 The project documentation lives in `src/content/docs/` and is rendered by
 [Starlight](https://starlight.astro.build).
 
-This website hosts the main static website for Thumbrella. There are several
-related websites that are part of the Thumbrella platform. This does not
-include
-- https://cloud.thumbrella.dev - the hosted thumbrella service (requires account)
-- https://demo.thumbrella.dev - gallery of example media and mock api
-- https://admin.thumbrella.dev - backend account management
+The Thumbrella platform has a small ecosystem of other sites that make up
+its ecosystem. 
+- https://cloud.thumbrella.dev hosted thumbrella service (requires account)
+- https://demo.thumbrella.dev gallery of example media and mock api
+- https://admin.thumbrella.dev backend account management
+- https://accounts.thumbrella.dev direct connection to clerk's account controls
 
 ## Getting Started
 
@@ -21,32 +21,29 @@ npm install
 npm run dev        # Astro dev server on port 4321
 ```
 
-The dev server binds to `0.0.0.0` so it works with forwarded ports in container
-environments.
+## Structure
 
-## Directory Structure
+This project is essentially two parts.
 
-```
-web/
-├── src/
-│   ├── components/       # Reusable Astro and React components
-│   │   └── starlight/    # Starlight component overrides
-│   ├── content/          # Markdown content for main page and documentation
-│   │   └── docs/         # Documentation pages (Starlight content collection)
-│   ├── layouts/          # Page layout components
-│   ├── pages/            # Route pages and API endpoints
-│   └── styles/           # Global CSS and Starlight theme overrides
-└── public/               # Static assets (favicon, robots.txt, logos)
-```
+1. The front landing page is a clumsy collection of Astro components. 
+Behind the scenes it is not pretty, but at the end of the day there is
+not that much content, so we can live with it.
+2. The documentation is static markdown files under `src/contents/docs`.
+Most of the content is in top level files. As they expand we may find we
+need to organize things differently.
 
-## Documentation
+## Contributions
+
+This site is build on Astro and Starlight. Contributions are expected to 
+work confortably in this environment. No bringing in foreign frameworks or
+new dependencies without some discussion ahead of time. And for the respect
+and preservation of sanity, no Tailwind, ever.
 
 ## Authentication
 
 The site connects with [Clerk](https://clerk.com) to allow users to create
-and manage their accounts. This is a static website, and those interactions
-are routed through a separate "admin" project with all the dynamic account
-and credentials management.
+and manage their accounts. Clerk is only enabled when this site can access
+the Thumbrella admin services.
 
 None of the Clerk or Admin is needed to edit, browse, and develop the static
 Thumbrella web contents. 

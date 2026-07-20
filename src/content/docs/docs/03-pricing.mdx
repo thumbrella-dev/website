@@ -14,97 +14,90 @@ stabilize, only free accounts with reduced limits are available.
 
 ### Thumbrella Cloud
 
-Use the **free** [Thumbrella Cloud](/docs/cloud/) services. They include an
-amazing worldwide CDN and support all formats and features of the Thumbrella
-server. No infrastructure to manage, no servers to maintain.
+The <u>free</u> **Thumbrella Cloud** account is <u>recommend for
+most users</u>. This include an amazing worldwide edge caching and support all
+formats and features of the Thumbrella server. No infrastructure to manage, no
+servers to maintain. Provides over 100,000 unique thumbnail renders per month.
 
-If you need unlimited usage or offline capability, see [self-hosting your own
-server](/docs/server/) which is free, open-source, and fully featured.
+Looking for unlimited usage or offline capability? See [self-hosting your own
+server](server/) which is free, open-source, and fully featured.
 
+<a href="https://accounts.thumbrella.dev/sign-up" class="pricing-cta">Sign Up for Free</a>
 
 <div class="card-grid">
-  <PricingCard title="Cloud Free" price="$0" href="/account">
+  <PricingCard title="Cloud Free" price="$0">
 
-    No payment information required. Connect your existing developer account
-    in two clicks. Get your authentication token immediately.
+    No payment information needed. Connect your existing developer account
+    in two clicks. The ideal plan for most users.
 
-    <table width="100%">
-    <tr><td>Daily&nbsp;Thumbnails</td><td>5,000</td></tr>
-    <tr><td>Hourly&nbsp;Thumbnails</td><td>500</td></tr>
-    <tr><td>Cache&nbsp;Limit</td><td>10 MB</td></tr>
-    </table>
+    <ul class="card-stats">
+      <li><span class="stat-label">Edge Cache</span><span class="stat-value">10 MB</span></li>
+      <li class="no-divider"><span class="stat-label">Thumbnails</span><span class="stat-value">3,600 daily</span></li>
+      <li><span></span><span class="stat-value stat-value--secondary">100,000+ monthly</span></li>
+    </ul>
 
-    Great for personal projects, prototypes, and low-traffic production apps.
+  </PricingCard><PricingCard title="Cloud Paid" price="$5" period="/month">
 
-  </PricingCard><PricingCard title="Cloud Paid" price="$5/month" href="/account">
+    Established users can upgrade to the paid plan for even more extensive
+    user limits.
 
-    Paid accounts run on dedicated servers for faster responses. Accounts get
-    vastly expanded rendering and caching limits.
+    <ul class="card-stats">
+      <li><span class="stat-label">Edge Cache</span><span class="stat-value">200 MB</span></li>
+      <li class="no-divider"><span class="stat-label">Thumbnails</span><span class="stat-value">18,000 daily</span></li>
+      <li><span></span><span class="stat-value stat-value--secondary">500,000+ monthly</span></li>
+    </ul>
 
-    <table width="100%">
-    <tr><td>Daily&nbsp;Thumbnails</td><td>25,000</td></tr>
-    <tr><td>Hourly&nbsp;Thumbnails</td><td>2,500</td></tr>
-    <tr><td>Cache&nbsp;Limit</td><td>200 MB</td></tr>
-    </table>
+  </PricingCard><PricingCard title="Sponsor" price="$50" period="/month">
 
-    Ideal for production applications with hundreds of users.
+    Help drive the future of Thumbrella, with usage rates in the millions,
+    [and more](sponsor).
 
-  </PricingCard><PricingCard title="Sponsor" price="$50/month" href="/account">
-
-    Help drive the future of Thumbrella. This also provides access to the
-    sponsored Docker container providing full functionality out of the box.
-
-    <table width="100%">
-    <tr><td>Daily&nbsp;Thumbnails</td><td>500,000</td></tr>
-    <tr><td>Hourly&nbsp;Thumbnails</td><td>50,000</td></tr>
-    <tr><td>Cache&nbsp;Limit</td><td>1,000 MB</td></tr>
-    </table>
-
-    For high-traffic services and organizations that want to support development.
+    <ul class="card-stats">
+      <li><span class="stat-label">Edge Cache</span><span class="stat-value">1,000 MB</span></li>
+      <li class="no-divider"><span class="stat-label">Thumbnails</span><span class="stat-value">360,000 daily</span></li>
+      <li><span></span><span class="stat-value stat-value--secondary">10,000,000+ monthly</span></li>
+    </ul>
 
   </PricingCard>
 </div>
 
-There are two measurements of a Thumbrella Cloud account:
-
-- **Cache** the amount and lifetime of preserved thumbnails in the global,
-  distributed edge cache. More cache means more thumbnails served instantly.
-- **Render** the number of thumbnails processed by the server. Cached results
-  do not count against this limit. Each account can use up to 10% of it's
-  daily limit within any single 60 minute period. More aggressive use of the
-  service will be throttled, and eventually be stopped by `429` results.
-
-Each thumbnail is usually between 5 KB and 10 KB in size. 
+Accounts over their usage limits can still use the Thumbrella api for
+cached and simple results. More complicated renders will result in simpler
+placeholders, but continue to work.
 See the [cloud limits](/docs/cloud/#limits) page for more details.
 
 
-### Self-Hosted
+### Comparisons
 
-Thumbrella is easy to serve and host on your own. The open source server is
-ready to run immediately with a single command. There are **no limits** on
-renders, cache sizes, or number of processors, when self-hosting. See the 
-[server documentation](/docs/server/) for details.
+Most online image services are focused on high quality image editing.
+This makes them inefficient and expensive for bulk generation of thumbnails.
+Thumbrella also wins by offering a wide range of supported formats and file types.
 
-### AI Platform Servers
+<div id="comparison">
+|      | **Thumbrella Cloud** | **Thumbrella Hosted** | [Cloudinary][1] | [Imageboss][2] | [Imgix][3] | [Cloudflare Images][4] |
+|-----------------------------|--------|--------|--------|------|----------|--------|
+| **100k monthly thumbnails**   | $0     | $0     | $100 <sub>monthly</sub>  | $120 <sub>monthly</sub>  | $300 <sub>monthly</sub>  | $61 <sub>monthly</sub> |
+| **1 million thumbnails**      | $50 <sub>monthly</sub>   | $0     | ~~n/a~~| ~~n/a~~| ~~n/a~~| $565 <sub>monthly</sub> |
+| **Edge caching worldwide**    | YES    |        | YES    | YES    | YES    | YES    |
+| **Efficient batch operations**| YES    | YES    |        |        |        |        |
+| **Supports camera formats**   | YES    | YES    | YES    | _heic_ | _heic_ | YES    |
+| **Supports videos**           | YES    | YES    | YES    |        | YES    |        |
+| **Open source server**        |        | YES    |        |        |        |        |
 
-:::note 
-Still coming soon
-:::
+_(Approximate pricing and features as of July 2026)_
+</div>
 
-Specially deployed Thumbrella servers will be available on hosted platforms
-like [fal.ai](https://fal.ai) and [Replicate](https://replicate.com). Run on
-these platforms using your existing accounts at no additional cost beyond the
-platform's compute pricing. Combine with a [Thumbrella Cloud token](/docs/cloud/#auth-tokens)
-for access to the shared global cache.
+[1]: https://cloudinary.com/pricing
+[2]: https://imageboss.me/pricing
+[3]: https://www.imgix.com/pricing
+[4]: https://developers.cloudflare.com/images/pricing/
 
-### Sponsor Edition
+<a href="https://accounts.thumbrella.dev/sign-up" class="pricing-cta">Sign Up for Free</a>
 
-Project supporters get access to significantly higher cloud resources and a
-custom [Docker](https://docker.com) image with all optional renderers
-pre-configured. See the [sponsors page](/docs/sponsor/) for details.
 
 ### Demo Server
 
-The [demo gallery](https://demo.thumbrella.dev) has a collection of media
-and can be used as a free server for the media it hosts. No account needed,
-point any client at `https://demo.thumbrella.dev`.
+The [Thumbrella Demo Gallery](https://demo.thumbrella.dev) has a collection of
+media and acts as a <u>free server</u> for the media it hosts. No account
+needed, point any client connect string to `https://demo.thumbrella.dev` and
+start making requests.
