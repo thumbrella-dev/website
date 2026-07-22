@@ -266,6 +266,9 @@ const currentPath = Astro.url.pathname;
       requestAnimationFrame(tryClick);
     }
 
+    var umbrellaSvg = '\u2614'; // ☂ — Unicode umbrella character
+    var circleSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg>';
+
     function openFallbackProfile() {
       var signOutHtml = '<button class="tbr-btn tbr-btn-sm tbr-signout" onclick="window.Clerk.signOut({redirectUrl:\'/\'})">Sign out</button>';
       var html = '<div style="padding:1.5rem;text-align:center;color:var(--text-muted)"><p>Thumbrella admin services temporarily not responding.</p><br>' + signOutHtml + '</div>';
@@ -274,7 +277,7 @@ const currentPath = Astro.url.pathname;
         url: 'thumbrella',
         mount: function (el) { el.innerHTML = html; },
         unmount: function (el) { el.innerHTML = ''; },
-        mountIcon: function (el) { el.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg>'; },
+        mountIcon: function (el) { el.innerHTML = umbrellaSvg; },
         unmountIcon: function (el) { el.innerHTML = ''; }
       }]);
     }
@@ -300,7 +303,7 @@ const currentPath = Astro.url.pathname;
               url: tab.url,
               mount: function (el) { el.innerHTML = html; },
               unmount: function (el) { el.innerHTML = ''; },
-              mountIcon: function (el) { el.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg>'; },
+              mountIcon: function (el) { el.innerHTML = tab.url === 'manage-account' ? umbrellaSvg : circleSvg; },
               unmountIcon: function (el) { el.innerHTML = ''; }
             };
           });
@@ -318,7 +321,7 @@ const currentPath = Astro.url.pathname;
       if (window.Clerk.user) {
         openDashboard();
       } else {
-        var opened = window.Clerk.openSignIn();
+        var opened = window.Clerk.openSignIn({ redirectUrl: '/account/' });
         if (opened && typeof opened.then === 'function') {
           opened.then(function () {
             if (window.Clerk && window.Clerk.user) {
@@ -371,7 +374,9 @@ const currentPath = Astro.url.pathname;
   .nav-auth-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.4rem;
+    min-width: 8rem;
     border: 2px solid rgba(255, 255, 255, 0.25);
     background: rgba(255, 255, 255, 0.04);
     color: var(--text-muted);

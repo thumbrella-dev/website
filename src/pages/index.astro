@@ -114,7 +114,7 @@ if (carouselItems.length > 0) {
 
         <br>
         <Code code={`# 1. Spin up a Docker server  (or choose the cross platform binaries)
-docker run --name tbr --publish 3114:3114 --rm thumbrella/server:prerelease
+docker run --name tbr --publish 3114:3114 --rm thumbrella/server:latest
 
 # 2. From another terminal, use a client library
 export TBR_CONNECT=http://localhost:3114

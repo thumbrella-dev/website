@@ -19,7 +19,7 @@ caching, and web components that work with zero configuration.
 npx @thumbrella/server thumb https://demo.thumbrella.dev/media/harbor-trucks.mp4 thumb.jpg
 
 # 2. Or spin up a Docker server locally
-podman run --name tbr --rm --publish 3114:3114 thumbrella/server:prerelease
+podman run --name tbr --rm --publish 3114:3114 thumbrella/server:latest
 
 # 3. From another terminal, use a client library
 export TBR_CONNECT=http://localhost:3114

@@ -458,7 +458,6 @@ Client libraries use this endpoint during `verify()` to confirm the connection
 is valid.
 
 The `"thumbrella"` field contains the major version of the Thumbrella server.
-(Currently it returns `0` while the project is in prerelease.)
 
 The Thumbrella Cloud server provides an additional `"token": boolean` field to
 this object. This will confirm if the provided authentication token is valid.
