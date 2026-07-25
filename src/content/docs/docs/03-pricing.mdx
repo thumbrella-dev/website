@@ -15,11 +15,12 @@ stabilize, only free accounts with reduced limits are available.
 ### Thumbrella Cloud
 
 The <u>free</u> **Thumbrella Cloud** account is <u>recommend for
-most users</u>. This include an amazing worldwide edge caching and support all
-formats and features of the Thumbrella server. No infrastructure to manage, no
-servers to maintain. Provides over 100,000 unique thumbnail renders per month.
+most users</u>. This include an amazing worldwide edge cache and supports all
+formats and features of the Thumbrella server. No infrastructure to manage or
+servers to maintain. The free service provides over 100,000 unique thumbnail 
+renders per month.
 
-Looking for unlimited usage or offline capability? See [self-hosting your own
+Prefer unlimited usage or offline capability? Learn about [self-hosting your own
 server](server/) which is free, open-source, and fully featured.
 
 <a href="https://accounts.thumbrella.dev/sign-up" class="pricing-cta">Sign Up for Free</a>
@@ -61,17 +62,21 @@ server](server/) which is free, open-source, and fully featured.
   </PricingCard>
 </div>
 
-Accounts over their usage limits can still use the Thumbrella api for
-cached and simple results. More complicated renders will result in simpler
-placeholders, but continue to work.
-See the [cloud limits](/docs/cloud/#limits) page for more details.
+Accounts above their [usage limits](/docs/cloud/#limits) can still use the
+Thumbrella api for cached and simple results. Complicated renders will fallback
+on simpler placeholders in the meantime. The service degrades but contiues to
+work reasonably.
 
+Every account can create multiple
+[authentication tokens](https://thumbrella.dev/docs/cloud/#auth-tokens) 
+and divide up their quota across each of them. Each token gets custom
+[restrictions and rules](https://thumbrella.dev/docs/cloud/#token-limitations).
 
 ### Comparisons
 
-Most online image services are focused on high quality image editing.
-This makes them inefficient and expensive for bulk generation of thumbnails.
-Thumbrella also wins by offering a wide range of supported formats and file types.
+Most online image services are focused on high quality image editing. This makes
+them inefficient and expensive for bulk generation of thumbnails. Thumbrella
+also wins by offering a wide range of supported formats and file types.
 
 <div id="comparison">
 |      | **Thumbrella Cloud** | **Thumbrella Hosted** | [Cloudinary][1] | [Imageboss][2] | [Imgix][3] | [Cloudflare Images][4] |
