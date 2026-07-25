@@ -24,10 +24,20 @@ This token is the value to use as the connection string. Either assign it to
 `$TBR_CONNECT` or provide it as an optional argument when constructing a
 `Client` object.
 
+Accounts can create additional tokens that share the limits and quotas for
+the account. Each token can be independendently disabled, rotated, and
+managed.
+
+All tokens have a rich set of limitations that can be applied. This allows
+generating tokens that can be used in interactive javascript applications
+with protections against running out the account's quotas.
+
 :::note
-It is discouraged to write authentication tokens directly into source code. Use
-standard practices for fetching secret values. This often means
-`.env` files or similar handling of secrets.
+By default, authentication tokens come with unrestricted access to the
+account's resources. Treat these as protected secrets; avoid placing
+them into source control. Use `.env` files or platform secrets to apply
+them to your offline code. If these tokens leak publically, strongly consider
+rerolling them, in the user dashboard pages.
 :::
 
 When making direct HTTP requests to Thumbrella Cloud the authentication
@@ -41,14 +51,48 @@ curl -G "https://cloud.thumbrella.dev/thumb" \
   --output thumb.jpeg
 ```
 
+### Token Limitations
 
-### Multiple Tokens
+Each token has a set of limitations that can be edited at any time on the
+user dashboard. These limitations restrict how the token can be used, making
+it less risky to put into publishable locations, like an interactive 
+web application.
 
-Paid accounts can create additional project tokens, each with its own quota
-limits and permissions. This is useful for isolating usage across applications,
-teams, or environments, a staging token can be given a low hourly cap while
-production tokens run with the full allocation. Token management is available
-in the account dashboard.
+On the dashboard, the usage and quota information is divided into each token,
+to allow simpler tracking of which tokens are being actively used.
+
+These are editable on the [user dashboard](/account). Each token has a 
+limitations dropdown that allows editing and committeng each of these fields.
+
+- **Origin Regex** When set, this is a regular expression that requires 
+  matching the http header `Origin`. This is reliably set by web browsers,
+  but be aware can be easily spoofed by direct http clients. Examples would
+  be string like `mydomain\.com$`. The regular expression is matched
+  case insensitively.
+- **Cors** This is the header value used for thumbnail requests. This is
+  respected by well behaved browsers to prevent using Thumbrella resources
+  from websites not allowed. Be aware this is easy to ignore for direct
+  HTTP clients. If empty this is equivalent to `*` which allows any browser
+  to generate thumbnails from any website.
+- **Media Url Regex Include** and **Media Url Regex Include**. This restricts
+  the media urls that can be used to generate thumbnails. There is a separate
+  *include* and *exclude* regular expression. If either is unset they will not
+  prevent any urls from used. These two fields can be set indenpendently, or
+  both combined. Examples would be like `mydomain\.com` or `/gallery`.
+  The regular expression is matched case insensitive.
+- **Quota** restricts the token to use only a percentage of the accounts
+  quota limits. Each token defaults to 100. Be aware that the account quota
+  is based on the combined usage of all tokens. But this setting allows a
+  single token to use no more than a fixed percentage of the account's total
+  data.
+- **Expires** allows a token to automatically expire after a given date.
+  This value can be set, cleared, or changed at any time. If the expiration
+  date passes, the token can reenabled and a new expiration set.
+- **Throttle** all accounts start to throttle requests when there are surges
+  of activity within a short period. Slowing down these requests assists
+  runaway clients from absorbing all the quota in a short period of time.
+  Enabling this value will start to throttle requests using this token at
+  a more aggressive level than regular free account limits.
 
 
 ## Usage

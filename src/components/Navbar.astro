@@ -237,6 +237,7 @@ const currentPath = Astro.url.pathname;
           portalWasPresent = true;
           requestAnimationFrame(poll);
         } else if (portalWasPresent) {
+          document.dispatchEvent(new CustomEvent('tbr-carousel-resume'));
           restoreAccountUrl();
         } else {
           requestAnimationFrame(poll);
@@ -246,6 +247,7 @@ const currentPath = Astro.url.pathname;
     }
 
     function openUserProfile(customPages) {
+      document.dispatchEvent(new CustomEvent('tbr-carousel-pause'));
       window.Clerk.openUserProfile({ customPages: customPages });
       pushAccountUrl();
       selectThumbrellaTab();
@@ -266,11 +268,11 @@ const currentPath = Astro.url.pathname;
       requestAnimationFrame(tryClick);
     }
 
-    var umbrellaSvg = '\u2614'; // ☂ — Unicode umbrella character
+    var umbrellaSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b8b8d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-30 12 12)"><path d="M12 2v20"/><path d="M12 2c-5 0-9.3 2.5-10 6.5"/><path d="M12 2c5 0 9.3 2.5 10 6.5"/><path d="M2 8.5h20"/><path d="M9 22c0-1.7 1.3-3 3-3s3 1.3 3 3"/></g></svg>';
     var circleSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg>';
 
     function openFallbackProfile() {
-      var signOutHtml = '<button class="tbr-btn tbr-btn-sm tbr-signout" onclick="window.Clerk.signOut({redirectUrl:\'/\'})">Sign out</button>';
+      var signOutHtml = '<button class="tbr-btn tbr-signout" onclick="window.Clerk.signOut({redirectUrl:\'/\'})">Sign out</button>';
       var html = '<div style="padding:1.5rem;text-align:center;color:var(--text-muted)"><p>Thumbrella admin services temporarily not responding.</p><br>' + signOutHtml + '</div>';
       openUserProfile([{
         label: 'Thumbrella',
@@ -294,7 +296,7 @@ const currentPath = Astro.url.pathname;
             return;
           }
 
-          var signOutHtml = '<button data-manage-account-sign-out class="tbr-btn tbr-btn-sm tbr-signout" onclick="window.Clerk.signOut({redirectUrl:\'/\'})">Sign out</button>';
+          var signOutHtml = '<button data-manage-account-sign-out class="tbr-btn tbr-signout" onclick="window.Clerk.signOut({redirectUrl:\'/\'})">Sign out</button>';
 
           var customPages = data.tabs.map(function (tab) {
             var html = tab.html.replace(/\{\{SIGNOUT\}\}/g, signOutHtml);

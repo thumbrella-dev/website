@@ -476,7 +476,18 @@ const { items } = Astro.props;
     }
     requestAnimationFrame(step);
 
-    // Pause on hover
+    // External pause/resume — dispatched by the Navbar when the Clerk modal opens/closes.
+    let clerkPaused = false;
+    document.addEventListener('tbr-carousel-pause', () => {
+      clerkPaused = true;
+      targetSpeed = 0;
+    });
+    document.addEventListener('tbr-carousel-resume', () => {
+      clerkPaused = false;
+      if (!hovering && !dragging && (!popup || !popup.classList.contains('is-open'))) {
+        targetSpeed = TARGET_SPEED;
+      }
+    });
     let hovering = false;
     track.parentElement?.addEventListener('mouseenter', () => {
       hovering = true;
