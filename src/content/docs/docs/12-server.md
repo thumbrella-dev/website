@@ -129,7 +129,7 @@ Thumbrella respects upstream HTTP caching:
 |---|---|---|---|
 | **Memory** | `mem:` | No | `mem:`, `mem:200mb`, `mem:2gb`, `mem:500` (entries) |
 | **[SQLite](https://sqlite.org)** | `sqlite:` | Yes | `sqlite:cache.db`, `sqlite:/var/cache.db#1gb` |
-| **Cloud** | `cloud:` | Yes (shared) | `cloud:tbr_s_AbCd...` (your cloud API token) |
+| **Cloud** | `cloud:` | Yes (shared) | `cloud:tbr_e_3QnzBcWx7KpRmYT2000example` (your cloud API token) |
 | **None** | `none:` | — | Disables all caching |
 
 Any cache backend can be sized by appending a limit: `mem:500mb`, `sqlite:db#2gb`.

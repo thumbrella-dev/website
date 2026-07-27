@@ -1,14 +1,14 @@
 ---
-label: JavaScript
+label: Node
 ---
 
-The [Javascript client](https://www.npmjs.com/package/@thumbrella/client) is a great starting point for both node and browser
-environments. 
+The [Javascript client](https://www.npmjs.com/package/@thumbrella/client) is a great 
+starting point for node, and similar environments. 
 
 - Zero runtime dependencies, only needs `fetch`
 - Stream async results as the server renders thumbnail batches
 - Caching takes full advantage of HTTP cache headers
-- Binary thumbnails load easily into `sharp`, dom nodes, and other image libraries
+- Binary thumbnails load easily into `sharp` and other image libraries
 - Always provides placeholder, even when disconnected or misconfigured
 - Typed results with media classification and metadata
 - Bundled CLI for thumbnailing local files
@@ -42,6 +42,5 @@ examples.
 - [examples/stream.ts](https://github.com/thumbrella-dev/clients/blob/main/typescript/examples/stream.ts) 
   Stream multiple thumbnails as they render.
 
-There are separate packages with high level web components for 
-[React](https://www.npmjs.com/package/@thumbrella/astro),
-[Astro](https://www.npmjs.com/package/@thumbrella/astro), and others.
+The client package also includes optional functions and components to
+be used in a browser environment. See the **Browser** tab for information.

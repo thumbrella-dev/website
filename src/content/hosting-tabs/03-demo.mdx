@@ -16,7 +16,8 @@ The demo site provides an [`index.json`](https://demo.thumbrella.dev)
 that describes the catalog of media.
 
 ```sh
-curl https://demo.thumbrella.dev/thumb.jpeg?url=https://demo.thumbrella.dev/media/wavy-wall.svg \
-  --output vector.jpeg
+curl -G "https://demo.thumbrella.dev" \
+  --data-urlencode "url=https://demo.thumbrella.dev/media/wavy-wall.svg" \
+  --output thumb.jpeg
 ```
 

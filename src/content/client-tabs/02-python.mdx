@@ -5,14 +5,11 @@ label: Python
 The Python client uses `requests` for blocking and optionally `aiohttp` for
 async streaming results.
 
-- Client defaults to synchronous requests with [requests](https://pypi.org/project/requests/)
-- Async support via `thumbrella-client[async]` using [aiohttp](https://pypi.org/project/aiohttp/)
 - Caching takes full advantage of HTTP cache headers
 - Binary thumbnails load easily into `PIL`, `Qt`, `Pygame, and other image libraries
 - Always provides placeholder, even when disconnected or misconfigured
-- Typed results with media classification and metadata
+- Typed results include media identification and metadata
 - Thumbrella server supports hundreds of formats
-
 
 ```python
 ##  Install with,  `uv add thumbrella-client`  ##

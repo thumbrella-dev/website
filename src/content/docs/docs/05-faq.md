@@ -21,8 +21,8 @@ Thumbrella supports over 100 media formats across several categories:
 | Audio | 6 | MP3, FLAC, OGG, M4A, AAC, WAV |
 | Vector | 1 | SVG |
 
-Thumbrella classifies every format into a `kind` and canonical `extension`
-and generates a standard `mime` type for each thumbnail.
+Thumbrella classifies every format into a `kind` and canonical `extension` and
+generates a standard `mime` type for each thumbnail.
 
 The server does require external, optional subcommands for rendering some file
 formats (notably 3D models and document formats). Run `thumbrella formats` to
@@ -33,11 +33,11 @@ see which formats are available in your environment.
 [Thumbrella Cloud](/docs/cloud/) is the hosted service, it supports all
 available file formats and includes a globally distributed edge cache that
 improves performance for users worldwide. The architecture is efficient and
-lean, making it economic and viable for free use cases. Paid subscriptions
-are available for more resources.
+lean, making it economic and viable for free use cases. Paid subscriptions are
+available for more resources.
 
 A [self-hosted server](/docs/server/) has other advantages. It can run in
-offline environments and handle private resource, are not publicly available. 
+offline environments and handle private resource, are not publicly available.
 There are **no usage limits** when self-hosting; unlimited renders, unlimited
 cache, no rate throttling.
 
@@ -58,15 +58,15 @@ The HTTP protocol has excellent standards for cache control. Thumbrella takes
 advantage of all of these. Both servers and client libraries can optionally
 store thumbnail results in persistent caches.
 
-The server handles HTTP headers like `Cache-Control`, `ETag`, and Last-Modified`.
+The server handles HTTP headers like `Cache-Control`, `ETag`, and
+Last-Modified`.
 
-Caching at both levels is the primary way Thumbrella is fast and efficient.
-When using Thumbrella Cloud, cached results do not count against quota and
-usage.
+Caching at both levels is the primary way Thumbrella is fast and efficient. When
+using Thumbrella Cloud, cached results do not count against quota and usage.
 
-The returned [Result](/docs/client/#result) structure contains a `cache`
-value when encodes everything the server needs to know about caching.
-See more details in the [server caching](/docs/server/#caching) section.
+The returned [Result](/docs/client/#result) structure contains a `cache` value
+when encodes everything the server needs to know about caching. See more details
+in the [server caching](/docs/server/#caching) section.
 
 ### Do I need a client library, or can I use HTTP directly?
 
@@ -74,7 +74,7 @@ No client library is needed. The [HTTP API](/docs/client/#http-thumbnail-api)
 is intentionally simple, a single `curl` call gets you a JPEG thumbnail:
 
 ```bash
-curl -G "http://localhost:3114/thumb" \
+curl http://localhost:3114/thumb.jpeg \
   --data-urlencode "url=https://demo.thumbrella.dev/media/raw-canon.cr2" \
   --output thumb.jpeg
 ```
@@ -89,34 +89,33 @@ Thumbnails are JPEG images, typically **5 KB to 10 KB** each with a fixed
 resolution of 250x200. Quality is tuned for fast loading and visual
 recognizability, not archival reproduction.
 
-You cannot change the resolution, format, or compression level. The output
-is opinionated and consistent by design. The [Thumbnail Output](/docs/project/#thumbnail-output)
-section has details on the resulting thumbnail image.
+You cannot change the resolution, format, or compression level. The output is
+opinionated and consistent by design. The [Thumbnail
+Output](/docs/project/#thumbnail-output) section has details on the resulting
+thumbnail image.
 
 ### How fast is it?
 
 For cached results: **instant** (no network round-trip needed if the client
-cache is warm). For fresh renders on Thumbrella Cloud: typically under **500 ms**
-for images, most videos thumbnail in under one second. Complex 3D renders
-can take longer. The [demo gallery](https://demo.thumbrella.dev) shows
-render times and performance for a variety of files.
+cache is warm). For fresh renders on Thumbrella Cloud: typically under **500
+ms** for images, most videos thumbnail in under one second. Complex 3D renders
+can take longer. The [demo gallery](https://demo.thumbrella.dev) shows render
+times and performance for a variety of files.
 
 ### Can I use Thumbrella in a commercial product?
 
-Yes. The server and client libraries are licensed under 
-[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0),
-which permits commercial use, modification, and distribution with minimal
-restrictions. You can embed the server, fork the code, or use Thumbrella
-Cloud in a paid product.
+Yes. The server and client libraries are licensed under [Apache
+2.0](https://www.apache.org/licenses/LICENSE-2.0), which encourages commercial
+use, modification, and distribution with minimal restrictions. You can embed the
+server, fork the code, or use Thumbrella Cloud in a paid product.
 
-### Does Thumbrella support authentication for private media?
+### Does Thumbrella support authentication for private servers?
 
 Yes. Set a [handshake secret](/docs/server/#handshake) on your self-hosted
-server, and clients must include it in every request. For Thumbrella Cloud,
-your [auth token](/docs/cloud/#auth-tokens) authenticates you. The server
-itself fetches remote URLs, if your media requires HTTP authentication,
-include credentials in the URL or use the [connect string](/docs/client/#connect)
-to pass custom headers.
+server, and clients must include it in every request. For Thumbrella Cloud, your
+[auth token](/docs/cloud/#auth-tokens) authenticates you. The server itself
+fetches remote URLs, if your media requires HTTP authentication, include
+credentials in the URL.
 
 ### What happens when I hit my rate limit?
 
@@ -136,28 +135,29 @@ WebSocket or long-poll requirements, it's plain HTTP.
 
 ### Does Thumbrella handle animated images?
 
-No. Thumbnails are always static JPEGs. Animated GIFs, APNGs, and video files
-produce a single representative frame. Thumbrella is a thumbnail service, not
-a media transcoder or optimizer.
+Thumbnails are always single, still JPEGs. Thumbrella does handle animated GIFs, 
+video files, and other animated formats like APNG. When handling video formats
+Thumbrella will select a single representative frame. Thumbrella is a thumbnail 
+service, not a media transcoder or optimizer.
 
 ### Where do I report bugs or request features?
 
-General discussion is on the [GitHub Discussions](https://github.com/orgs/thumbrella-dev/discussions)
-page.
+General discussion is on the [GitHub
+Discussions](https://github.com/orgs/thumbrella-dev/discussions) page.
 
 File issues on the relevant GitHub repository:
 [server](https://github.com/thumbrella-dev/thumbrella/issues),
 [clients](https://github.com/thumbrella-dev/clients/issues), or
 [website](https://github.com/thumbrella-dev/website/issues).
 
-### Is there a hosted demo I can try without installing anything?
+### Is there a free host I can try without installing anything or registering?
 
 Yes. The [demo gallery](https://demo.thumbrella.dev) runs Thumbrella with a
-curated set of media files. Use it as a connect string for any client:
+curated set of media files. This can only server media from the demo website.
+Use the url as a connect string for any client:
 
 ```bash
 export TBR_CONNECT=https://demo.thumbrella.dev
 npx @thumbrella/server thumb https://demo.thumbrella.dev/media/neon-block.png out.jpg
 ```
 
-No account or token needed for demo media.

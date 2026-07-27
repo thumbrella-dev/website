@@ -1,0 +1,42 @@
+---
+label: Browser
+---
+
+The [Javascript client](https://www.npmjs.com/package/@thumbrella/client) 
+provides optional functions and components that integrate into 
+web browsers.
+
+- Zero runtime dependencies, only needs `fetch`
+- Defines custom `<tbr-thumb>` html element
+- Automatic lazy streaming and batch requests through viewport visibility
+- Client and server side caching take full advantage of HTTP cache headers
+- No build imports, works directly in simple web pages
+- Always provides placeholder, even when disconnected or misconfigured
+- Thumbrella server supports hundreds of formats
+
+The custom element `<tbr-thumb>` element is defined under the optional
+export `/element`. Use the setup function as the easiest way to register
+everything.
+
+```html
+<script type="module">
+  import { tbrSetup } from "https://cdn.jsdelivr.net/npm/@thumbrella/client@1/element";
+  tbrSetup("http://localhost:3114");
+</script>
+
+<h1>Hello, Thumbrella</h1>
+<tbr-thumb src="https://demo.thumbrella.dev/media/pocket-game.webp"></tbr-thumb>
+<tbr-thumb src="https://demo.thumbrella.dev/media/padres-stereo.exr"></tbr-thumb>
+```
+
+A separate export at `/browser` provides a lightwer weight set of functions
+to help integrate Thumbrella client results with dom nodes.
+
+The package source comes with several starting point examples. See the [client
+documentation](https://thumbrella.dev/docs/client/) for more details and
+examples.
+
+- [examples/element.html](https://github.com/thumbrella-dev/clients/blob/main/typescript/examples/element.html) 
+  Using the custom `<tbr-thumb>` element.
+- [examples/browser.html](https://github.com/thumbrella-dev/clients/blob/main/typescript/examples/browser.html) 
+  Track multiple thumbnails as they stream.

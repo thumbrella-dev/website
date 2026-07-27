@@ -68,7 +68,7 @@ initial release.
 
 | Property | Value |
 |----------|-------|
-| Size     | 250 × 200 pixels (4:3 aspect ratio) |
+| Size     | 250 × 200 pixels (5:4 aspect ratio) |
 | Format   | JPEG, quality ~60 |
 | Transparency | Composited over a neutral background |
 | Cropping | Loosely preserves the source media's aspect ratio |
@@ -132,7 +132,7 @@ section and
 | Repository | Description |
 |------------|-------------|
 | [thumbrella-dev/thumbrella](https://github.com/thumbrella-dev/thumbrella) | Thumbrella server in [Rust](https://rust-lang.org) |
-| [thumbrella-dev/clients](https://github.com/thumbrella-dev/clients) | Public client packages (TypeScript, Python, Rust, React, Astro) |
+| [thumbrella-dev/clients](https://github.com/thumbrella-dev/clients) | Public client packages (TypeScript, Python, Rust) |
 | [thumbrella-dev/website](https://github.com/thumbrella-dev/website) | Project information and documentation (this site) |
 
 

@@ -17,7 +17,7 @@ token. This token is used as the connection string, typically assigned to
 the `TBR_CONNECT` environment variable.
 
 ```bash
-export TBR_CONNECT=tbr_e_3QnzBcWx7KpRmYT2vLfJdE9sMhXuoG6i
+export TBR_CONNECT=tbr_e_3QnzBcWx7KpRmYT2000example
 ```
 
 This token is the value to use as the connection string. Either assign it to
@@ -45,9 +45,9 @@ token is sent as a bearer authentication HTTP Header. With
 `curl` that will look like this.
 
 ```bash
-curl -G "https://cloud.thumbrella.dev/thumb" \
+curl -G "https://cloud.thumbrella.dev/thumb.jpeg" \
   --data-urlencode "url=https://demo.thumbrella.dev/media/golden-gate.exr" \
-  --header "Authorization: Bearer tbr_e_3QnzBcWx7KpRmYT2vLfJdE9sMhXuoG6i" \
+  --header "Authorization: Bearer tbr_e_3QnzBcWx7KpRmYT2000example" \
   --output thumb.jpeg
 ```
 

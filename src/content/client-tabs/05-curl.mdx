@@ -1,5 +1,5 @@
 ---
-label: curl
+label: Curl
 ---
 
 The direct HTTP requests are designed to be usable without rich clients. This
@@ -19,14 +19,14 @@ curl -G "http://localhost:3114/thumb" \
 ```
 
 To interact with Thumbrella Cloud, register online for a quick and free
-account. Then add the token into the Authoriation header.
+account. Then add the token into the Authorization header.
 
 ```bash
 curl -G "https://cloud.thumbrella.dev/thumb" \
   --data-urlencode "url=https://demo.thumbrella.dev/media/golden-gate.exr" \
-  --header "Authorization: Bearer tbr_e_HVZgIwSOUwhJZscXQ2sN7eO" \
+  --header "Authorization: Bearer tbr_e_3QnzBcWx7KpRmYT2000example" \
   --output thumb.jpeg
 ```
 
-See the [client api documentation](https) for more details on the calls
-available.
+See the [client api documentation](https) for more details how these calls
+can be used.

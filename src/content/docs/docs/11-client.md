@@ -13,8 +13,7 @@ recovery, and other conveniences on top of the core HTTP API.
 
 There are also higher level clients that provide simple web components like
 `<Thumbnail src="/media/welcome.pdf">`. These are the preferred way to integrate
-Thumbrella into web based applications. At launch, these components are available
-for [React](https://react.dev) and [Astro](https://astro.build).
+Thumbrella into web based applications. 
 
 A client library is not required to use Thumbrella. The [HTTP API](#http-thumbnail-api) is
 intentionally simple and works with any tool that can make an HTTP request;
@@ -28,13 +27,13 @@ Thumbrella Cloud token or a server URL:
 
 ```bash
 # Cloud token (routes to Thumbrella Cloud automatically)
-export TBR_CONNECT=tbr_a_3QnzBcWx7KpRmYT2vLfJdE9sMhXuoG6i
+export TBR_CONNECT=tbr_e_3QnzBcWx7KpRmYT2000example
 
 # Self-hosted server
 export TBR_CONNECT=http://localhost:3114
 
 # Self-hosted server with a handshake secret
-export TBR_CONNECT=http://localhost:3114,wafflecones
+export TBR_CONNECT=http://localhost:3114,x-tbr-handshake=wafflecones
 
 # Demo server (free, no account needed)
 export TBR_CONNECT=https://demo.thumbrella.dev
@@ -383,16 +382,17 @@ There is no way to use client side caching with this call, but the Thumbrella
 server can still handle caching the results.
 
 ```bash
-curl "http://localhost:3114/thumb.jpeg?url=https://example.com/photo.jpg" \
-     --output thumb.jpg
+curl http://localhost:3114/thumb.jpeg \
+  --data-urlencode "url=https://demo.thumbrella.dev/media/raw-canon.cr2" \
+  --output thumb.jpeg
 ```
 
 Pass a handshake header for servers that require one:
 
-```bash
-curl -H "x-tbr-handshake: wafflecones" \
-     "http://localhost:3114/thumb.jpeg?url=https://example.com/photo.jpg" \
-     --output thumb.jpg
+```bash http://localhost:3114/thumb.jpeg \
+  --data-urlencode "url=https://demo.thumbrella.dev/media/game-level.png" \
+  -H "x-tbr-handshake: wafflecones" \
+  --output thumb.jpg
 ```
 
 ### `POST /batch`
@@ -409,7 +409,7 @@ streaming details.
 curl -s http://localhost:3114/batch \
      -H "Content-Type: application/json" \
      -H "Accept: application/x-ndjson" \
-     -d '{"items": [{"url": "https://example.com/photo.jpg"}]}' \
+     -d '{"items": [{"url": "https://demo.thumbrella.dev/media/golden-gate.exr"}]}' \
   | jq -c 'del(.media.thumbnail)'
 ```
 

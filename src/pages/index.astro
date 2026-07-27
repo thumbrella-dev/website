@@ -91,7 +91,6 @@ if (carouselItems.length > 0) {
           Start with
           <ProsePopover> <span slot="trigger">client libraries</span>
             packages already available for Typescript, Python, and Rust.<br>
-            High level web components for Astro and React.<br>
             Set a connection string, `<code>Client().batch(urls)</code>`, and done.<br>
             <a href="/docs/client">Docs →</a>
           </ProsePopover>
@@ -120,8 +119,8 @@ docker run --name tbr --publish 3114:3114 --rm thumbrella/server:latest
 export TBR_CONNECT=http://localhost:3114
 uvx thumbrella-client basic https://demo.thumbrella.dev/media/math-guide.odt
 
-# 3. Or use CLI commands to generate a thumbnail from any URL or path
-npx @thumbrella/server thumb https://demo.thumbrella.dev/media/harbor-trucks.mp4 out.jpg`} lang="bash" />
+# 3. Or use server CLI commands to generate a thumbnails from paths
+npx @thumbrella/server thumb brilliant-document.odt thumb.jpeg`} lang="bash" />
 
       </div>
     </div>
