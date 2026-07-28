@@ -106,7 +106,7 @@ if (carouselItems.length > 0) {
           <FormatChip icon="📷" title="Photographs" count="27">Camera and film formats are often heavy and high definition frame captures, multichannel imagery that requires color processing.<br>RAW, DNG, EXR, HDR, CR2, NEF, ARW, ORF, RW2, PEF, SRW, RAF, 3FR, MEF...</FormatChip>
           <FormatChip icon="🧊" title="3D geometry" count="26">Three dimensional models and scenes that can contain triangles, shaders, and textures.<br>OBJ, GLTF, GLB, STL, FBX, USDZ, IGES, DAE, PLY, 3DS, VRML...</FormatChip>
           <FormatChip icon="📄" title="Documents" count="6">Documents are usually multi-page collections of styled text and media.<br>DOCX, PPTX, ODT, XLSX, ODS, ODP, PDF (soon).</FormatChip>
-          <FormatChip icon="📦" title="And more" count="10">Vector graphics are rendered in high quality. Even audio formats commonly provide cover art to view. And more on the way.<br>SVG, MP3, FLAC, OGG, M4A, AAC...</FormatChip>
+          <FormatChip icon="📦" title="And more" count="10">Many more formats provide ways to generate thumbnails or embed them directly.<br>SVG, MP3, FLAC, OGG, M4A, AAC...</FormatChip>
         </div>
 
       </div>
@@ -126,7 +126,7 @@ if (carouselItems.length > 0) {
         <div class="first-steps__row">
           <span class="first-steps__icon">🐳</span>
           <span class="first-steps__desc">Start Docker server</span>
-          <Code code={`docker run --publish 3114:3114 --rm \\
+          <Code code={`docker run --name tbr --publish 3114:3114 --rm \\
   thumbrella/server:latest`} lang="bash" />
         </div>
 
