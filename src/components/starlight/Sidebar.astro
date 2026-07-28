@@ -9,30 +9,45 @@ const currentId = currentRoute.id.replace(/\/index$/, '');
 
 const docs = await getCollection('docs');
 
-// Build pages array with H2 headings extracted from raw markdown body.
+// Build pages array with H2/H3 headings extracted from raw markdown body.
 // We can't use entry.render() because it's not available in the workerd SSR runtime.
-function extractH2s(body) {
-  const h2s = [];
-  const re = /^##\s+(.+)$/gm;
+function extractHeadings(body) {
+  const headings = [];
+  const re = /^(#{2,3})\s+(.+)$/gm;
   let m;
   while ((m = re.exec(body)) !== null) {
-    const text = m[1].trim();
-    // Generate a slug matching Astro/Starlight's heading slug algorithm
+    const level = m[1].length;
+    const text = m[2].trim();
     const slug = text
       .toLowerCase()
       .replace(/[^\w\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
-    h2s.push({ text, slug });
+    headings.push({ level, text, slug });
   }
-  return h2s;
+  return headings;
+}
+
+// Nest H3s under their parent H2
+function nestHeadings(headings) {
+  const result = [];
+  let currentH2 = null;
+  for (const h of headings) {
+    if (h.level === 2) {
+      currentH2 = { ...h, h3s: [] };
+      result.push(currentH2);
+    } else if (h.level === 3 && currentH2) {
+      currentH2.h3s.push(h);
+    }
+  }
+  return result;
 }
 
 const pages = docs.map((entry) => {
   const slug = entry.id.replace(/\/index$/, '');
-  const h2s = extractH2s(entry.body || '');
-  return { slug, title: entry.data.title, h2s };
+  const headings = nestHeadings(extractHeadings(entry.body || ''));
+  return { slug, title: entry.data.title, headings };
 });
 
 // Sidebar page order. Must match the `sidebar.items` array in astro.config.mjs.
@@ -45,6 +60,8 @@ const slugOrder = [
   'docs/sponsor',
   'docs/faq',
   'docs/client',
+  'docs/components',
+  'docs/http-api',
   'docs/server',
   'docs/cloud',
   'docs/development',
@@ -61,8 +78,9 @@ pages.sort((a, b) => slugOrder.indexOf(a.slug) - slugOrder.indexOf(b.slug));
       {pages.map((page) => {
         const isCurrent = page.slug === currentId;
         const href = page.slug === 'docs' ? '/docs/' : `/${page.slug}/`;
+        const hasGapBefore = page.slug === 'docs/client' || page.slug === 'docs/server' || page.slug === 'docs/development'|| page.slug === 'docs/project';
         return (
-          <li>
+          <li class:list={{ 'sidebar-gap': hasGapBefore }}>
             <a
               href={href}
               class:list={['sidebar-page-link', { current: isCurrent }]}
@@ -70,14 +88,27 @@ pages.sort((a, b) => slugOrder.indexOf(a.slug) - slugOrder.indexOf(b.slug));
             >
               {page.title}
             </a>
-            {page.h2s.length > 0 && (
+            {isCurrent && page.headings.length > 0 && (
               <ul class="sidebar-headings">
-                {page.h2s.map((h2) => (
-                  <li>
-                    <a href={`${href}#${h2.slug}`} class="sidebar-heading-link">
-                      {h2.text}
-                    </a>
-                  </li>
+                {page.headings.map((h2) => (
+                  <>
+                    <li>
+                      <a href={`${href}#${h2.slug}`} class="sidebar-heading-link">
+                        {h2.text}
+                      </a>
+                    </li>
+                    {/* {h2.h3s.length > 0 && (
+                      <ul class="sidebar-subheadings">
+                        {h2.h3s.map((h3) => (
+                          <li>
+                            <a href={`${href}#${h3.slug}`} class="sidebar-subheading-link">
+                              {h3.text}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )} */}
+                  </>
                 ))}
               </ul>
             )}
@@ -115,6 +146,9 @@ pages.sort((a, b) => slugOrder.indexOf(a.slug) - slugOrder.indexOf(b.slug));
     background: var(--sl-color-gray-6);
     color: var(--sl-color-text-accent);
   }
+  .sidebar-gap {
+    margin-top: 1rem;
+  }
   .sidebar-headings {
     list-style: none;
     padding: 0;
@@ -123,13 +157,30 @@ pages.sort((a, b) => slugOrder.indexOf(a.slug) - slugOrder.indexOf(b.slug));
   }
   .sidebar-heading-link {
     display: block;
-    padding: 0.15rem 0.75rem;
+    padding: 0.1rem 0.9rem;
     font-size: var(--sl-text-xs);
     color: var(--sl-color-gray-2);
     text-decoration: none;
     transition: color 0.15s;
   }
   .sidebar-heading-link:hover {
+    color: var(--sl-color-white);
+  }
+  .sidebar-subheadings {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.25rem 0.75rem;
+    border-left: 1px solid var(--sl-color-gray-5);
+  }
+  .sidebar-subheading-link {
+    display: block;
+    padding: 0 1.2rem 0.1rem;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .sidebar-subheading-link:hover {
     color: var(--sl-color-white);
   }
 </style>

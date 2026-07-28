@@ -318,7 +318,7 @@ pre {
     text-decoration: underline;
 }
 
-/* ─ HERO gradient text */
+/* HERO gradient text */
 .hero__any {
     background: linear-gradient(90deg, var(--accent-strong), #c8c0ff);
     -webkit-background-clip: text;
@@ -331,7 +331,8 @@ pre {
     margin-bottom: 1.25rem;
 }
 
-/* ─ CAPS PANEL (prose + inline formats) */
+/* CAPS PANEL (prose + inline formats) */
+.first-steps, 
 .caps-panel {
     max-width: 900px;
     margin: 0 auto 0;
@@ -415,7 +416,7 @@ pre {
     line-height: 1.5;
 }
 
-/* ─ PROSE POPOVER (inline) */
+/* PROSE POPOVER (inline) */
 
 .prose-popover {
     position: relative;
@@ -741,7 +742,7 @@ pre {
     color: var(--text-muted);
 }
 
-/* ─ GENERIC HP SECTION */
+/* GENERIC HP SECTION */
 .hp-section {
     padding: 4rem 0;
 }
@@ -919,5 +920,61 @@ pre {
 
     .nav-auth-btn {
         padding: 0.45rem 0.6rem;
+    }
+}
+
+/* FIRST STEPS */
+
+.first-steps {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.first-steps__row {
+    display: grid;
+    grid-template-columns: auto 0.4fr 2fr;
+    gap: 1.2rem;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(124, 92, 191, 0.15);
+}
+
+.first-steps__row:last-child {
+    border-bottom: none;
+}
+
+.first-steps__icon {
+    font-size: 2.2rem;
+    line-height: 1;
+    opacity: 0.8;
+}
+
+.first-steps__desc {
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.first-steps__desc a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.first-steps__desc a:hover {
+    color: var(--accent);
+}
+
+.first-steps__detail {
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+    .first-steps__row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
     }
 }

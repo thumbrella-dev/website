@@ -4,7 +4,7 @@ description: Project information
 slug: docs/project
 ---
 
-### Purpose
+## Purpose
 
 Thumbrella is a server that creates thumbnails and metadata for online media.
 The code is open source under the 
@@ -15,7 +15,7 @@ At the time of creation, there weren't many existing options. Minimal thumbnail
 examples are integrated into file explorer interfaces, but nothing is easy to
 integrate into separate projects.
 
-### Original Goals Thumbrella
+#### Original Goals
 
 * Strive for developer experience and flexible open source use cases
 * Browsers can only reliably render a handful of image formats
@@ -29,21 +29,21 @@ integrate into separate projects.
 * Simple [HTTP](/docs/client/#http-thumbnail-api) api for the simple cases
 * Provide fantastic [client libraries](/docs/client/) that go even farther
 
-### How It Compares
+#### How It Compares
 
 If you're evaluating thumbnail solutions, here is how Thumbrella relates to
 common alternatives:
 
 | Approach | Example | Thumbrella difference |
 |----------|---------|-----------------------|
-| Browser-only `<img>` | Standard HTML | Only supports ~5 image formats. No video, documents, or raw photos. |
-| Cloud image services | imgix, Cloudinary | These are focused on images and producing high quality (slow) results, one media at a time. |
-| Server-side `ffmpeg` scripts | Custom bash/python | Challenges to distribute, deploy, and integrate into online environments. |
-| Image libraries | ImageMagick, libvips | Images only and inefficient on remote media. |
+| Browser-only `<img>` | Standard HTML | Only supports ~5 image formats. No video, documents, or camera photos. |
+| Cloud image services | Imgix, Cloudinary | These are focused on images and producing high slow results, and generally 100x more expensive. |
+| Server-side `ffmpeg` scripts | Custom bash/python | Challenges to distribute, deploy, and integrate into hosted environments. |
+| Image libraries | Sharp, libvips, ImageMagick | Images only and inefficient on remote media. |
 | **Thumbrella** | | **Open source server + clients. One binary, 100+ formats, CDN-ready.** |
 
 
-### Authors
+## Authors
 
 <div class="author-card">
 
@@ -58,27 +58,26 @@ specialized projects.
 </div>
 
 
-### Thumbnail Output
+## Thumbnail Output
 
-Every thumbnail Thumbrella generates shares a consistent set of
-characteristics. These are **not configurable**, the output is opinionated
-by design to keep the API simple and the results predictable. Custom sizes,
-formats, and styling are an intended future feature but not part of the
-initial release.
+Every Thumbrella thumbnail shares a consistent set of characteristics. These are
+**not configurable**, the output is opinionated by design to keep the API simple
+and the results predictable. Custom sizes, formats, and styling are an intended
+future feature but not part of the initial release.
 
 | Property | Value |
 |----------|-------|
 | Size     | 250 × 200 pixels (5:4 aspect ratio) |
-| Format   | JPEG, quality ~60 |
-| Transparency | Composited over a neutral background |
-| Cropping | Loosely preserves the source media's aspect ratio |
+| Format   | JPEG, quality ~60 or less |
+| Opacity  | Transparency composited over a neutral background |
+| Cropping | Loosely represents the media's aspect ratio |
 | Look     | Lightweight image processing for visual consistency |
 
-Thumbnails are small (5–10 KB) and optimized for fast loading. The JPEG quality
+Thumbnails are small, 5–10 KB, and optimized for fast loading. The JPEG quality
 is deliberately low. Enough to recognise the content, not for archival
 reproduction.
 
-The resulting thumbnail is always a full edge to edge 4:3. This consistency is
+The resulting thumbnail is always a full edge to edge 5:4. This consistency is
 intended to simplify client uses and help galleries and tools predictable. The
 thumbnail is still cropped to represent the aspect ratio used by the source
 media.
@@ -95,12 +94,12 @@ paths for missing or failed thumbnails.
 <img src="https://cloud.thumbrella.dev/placeholder/audio.jpeg" alt="Audio placeholder" style="display:inline-block;max-width:100%;aspect-ratio:4/3;width:160px;">
 <img src="https://cloud.thumbrella.dev/placeholder/document.jpeg" alt="Document placeholder" style="display:inline-block;max-width:100%;aspect-ratio:4/3;width:160px;">
 
-Each thumbnail comes with a [lightweight description](/docs/client/#result) of
-the source media. This describes the resolutions for images, lengths of videos,
-and more. The `Result` structure for each thumbnail. 
+Each thumbnail result also contains [lightweight metadata](/docs/client/#result)
+from the source media. This describes the resolutions for images, lengths of
+videos, and more. The `Result` structure for each thumbnail. 
 
 
-### Unsupported Features
+## Unsupported Features
 
 There is no way to configure the style, resolution, or format of the thumbnails.
 The settings are hardcoded into the converter and cannot be changed. The
@@ -118,7 +117,7 @@ Thumbrella runs as a standalone server. It cannot be run inside a browser
 environment.
 
 
-### GitHub Repositories
+## GitHub Repositories
 
 Thumbrella is hosted across several GitHub projects under the
 [thumbrella-dev](https://github.com/thumbrella-dev) organization.
@@ -129,10 +128,10 @@ The Github organization also has a simple
 section and
 [news](https://github.com/orgs/thumbrella-dev/discussions/categories/news) posts.
 
-| Repository | Description |
-|------------|-------------|
-| [thumbrella-dev/thumbrella](https://github.com/thumbrella-dev/thumbrella) | Thumbrella server in [Rust](https://rust-lang.org) |
-| [thumbrella-dev/clients](https://github.com/thumbrella-dev/clients) | Public client packages (TypeScript, Python, Rust) |
-| [thumbrella-dev/website](https://github.com/thumbrella-dev/website) | Project information and documentation (this site) |
+| Description | Repository |
+|-------------|------------|
+| Thumbrella server in [Rust](https://rust-lang.org) | [thumbrella-dev / thumbrella](https://github.com/thumbrella-dev/thumbrella) |
+| Public client packages (TypeScript, Python, Rust) | [thumbrella-dev / clients](https://github.com/thumbrella-dev/clients) |
+| Project information and documentation (this site) | [thumbrella-dev / website](https://github.com/thumbrella-dev/website) |
 
 

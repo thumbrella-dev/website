@@ -1,29 +1,32 @@
 ---
-title: Client
-description: Making requests with client libraries
+title: Client Libraries
+description: Using the TypeScript, Python, and Rust client libraries
 slug: docs/client
 ---
 
-Thumbrella provides client libraries for [TypeScript](https://www.npmjs.com/package/@thumbrella/client),
+Thumbrella provides client libraries for
+[Javascript](https://www.npmjs.com/package/@thumbrella/client),
 [Python](https://pypi.org/project/thumbrella/), and
-[Rust](https://crates.io/crates/thumbrella). Support for
-[Go](https://go.dev), [Ruby](https://www.ruby-lang.org), [PHP](https://php.net),
-and more will be coming soon. These libraries handle caching, streaming, error
-recovery, and other conveniences on top of the core HTTP API.
+[Rust](https://crates.io/crates/thumbrella). 
+Support for more languages will be excellent future additions. The client
+libraries handle caching, streaming, error recovery, and other conveniences on
+top of the core [HTTP API](../http-api/).
 
-There are also higher level clients that provide simple web components like
-`<Thumbnail src="/media/welcome.pdf">`. These are the preferred way to integrate
-Thumbrella into web based applications. 
+The Javascript library is written in Typescript and also comes with optional
+browser level libraries, including a custom element
+[`<tbr-thumb>`](../components/). Those are the preferred way to integrate
+Thumbrella into web based applications.
 
-A client library is not required to use Thumbrella. The [HTTP API](#http-thumbnail-api) is
-intentionally simple and works with any tool that can make an HTTP request;
-[curl](https://curl.se), [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API),
-or the standard library of any language.
+A client library is not required to use Thumbrella, but provides many
+high level features. The [HTTP API](../http-api/) is intentionally simple and 
+works with any tool that can make an HTTP request; [curl](https://curl.se), 
+[fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), or the 
+standard library of most languages.
 
 ## Connect
 
 Every client is configured through a **connect string**. The simplest form is a
-Thumbrella Cloud token or a server URL:
+server URL or Thumbrella Cloud token:
 
 ```bash
 # Cloud token (routes to Thumbrella Cloud automatically)
@@ -31,9 +34,6 @@ export TBR_CONNECT=tbr_e_3QnzBcWx7KpRmYT2000example
 
 # Self-hosted server
 export TBR_CONNECT=http://localhost:3114
-
-# Self-hosted server with a handshake secret
-export TBR_CONNECT=http://localhost:3114,x-tbr-handshake=wafflecones
 
 # Demo server (free, no account needed)
 export TBR_CONNECT=https://demo.thumbrella.dev
@@ -53,22 +53,47 @@ server url.
 export TBR_CONNECT=https://tbr.mycompany.net,x-credentials=secret,x-tool-name=frontpage
 ```
 
-Custom servers can also define a special handshake token. This is simply passed
-like the other http headers, but no `=` assignment is used, just the value.
-The handshake and regular http headers can be combined.
+## Design
 
-```bash
-export TBR_CONNECT=https://tbr.mycompany.net,secret-handshake-1
-```
+There are several design concepts shared across all language implementations.
+
+- Results are always guaranteed. Every batched request always comes with
+a response. Each thumbnail request has its own `status` and description of
+what happened. There can be failed results, but this is never an exception or
+error. Even if the server is offline or there is a configuration error, a
+placeholder and description will be provided.
+- Thumbrella requests are made through a `Client` object. This coordinates all
+the configuration and caching for requests. Creating client objects is free,
+there is no network connections or operations until the first request.
+- The `Result` and `Client` values have a `verify()` method that helps returned
+failed operations into real errors. If successful this returns itself so
+the instance can be chained to other operations.
+-Clients default to a small, temporary cache in memory. This cache can
+be customized, or combined with persistent caches. Each language and environment
+provides its own caches. The cache can also be disabled.
+- Batching requests is a key to efficiency. Group multiple thumbnails into a
+single request. Batch requests can also be streamed, so results are immediately
+available. This is the best design for interactive applications and use cases.
+ Streaming requests also provide intermediate updates for thumbnails in-flight
+for even better interactivity.
+
+## Languages
+
+Install the library for your language and make a first request. These examples
+all requires `$TBR_CONNECT` from the environment.
 
 
-## Libraries
+### JavaScript
 
-Install the library for your language and make a first request. Each example
-below uses `$TBR_CONNECT` from the environment.
+The [client package](https://www.npmjs.com/package/@thumbrella/client) is 
+`@thumbrella/client` and is published to [npmjs](https://www.npmjs.com).
 
+The Javascript library is actually written in Typescript, and provides a fully
+typed interface for that environment.
 
-### TypeScript / JavaScript
+There are no runtime dependencies for the Javascript library. It uses the
+builtin `fetch` interface to interact with Thumbrella servers. All calls are
+<code>async</code>.
 
 ```bash
 npm install @thumbrella/client
@@ -79,8 +104,9 @@ import { writeFileSync } from "node:fs";
 import { Client } from "@thumbrella/client";
 
 const tbr = await new Client().verify();
-const result = await tbr.thumb("https://demo.thumbrella.dev/media/harbor-trucks.mp4");
 
+// Simplified function for fetching a single thumbnail.
+const result = await tbr.thumb("https://demo.thumbrella.dev/media/harbor-trucks.mp4");
 const m = result.media;
 if (!m) {
   console.error("Thumbnail failed:", result.status);
@@ -91,52 +117,69 @@ console.log(`${m.kind}  ${m.fileSize.toLocaleString()} bytes  ->  ${m.thumbnail.
 writeFileSync("thumb.jpg", m.thumbnail.bytes);
 ```
 
-The `Client` constructor accepts an optional `connect` string. Without it the
-client reads `$TBR_CONNECT`. `verify()` confirms the server is reachable before
-making any thumbnail requests, useful at startup to catch misconfiguration
-early.
 
 ### Python
 
+The [client package](https://pypi.org/project/thumbrella-client/) is
+`thumbrella-client` and is published to [pypi](https://pypi.org).
+
+Most functionality in the Thumbrella client is not `async`, and uses
+[requests](https://pypi.org/project/requests/) as the dependency for interacting
+with Thumbrella servers.
+
+When `async` is helpful it can be installed as an optional feature. Use
+`thumbrella-client[async]`, which requires an additional dependency on
+[aiohttp](https://pypi.org/project/aiohttp/).
+
+
 ```bash
-uv add thumbrella
-# or: pip install thumbrella
+uv add thumbrella-client
 ```
 
 ```python
 import thumbrella
 from pathlib import Path
 
-tbr = thumbrella.Client().verify()
+tbr = thumbrella.Client()
+
+# Simplified function for fetching a single thumbnail.
 result = tbr.thumb("https://demo.thumbrella.dev/media/harbor-trucks.mp4")
+media = result.verify().media
 
-m = result.media
-if m is None:
-    print("Thumbnail failed:", result.status)
-    raise SystemExit(1)
+print(f"{media.kind}  {media.file_size:,} bytes  ->  {len(media.thumbnail):,} bytes")
+Path("thumb.jpg").write_bytes(media.thumbnail.bytes)
 
-print(f"{m.kind}  {m.file_size:,} bytes  ->  {len(m.thumbnail):,} bytes")
-Path("thumb.jpg").write_bytes(m.thumbnail.bytes)
-
-# Or open directly in Pillow without a temporary file
+# Or open directly in Pillow without a temporary file or copied data
 from PIL import Image
-img = Image.open(m.thumbnail.io)
+img = Image.open(media.thumbnail.io)
 print(img.mode, img.width, img.height)
 ```
 
-The Python client provides both a synchronous API (using [requests](https://pypi.org/project/requests/))
-and an async streaming interface (using [aiohttp](https://pypi.org/project/aiohttp/)).
 The `thumbnail.io` property returns a file-like
 [BytesIO](https://docs.python.org/3/library/io.html#io.BytesIO) object, so image
 libraries like [Pillow](https://pillow.readthedocs.io) and
-[OpenCV](https://opencv.org) can load thumbnails without writing to disk.
+[OpenCV](https://opencv.org) can load thumbnails without writing to disk or
+duplicating in memory.
 
 ### Rust
+
+The [client package](https://crates.io/crates/thumbrella-client) is
+`thumbrella-client` and is published to [crates.io](https://crates.io).
+
+By default, all calls are `async`. The [requests](https://pypi.org/project/requests/) 
+library is used to interact with Thumbrella servers.
+
+An optional `blocking` feature is available which redefines the interface
+to not be `async`. 
+
+The package depends on other utility libraries like 
+[serde](https://serde.rs/),  [base64](https://crates.io/crates/base64), and
+[thiserror](https://github.com/dtolnay/thiserror).
 
 ```toml
 # Cargo.toml
 [dependencies]
-thumbrella = "0.1"
+thumbrella = "1"
 tokio = { version = "1", features = ["full"] }
 ```
 
@@ -149,6 +192,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let tbr = Client::new(None);
     tbr.verify().await?;
 
+    // Simplified function for fetching a single thumbnail.
     let result = tbr.thumb("https://demo.thumbrella.dev/media/harbor-trucks.mp4").await?;
     if let Some(media) = &result.media {
         fs::write("thumb.jpg", media.thumbnail.bytes())?;
@@ -157,15 +201,99 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             media.kind,
             media.file_size,
             media.thumbnail.len(),
-            result.source.as_deref().unwrap_or("render"),
+            result.source,
         );
     }
     Ok(())
 }
 ```
 
-`Client::new(None)` reads `$TBR_CONNECT` from the environment. Pass a string
-directly to use a specific connect string.
+## Client
+
+The `Client` object is the entry point for all thumbnail operations. It holds
+the connection configuration, manages caching, and provides the methods for
+requesting thumbnails.
+
+### Construction
+
+Create a client with an optional connect string. If no argument is provided,
+the client reads `$TBR_CONNECT` from the environment.
+
+```ts
+// TypeScript
+import { Client } from "@thumbrella/client";
+
+const tbr = new Client(); // reads $TBR_CONNECT
+const tbr = new Client("tbr_e_3QnzBcWx7KpRmYT2000example");
+const tbr = new Client("http://localhost:3114");
+```
+
+```python
+# Python
+import thumbrella
+
+tbr = thumbrella.Client()  # reads $TBR_CONNECT
+tbr = thumbrella.Client("tbr_e_3QnzBcWx7KpRmYT2000example")
+tbr = thumbrella.Client("http://localhost:3114")
+```
+
+```rust
+// Rust
+use thumbrella::Client;
+
+let tbr = Client::new(None); // reads $TBR_CONNECT
+let tbr = Client::new(Some("tbr_e_3QnzBcWx7KpRmYT2000example"));
+let tbr = Client::new(Some("http://localhost:3114"));
+```
+
+Creating a `Client` is cheap — it does not open any network connections or
+perform any I/O. The client is ready to use immediately after construction.
+
+By default each client comes with a small, temporary memory cache. This can be
+controlled by passing a stack of cache objects to the constructor. This array
+of cache objects can be empty to disable caching. 
+
+Applications that want control of the caches should instantiate them before
+creating the client. The caches can be shared by multiple `Client` objects.
+
+### Verify
+
+Call `verify()` to confirm the server is reachable and the connection is valid.
+This is useful at application startup to catch misconfiguration early, rather
+than discovering it on the first thumbnail request.
+
+On success this returns the `Client` object, which makes chaining or assignments
+simpler.
+
+What an error or exception means is different for each language.
+
+```ts
+const tbr = await new Client().verify();
+```
+
+```python
+tbr = thumbrella.Client().verify()
+```
+
+```rust
+let tbr = Client::new(None).verify().await?;
+```
+
+If verification fails, `verify()` raises an error (or returns a failed `Result`
+in languages that use that pattern).
+
+### Methods
+
+The `Client` provides three main methods for requesting thumbnails. These are
+all variations of the same data, requiring `url` string arguments for the media
+and returning matching `Result` objects for each request.
+
+| Method | Description |
+|---|---|
+| `thumb(url)` | Fetch a single thumbnail. Returns a `Result`. |
+| `batch(urls)` | Fetch multiple thumbnails. Returns all results after every request completes. |
+| `stream(urls)` | Fetch multiple thumbnails as a stream. Results arrive as soon as they are ready. |
+
 
 ## Result
 
@@ -173,10 +301,14 @@ Every thumbnail request returns a `Result`. Results are returned for every URL,
 including failures. A placeholder image will always be returned for every request,
 even if the server is unreachable or the file format is completely unknown.
 
+:::note
+In Rust the Thumbrella result object is named `ResultData` and does not
+conflict with the language's standard `Result` for possibly failed values.
+:::
+
 The Result structure is split into two levels. The outer top level describes the
 operation itself. An inner `media` field describes data that comes from the
-remote media itself and the thumbnail. The media information is what a client
-side cache will want to preserve.
+remote media itself and the thumbnail. 
 
 | Field | Type | Description |
 |---|---|---|
@@ -188,6 +320,8 @@ side cache will want to preserve.
 | `downloadSize` | number | Bytes fetched from the upstream source. |
 | `httpStatus` | number | HTTP status returned by the upstream source, if fetched. |
 | `media` | object | The thumbnail and its metadata. `null` on total failure. |
+
+## Media
 
 The `media` object carries the stable, cacheable payload. Two results for the
 same file share the same `media`, clients can compare fields to deduplicate.
@@ -212,6 +346,8 @@ mean the response came from a cache without re-rendering.
 Client libraries will convert the `thumbnail` base64 information into a binary
 or bytes representation appropriate for that language. The contents are usually
 around 5kb to 10kb in size.
+
+The internal media information is what gets cached by the client.
 
 ### Properties
 
@@ -331,10 +467,11 @@ By default clients use an in-memory cache that holds a few hundred icons.
 Ideally a client will configure a persistent cache using one of the optional
 cache backends provided by each language and environment.
 
-The client caching is layered on top of any server side caching. The two work
-together quite well using packaged "cache strings". See the [server caching](../server/#caching)
-section on ways to interact with these caches directly. Client libraries will
-handle all this automatically.
+The client caching is layered on top of server side caching. The two work
+together quite well using packaged "cache strings". See the [server
+caching](../server/#caching) section on ways to interact with these caches
+directly. Client libraries handle all this automatically, which makes lookups
+feel magically fast.
 
 ```python
 # Python, persist cache strings across runs with a JSON file
@@ -366,118 +503,9 @@ asyncio.run(main())
 See the [Server docs](../server/#caching) for how server-side caching interacts
 with the client layer.
 
-## HTTP Thumbnail API
 
-There are two URLs used to look up thumbnails.
+## See Also
 
-### `GET /thumb.jpeg?url=<url>`
-
-The Thumbrella provides a light weight simple url for basic HTTP requests.
-This is a subset of the functionality in the other calls. It is a useful
-tool for simple one-off requests or testing. Interactive applications should
-prefer to use the other `/batch` call.
-
-Returns a JPEG thumbnail as the response body. The simplest possible request.
-There is no way to use client side caching with this call, but the Thumbrella
-server can still handle caching the results.
-
-```bash
-curl http://localhost:3114/thumb.jpeg \
-  --data-urlencode "url=https://demo.thumbrella.dev/media/raw-canon.cr2" \
-  --output thumb.jpeg
-```
-
-Pass a handshake header for servers that require one:
-
-```bash http://localhost:3114/thumb.jpeg \
-  --data-urlencode "url=https://demo.thumbrella.dev/media/game-level.png" \
-  -H "x-tbr-handshake: wafflecones" \
-  --output thumb.jpg
-```
-
-### `POST /batch`
-
-This is the primary url for interacting with Thumbrella. It is a POST
-request that requires a simple json uploaded body to define the requests.
-
-The `Accepts:` HTTP header controls if the results are returned in a
-single json batch, or incrementally streamed through various streaming
-formats. See the [stream section](#batch-streaming) section for more
-streaming details.
-
-```bash
-curl -s http://localhost:3114/batch \
-     -H "Content-Type: application/json" \
-     -H "Accept: application/x-ndjson" \
-     -d '{"items": [{"url": "https://demo.thumbrella.dev/media/golden-gate.exr"}]}' \
-  | jq -c 'del(.media.thumbnail)'
-```
-
-The uploaded JSON body must be an object with an `items` field that is a
-list of objects. Each object must have an `url` field, and can optionally
-contain a `cache` string.
-
-The server will always generate a response for each url. Be aware that if passing
-a `cache` value it is possible the server will respond with `status: "not_modified"`
-for that URL.
-
-```json
-{
-    "items": [
-        {"url": "https://demo.thumbrella.dev/media/golden-gate.exr"},
-        {"url": "https://demo.thumbrella.dev/media/game-level.png", "cache": "beef:AAA"},
-        {"url": "https://demo.thumbrella.dev/media/miss-library.avif"}
-    ]
-}
-```
-
-The batch mode returns a single JSON object with a result for each provided URL,
-in the same order as requested.
-
-```json
-{
-    "items": [
-        {"url": "https://demo.thumbrella.dev/media/golden-gate.exr", "status": "success", ...},
-        {"url": "https://demo.thumbrella.dev/media/game-level.png", "status": "not-modified"},
-        {"url": "https://demo.thumbrella.dev/media/miss-library.avif", "status": "failed", ...},
-    ]
-}
-```
-
-## HTTP Utility API
-
-### `GET /health`
-
-Returns a small JSON object confirming the server is running:
-
-```json
-{"status": "ok", "thumbrella": 1}
-```
-
-Client libraries use this endpoint during `verify()` to confirm the connection
-is valid.
-
-The `"thumbrella"` field contains the major version of the Thumbrella server.
-
-The Thumbrella Cloud server provides an additional `"token": boolean` field to
-this object. This will confirm if the provided authentication token is valid.
-This health call will work even without a valid authentication token.
-
-When running a custom server with a `TBR_HANDSHAKE` defined, this url
-will respond with status 4XX when the handshake is invalid.
-
-
-## Components
-
-Higher-level components are available for browser environments that wrap the
-client library and integrate with framework conventions.
-
-- **Astro** an `<Image>` component that requests thumbnails at build time or
-  on the edge and renders them inline.
-- **React** a `<Thumbnail>` component that lazily fetches thumbnails from a
-  Thumbrella server and handles loading and error states.
-
-These components are in the [clients repository](https://github.com/thumbrella-dev/clients)
-alongside the core libraries. They handle the client connection, result
-rendering, and placeholder display so no direct client API usage is needed for
-standard UI cases.
+- [Web Component](../components/) — Zero-config `<tbr-thumb>` custom element for browsers
+- [HTTP API](../http-api/) — Direct HTTP interface for thumbnail generation
+- [Server](../server/) — Server configuration, caching, and deployment

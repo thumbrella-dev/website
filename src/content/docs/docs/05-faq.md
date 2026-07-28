@@ -87,12 +87,12 @@ but the core API works with any HTTP tool.
 
 Thumbnails are JPEG images, typically **5 KB to 10 KB** each with a fixed
 resolution of 250x200. Quality is tuned for fast loading and visual
-recognizability, not archival reproduction.
+recognizability, they are low quality.
 
-You cannot change the resolution, format, or compression level. The output is
-opinionated and consistent by design. The [Thumbnail
-Output](/docs/project/#thumbnail-output) section has details on the resulting
-thumbnail image.
+You cannot customize the resolution, format, or compression level. The output is
+opinionated and consistent by design. The 
+[Thumbnail Output](/docs/project/#thumbnail-output) section has details on the 
+resulting thumbnail image.
 
 ### How fast is it?
 

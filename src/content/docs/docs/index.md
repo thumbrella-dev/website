@@ -9,47 +9,60 @@ formats; video, images, documents, 3D models, audio, and more. A collection of
 [client libraries](/docs/client/) simplify advanced features like streaming,
 caching, and web components that work with zero configuration.
 
+<div class="first-steps" style="margin-top: 1.5rem;">
 
+<div class="first-steps__row">
+<span class="first-steps__icon">📦</span>
+<span class="first-steps__desc"><a href="/docs/client/">Client Libraries</a></span>
+<span class="first-steps__detail">Instructions and reference for using the 
+client libraries. Each language provides a similar API and functionality.</span>
+</div>
 
+<div class="first-steps__row">
+<span class="first-steps__icon">🧩</span>
+<span class="first-steps__desc"><a href="/docs/components/">Web Component</a></span>
+<span class="first-steps__detail">Zero-config <code>&lt;tbr-thumb&gt;</code> custom element for browsers. The <em>best way</em> to get thumbnails onto any browser page.</span>
+</div>
 
-### Thirty second quickstart
+<div class="first-steps__row">
+<span class="first-steps__icon">🌐</span>
+<span class="first-steps__desc"><a href="/docs/http-api/">HTTP API</a></span>
+<span class="first-steps__detail">Reference for working directly with
+Thumbrella servers. Looks at the lower level requests, caching, and error handling.</span>
+</div>
 
-```bash
-# 1. One command to see a thumbnail from any URL or file path
-npx @thumbrella/server thumb https://demo.thumbrella.dev/media/harbor-trucks.mp4 thumb.jpg
+<div class="first-steps__row">
+<span class="first-steps__icon">🖥️</span>
+<span class="first-steps__desc"><a href="/docs/server/">Server</a></span>
+<span class="first-steps__detail">Install, and run your own Thumbrella server. 
+This covers configurations, troubleshooting, and the various supported 
+environments.</span>
+</div>
 
-# 2. Or spin up a Docker server locally
-podman run --name tbr --rm --publish 3114:3114 thumbrella/server:latest
+<div class="first-steps__row">
+<span class="first-steps__icon">☁️</span>
+<span class="first-steps__desc"><a href="/docs/cloud/">Cloud</a></span>
+<span class="first-steps__detail">The <em>free</em> Thumbrella Cloud service
+is the easiest way to get started. Manage your account, your tokens, and
+track your usage.</span>
+</div>
 
-# 3. From another terminal, use a client library
-export TBR_CONNECT=http://localhost:3114
-uvx thumbrella-client basic https://demo.thumbrella.dev/media/math-guide.odt
-```
+<div class="first-steps__row">
+<span class="first-steps__icon">🔧</span>
+<span class="first-steps__desc"><a href="/docs/development/">Development</a></span>
+<span class="first-steps__detail">Discover the server architecture and structure 
+of the <a href="https://github.com/thumbrella-dev/thumbrella">Github repository</a>. 
+Also covers code, contributions, and community guidelines.</span>
+</div>
 
-Documentation is organized into sections tailored to different roles:
-
-- **[Client](/docs/client/)** first steps for using a Thumbrella
-  server through code. The full API reference and best practices. Or
-  use directly with curl.
-
-- **[Server](/docs/server/)** how to install and run your own server.
-  This covers configurations, troubleshooting, and more.
-
-
-- **[Cloud](/docs/cloud/)** is the hosted service with all the features
-  and functionality for free.
-
-- **[Development](/docs/development/)** goes deeper into the
-  project architecture and structure of the
-  [Github repository](https://github.com/thumbrella-dev/thumbrella). Also code,
-  contribution, and community guidelines.
+</div>
 
 ### Contribute
 
 This documentation and website are [hosted on
 Github](https://github.com/thumbrella-dev/website). The content for this
 documentation is written with [Starlight](https://astro.build/), a markdown
-documentation system for [Astro](https://astro.build/). Each page has an
-**Edit** link at the bottom.
+documentation system for [Astro](https://astro.build/). Please use the 
+**Edit page** link at the bottom of any page to submit improvements.
 
-![Astro](https://astro.build/assets/press/astro-icon-light.svg)
+<!-- ![Astro](https://astro.build/assets/press/astro-icon-light.svg) -->

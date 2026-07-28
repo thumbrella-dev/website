@@ -43,6 +43,8 @@ export default defineConfig({
             { slug: 'docs/sponsor' },
             { slug: 'docs/faq' },
             { slug: 'docs/client' },
+            { slug: 'docs/components' },
+            { slug: 'docs/http-api' },
             { slug: 'docs/server' },
             { slug: 'docs/cloud' },
             { slug: 'docs/development' },
