@@ -29,15 +29,15 @@ This project is essentially two parts.
 Behind the scenes it is not pretty, but at the end of the day there is
 not that much content, so we can live with it.
 2. The documentation is static markdown files under `src/contents/docs`.
-Most of the content is in top level files. As they expand we may find we
-need to organize things differently.
+Information is split into about 10 pages that focus on documenting various
+aspects of using and running Thumbrella, as well as describing the project
+itself.
 
 ## Contributions
 
-This site is build on Astro and Starlight. Contributions are expected to 
-work confortably in this environment. No bringing in foreign frameworks or
-new dependencies without some discussion ahead of time. And for the respect
-and preservation of sanity, no Tailwind, ever.
+This site is build on Astro and Starlight. There's plenty of details to
+improve and expand apon. Try to stick with the builtin framework and components. 
+And for the respect and preservation of sanity, no Tailwind, ever.
 
 ## Authentication
 

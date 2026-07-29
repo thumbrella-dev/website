@@ -13,19 +13,17 @@ like `curl` or `wget`.
 - Thumbrella server supports hundreds of formats
 
 ```bash
-curl -G "http://localhost:3114/thumb" \
-  --data-urlencode "url=https://demo.thumbrella.dev/media/harbor-trucks.mp4" \
-  --output thumb.jpeg
+curl -OG "http://localhost:3114/thumb.jpeg" \
+  --data-urlencode "url=https://demo.thumbrella.dev/media/harbor-trucks.mp4"
 ```
 
 To interact with Thumbrella Cloud, register online for a quick and free
 account. Then add the token into the Authorization header.
 
 ```bash
-curl -G "https://cloud.thumbrella.dev/thumb" \
+curl -OG "https://cloud.thumbrella.dev/thumb.jpeg" \
   --data-urlencode "url=https://demo.thumbrella.dev/media/golden-gate.exr" \
-  --header "Authorization: Bearer tbr_e_3QnzBcWx7KpRmYT2000example" \
-  --output thumb.jpeg
+  --header "Authorization: Bearer tbr_e_3QnzBcWx7KpRmYT2000example"
 ```
 
 See the [client api documentation](https) for more details how these calls

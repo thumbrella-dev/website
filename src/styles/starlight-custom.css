@@ -40,6 +40,12 @@ starlight-theme-select { display: none; }
   background:  rgba(124, 92, 191, 0.1);
 }
 
+#comparison table td:nth-child(2),
+#comparison table td:nth-child(3) {
+  color: #c2a9e7;
+  font-size: 120%;
+}
+
 /* Ensure comparison rows have a consistent minimum height.
    The first-column label is wrapped in <strong> by the markdown parser. */
 #comparison table td:first-child strong {
