@@ -12,7 +12,7 @@ you would use an `<img>`.
 
 ```html
 <script type="module">
-  import { tbrSetup } from "https://cdn.jsdelivr.net/npm/@thumbrella/client@1/dist/element.js";
+  import { tbrSetup } from "https://cdn.jsdelivr.net/npm/@thumbrella/client@1/element.js";
   tbrSetup("tbr_e_3QnzBcWx7KpRmYT2000example");
 </script>
 
@@ -20,7 +20,7 @@ you would use an `<img>`.
 ```
 
 No build step, no framework, no client library code to write. The component
-renders a shimmer animation while the thumbnail loads, fades in the final
+renders a busy animation while the thumbnail loads, fades in the final
 image, and shows a placeholder icon if the source is unreachable or the format
 is unsupported.
 
@@ -36,11 +36,11 @@ standard modern approach and works in all current browsers.
 
 ```html
 <script type="module">
-  import { tbrSetup } from "https://cdn.jsdelivr.net/npm/@thumbrella/client@1/dist/element.js";
+  import { tbrSetup } from "https://cdn.jsdelivr.net/npm/@thumbrella/client@1/element.js";
   tbrSetup("tbr_e_3QnzBcWx7KpRmYT2000example");
 </script>
 
-<tbr-thumb src="https://example.com/photo.jpg" style="width: 200px;"></tbr-thumb>
+<tbr-thumb src="https://example.com/photo.jpg""></tbr-thumb>
 ```
 
 The `import` statement fetches the module, which registers the `<tbr-thumb>`
@@ -55,7 +55,6 @@ npm install @thumbrella/client
 
 ```ts
 import { tbrSetup } from "@thumbrella/client/element";
-
 tbrSetup("tbr_e_3QnzBcWx7KpRmYT2000example");
 ```
 
@@ -79,22 +78,6 @@ tbrSetup({
 |---|---|---|
 | `connect` | string | Thumbrella connect string. A Cloud token, a server URL, or a full connect string with headers. |
 | `persist` | number \| boolean | Enable IndexedDB persistent cache. The value is the maximum size in MB (default 5 if `true`). Omit to disable. |
-
-### Self-hosted server
-
-When pointing at your own Thumbrella server, use the server URL as the connect
-string. Add a handshake token if the server requires one.
-
-```ts
-// Self-hosted, no handshake
-tbrSetup("http://localhost:3114");
-
-// Self-hosted with handshake
-tbrSetup("http://localhost:3114,x-tbr-handshake=wafflecones");
-
-// Self-hosted with custom headers
-tbrSetup("https://tbr.mycompany.net,x-credentials=secret,x-tool-name=frontpage");
-```
 
 See the [connect string](../client/#connect) section in the client docs for the
 full connect string syntax.

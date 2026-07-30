@@ -174,10 +174,21 @@ itself. An inner `media` field describes the thumbnail and its metadata.
 | `httpStatus` | number | HTTP status returned by the upstream source, if fetched. |
 | `media` | object | The thumbnail and its metadata. `null` on total failure. |
 
+The `source` field describes how the thumbnail was produced:
+
+- `render` — A fresh thumbnail was generated.
+- `shortcut` — An embedded thumbnail inside the source file was used (common for video and audio).
+- `cache` — The response came from a cache without re-rendering.
+- `not_modified` — The client provided a cache token and the server confirmed the cached result is still valid.
+- `fallback` — A fallback icon was used because the source could not be processed.
+- `placeholder` — A generic placeholder icon was used.
+
+
 ### Media fields
 
 The `media` object carries the stable, cacheable payload. Two results for the
 same file share the same `media`, so clients can compare fields to deduplicate.
+
 
 | Field | Type | Description |
 |---|---|---|
@@ -191,18 +202,12 @@ same file share the same `media`, so clients can compare fields to deduplicate.
 | `cache` | string | Cache token for round-tripping in an encoded format. Empty means do not cache. |
 | `properties` | object | Format-specific metadata. See below. |
 
-The `source` field describes how the thumbnail was produced:
-
-- `render` — A fresh thumbnail was generated.
-- `shortcut` — An embedded thumbnail inside the source file was used (common for video and audio).
-- `cache` — The response came from a cache without re-rendering.
-- `not_modified` — The client provided a cache token and the server confirmed the cached result is still valid.
-- `fallback` — A fallback icon was used because the source could not be processed.
-- `placeholder` — A generic placeholder icon was used.
-
 Client libraries typically decode the base64 `thumbnail` into a binary or bytes
 representation appropriate for the language. Thumbnails are usually 5 KB to
 10 KB in size.
+
+When client libraries cache thumbnail results, they store only the `media`
+level data, not the full result.
 
 ### Properties
 
