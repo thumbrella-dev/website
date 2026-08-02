@@ -63,6 +63,11 @@ The primary endpoint for thumbnail generation. Accepts a JSON body with
 multiple URLs and returns thumbnails for each. Supports both batch and
 streaming response modes.
 
+The server accepts at most **12 items** per request. Items beyond the
+limit are returned with `status: "batchlimit"` — clients should split
+larger batches across multiple requests. The request body is also capped
+at **256 KB**; oversized payloads receive an immediate `413`.
+
 **Request**
 
 ```bash
@@ -166,7 +171,7 @@ itself. An inner `media` field describes the thumbnail and its metadata.
 | Field | Type | Description |
 |---|---|---|
 | `url` | string | The original URL that was requested. |
-| `status` | string | Outcome of this request: `success`, `failed`, `overloaded`, or `intermediate`. |
+| `status` | string | Outcome of this request: `success`, `failed`, `overloaded`, `intermediate`, or `batchlimit`. |
 | `source` | string | How the thumbnail was produced: `render`, `shortcut`, `cache`, `not_modified`, `fallback`, or `placeholder`. |
 | `message` | string | Human-readable detail, usually only set on failure. |
 | `duration` | number | Wall-clock seconds to produce this result (fractional, e.g. `0.15`). |
@@ -290,6 +295,7 @@ The API uses standard HTTP status codes:
 - `400 Bad Request` — Invalid request (missing URL, malformed JSON, etc.).
 - `401 Unauthorized` — Invalid or missing authentication token (Thumbrella Cloud).
 - `403 Forbidden` — Invalid handshake token.
+- `413 Payload Too Large` — Request body exceeds the 256 KB limit.
 - `429 Too Many Requests` — Rate limit exceeded.
 - `500 Internal Server Error` — Server error.
 - `503 Service Unavailable` — Server is temporarily overloaded.
@@ -300,6 +306,7 @@ Every result object includes a `status` field that provides more detail:
 - `failed` — The request failed (bad URL, unsupported format, etc.).
 - `overloaded` — The server is temporarily overloaded.
 - `intermediate` — An intermediate result (streaming mode only).
+- `batchlimit` — The batch exceeded the per-request limit of 12 items; resend in smaller batches.
 
 The `message` field contains a human-readable description of the failure, if
 any.

@@ -25,18 +25,18 @@ standard library of most languages.
 
 ## Connect
 
-Every client is configured through a **connect string**. The simplest form is a
-server URL or Thumbrella Cloud token:
+Every client is configured through a **connect string**. The simplest forms
+are a server URL or a Thumbrella Cloud token:
 
 ```bash
-# Cloud token (routes to Thumbrella Cloud automatically)
-export TBR_CONNECT=tbr_e_3QnzBcWx7KpRmYT2000example
-
 # Self-hosted server
 export TBR_CONNECT=http://localhost:3114
 
-# Demo server (free, no account needed)
+# Demo server (free, no account needed for demo gallery)
 export TBR_CONNECT=https://demo.thumbrella.dev
+
+# Cloud token (routes to Thumbrella Cloud automatically)
+export TBR_CONNECT=tbr_e_3QnzBcWx7KpRmYT2000example
 ```
 
 All client libraries read `$TBR_CONNECT` automatically when no explicit
@@ -44,13 +44,41 @@ connect string is provided. This makes it easy to point the same application
 at a local server for development and Thumbrella Cloud for production without
 touching application code.
 
-The connection string can also apply arbitrary http headers to any server.
-These are provided with comma separated values that define the header.
-These will only be needed for connect strings that already provide a custom
-server url.
+### Custom headers
+
+A connect string can carry extra HTTP headers after the URL, separated by
+commas. This is useful for private servers that require authentication or
+a shared secret:
 
 ```bash
-export TBR_CONNECT=https://tbr.mycompany.net,x-credentials=secret,x-tool-name=frontpage
+# Explicit header with key=value
+export TBR_CONNECT=https://tbr.mycompany.net,x-api-key=sk-abc123
+
+# Bare value -- treated as a handshake header (x-tbr-handshake)
+export TBR_CONNECT=https://tbr.mycompany.net,my-shared-secret
+```
+
+Bare values in the comma-separated list are interpreted automatically:
+values that look like an auth token (`tbr_[a-z]_...`) are sent as
+`Authorization: Bearer <token>`, and everything else becomes an
+`x-tbr-handshake` header.
+
+### Auth tokens
+
+Thumbrella Cloud uses short **auth tokens** that double as the connect
+string. These always start with `tbr_?_` followed by base64 characters.
+
+A bare token without a URL automatically targets Thumbrella Cloud:
+
+```bash
+export TBR_CONNECT=tbr_s_3QnzBcWx7KpRmYT2000example
+```
+
+Tokens can also be attached to a self-hosted URL when the server has
+token authentication enabled:
+
+```bash
+export TBR_CONNECT=https://tier2.internal:3115,tbr_s_3QnzBcWx7KpRmYT2000example
 ```
 
 ## Design
