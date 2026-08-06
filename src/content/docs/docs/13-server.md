@@ -207,12 +207,35 @@ curl http://localhost:3114/health
 # {"status": "ok", "thumbrella": 1}
 ```
 
+## Hybrid Cloud
+
+A standalone server can be connected to a free account on Thumbrella Cloud
+to expand it's functionality.
+
+A standalone server can use Thumbrella Cloud as its persistent caching backend.
+The cached requests will be managed with quota and lifetimes the same as
+the requests are handled by Thumbrella Cloud. This cache is also shared with
+regular Cloud requests for the same account. Set the `TBR_CACHE` environment
+variable to `cloud:` followed by a private token for your account. 
+
+A standalone server can present difficulty to get all the formats supported
+when they are handled by external tools. The thumbrella server must have access
+to tools like `oiiotool`, `f3d` (with a framebuffer), and more. Instead of 
+setting these up a standalone Thumbrella server can be configured to fallback
+on Thumbrella Cloud to handle only these more complicated and optional
+formats. This is done by setting the `TBR_TIER3` environment variable to a
+private token for your account. 
+
+```bash
+export TBR_CACHE=cloud:tbr_e_3QnzBcWx7KpRmYT2000example
+export TBR_TIER3=tbr_e_3QnzBcWx7KpRmYT2000example
+```
+
 ### Docker troubleshooting
 
-When running in Docker, the server cannot access `localhost` on the host.
-Use `host.docker.internal` (Docker Desktop) or `--network host` (Linux) to
-reach services on the host. The scratch directory (`TBR_SCRATCH`) should be
-a mounted volume for temporary file storage.
+Thumbrella's scratch directory (`TBR_SCRATCH`) should be a mounted volume for
+temporary file storage. If using persistent caching with the `TBR_CACHE`
+variable, also consider keeping this stored on a local volume.
 
 External tools like `oiiotool` and `f3d` are not included in the base Docker
 image. Use the [sponsor edition](/docs/sponsor/) Docker image for a

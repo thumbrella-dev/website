@@ -160,6 +160,15 @@ cache, so frequently accessed URLs can resolve without any network call at all.
 See the [Client docs](../client/#caching) for details.
 
 
+## Hybrid Servers
+
+The Thumbrella Cloud server can be used to extend standalone self hosted
+Thumbrella servers. These can be used together for caching and to simplify
+the handling of more complicated media formats.
+
+See the [server hybrid](../server/#hybrid-cloud) section for configuring the
+standalone server this way.
+
 ## Demo Server
 
 At any point, you can experiment with a client using the Thumbrella Demo site.
@@ -244,7 +253,7 @@ Thumbrella Cloud avoids storing personally identifiable information. In practice
 this means.
 
 - All user information is handled through Clerk.
-  - Thumbrella only stores the internal Clerk account id. 
+  - Thumbrella only stores the internal Clerk account id.
     - No email, no user names, or any other PII stored by Thumbrella Cloud.
   - Clerk triggers webhooks when account status has changed.
   - Clerk keeps a JWT cookie in the browser session.
