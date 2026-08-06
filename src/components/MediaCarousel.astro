@@ -189,13 +189,11 @@ const { items } = Astro.props;
   .ctile__placeholder {
       position: absolute;
       inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       opacity: 0;
-      transition: opacity 0.35s ease;
+      transition: opacity 0.45s ease;
       pointer-events: none;
   }
 
@@ -203,9 +201,9 @@ const { items } = Astro.props;
   .ctile.is-loaded  .ctile__placeholder { opacity: 0; }
 
   .ctile__ph-img {
-      width: 48px;
-      height: 48px;
-      object-fit: contain;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       opacity: 0.7;
       filter: grayscale(0.2);
   }
@@ -270,7 +268,7 @@ const { items } = Astro.props;
 
   .ctile.is-loaded .ctile__badge { opacity: 1; }
 
-  .ctile__badge--video { color: var(--accent-strong); }
+  .ctile__badge--video { color: #cfa0d4; }
   .ctile__badge--photo { color: #a0d4b0; }
   .ctile__badge--audio { color: #e0b0d0; }
   .ctile__badge--3d    { color: #c9b4f0; }
@@ -287,7 +285,7 @@ const { items } = Astro.props;
       margin: 0;
       padding: 0 2px;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 1s ease;
   }
 
   .ctile.is-pending .ctile__name,
