@@ -342,7 +342,7 @@ pre {
     padding: 1.6rem 1.8rem;
 }
 
-.caps-prose {
+.caps-panel p {
     margin: 0 0 1.25rem;
     color: var(--text-muted);
 }

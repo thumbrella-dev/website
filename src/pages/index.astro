@@ -1,6 +1,5 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
-import ProsePopover from '../components/ProsePopover.astro';
 import FormatChip from '../components/FormatChip.astro';
 import MediaCarousel from '../components/MediaCarousel.astro';
 import { Content as AboutContent } from '../content/home/about.mdx';
@@ -29,7 +28,7 @@ if (carouselItems.length > 0) {
 
 <MainLayout
   title="Thumbrella is the open source server for online thumbnails"
-  description="Serve fast, cached thumbnails from over 100 formats: photographs, videos, documents, even 3D models. Feed it your media libraries and get reliable thumbnail back.">
+  description="Fast, cache-friendly thumbnails for the full range of online media. Built for developer tools and AI workflows that need to explore, organize, and understand media libraries.">
 
   <!-- HERO -->
   <section class="hero" id="hero">
@@ -46,58 +45,18 @@ if (carouselItems.length > 0) {
       <h2 class="section-heading">About</h2>
       <div class="caps-panel">
 
-        <p class="caps-prose">
-          Thumbrella is the
-          <ProsePopover> <span slot="trigger">open source</span>
-            Apache&nbsp;2 license for the server and all client libraries.<br>
-            One of the simplest licenses to integrate into most projects.
-          </ProsePopover>
-          server for online thumbnails. 
-          
-        </p>
-        <p class="caps-prose">
-          Serve
-          <ProsePopover> <span slot="trigger">fast, cached</span>
-            Server written in Rust and deployed to the edge in over 300 regions.<br>
-            Full integration with http caching headers and range requests 
-            for excellent performance.
-          </ProsePopover>
-          thumbnails from over
-          <ProsePopover> <span slot="trigger">100 formats</span>
-            Handles megapixel imagery with complicated pixel formats and codecs.<br>
-            Efficiently work through massive video files.<br>
-            Render quality images from vector artwork, 3d models, and documents.<br>
-            Quickly extract embedded thumbnails and cover art from other formats.
-          </ProsePopover>:
-          photographs, videos, documents, even 3D models.
-
-        </p>
-        <p class="caps-prose">
-          <ProsePopover> <span slot="trigger">One command</span>
-            Run from most operating systems, `<code>npx @thumbrella/server serve</code>`
-            and be running in seconds.<br>
-            Or work with Docker with `<code>docker run -it -p 3114:3114 thumbrella/server</code>`.<br>
-          </ProsePopover>
-          runs it locally or in Docker. Our
-          <ProsePopover> <span slot="trigger">Thumbrella Cloud</span>
-            Register with an existing developer account in <a href="/account">two clicks</a>, no payment info.<br>
-            Set your token and get full access to all features.
-          </ProsePopover>
-          is efficient enough to offer a genuinely useful free tier.
-        </p>
-        <p class="caps-prose">
-          Start with
-          <ProsePopover> <span slot="trigger">client libraries</span>
-            packages already available for Typescript, Python, and Rust.<br>
-            Set a connection string, `<code>Client().batch(urls)</code>`, and done.<br>
-            <a href="/docs/client">Docs →</a>
-          </ProsePopover>
-          for languages you already use. Docs and examples get you
-          <ProsePopover> <span slot="trigger">streaming thumbnails</span>
-            Stream individual thumbnails or batch-process entire directories.<br>
-            Resilient clients provide placeholders even when the server is unreachable.
-          </ProsePopover>
-          immediately.
+        <p>
+        Thumbrella brings fast, beautiful thumbnails to any online gallery, 
+        with support for 100+ formats: photos, video, documents, 3D models,
+        and other media.
+        </p><p>
+        Run the open-source server with one command, zero config, and all
+        the features and functionality. Then connect with client libraries for 
+        the browser or any of the other supported languages. 
+        </p><p>
+        Also check out the Thumbrella Cloud for a distributed server and caching
+        system. This genuine free tier is built for real every day projects; 
+        connected in two clicks.
         </p>
 
         <div class="caps-formats">
@@ -115,7 +74,6 @@ if (carouselItems.length > 0) {
 
 
   <NewsSection />
-
 
 
   <section class="hp-section hp-section--no-border">
