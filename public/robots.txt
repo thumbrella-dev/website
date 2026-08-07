@@ -1,1 +1,15 @@
 User-agent: *
+Allow: /
+Allow: /docs/
+Allow: /docs/client/
+Allow: /docs/cloud/
+Allow: /docs/components/
+Allow: /docs/development/
+Allow: /docs/faq/
+Allow: /docs/http-api/
+Allow: /docs/pricing/
+Allow: /docs/project/
+Allow: /docs/server/
+Allow: /docs/sponsor/
+Sitemap: https://thumbrella.dev/sitemap-0.xml
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
