@@ -16,7 +16,7 @@ you would use an `<img>`.
   tbrSetup("tbr_e_3QnzBcWx7KpRmYT2000example");
 </script>
 
-<tbr-thumb src="https://example.com/photo.jpg" style="width: 200px;"></tbr-thumb>
+<tbr-thumb src="https://demo.thumbrella.dev/media/kids-theater.heic" style="width: 200px;"></tbr-thumb>
 ```
 
 No build step, no framework, no client library code to write. The component
@@ -40,7 +40,7 @@ standard modern approach and works in all current browsers.
   tbrSetup("tbr_e_3QnzBcWx7KpRmYT2000example");
 </script>
 
-<tbr-thumb src="https://example.com/photo.jpg""></tbr-thumb>
+<tbr-thumb src="https://demo.thumbrella.dev/media/blue-scooter.fbx""></tbr-thumb>
 ```
 
 The `import` statement fetches the module, which registers the `<tbr-thumb>`
@@ -99,7 +99,7 @@ except `src`.
 
 ```html
 <tbr-thumb
-  src="https://example.com/large-model.glb"
+  src="https://demo.thumbrella.dev/media/apollo-exterior.glb"
   alt="3D model of a spaceship"
   lazy="true"
   style="width: 300px;">
@@ -128,7 +128,7 @@ elements that need a different server or authentication context.
 </script>
 
 <!-- Uses the global connect string -->
-<tbr-thumb src="https://example.com/photo.jpg"></tbr-thumb>
+<tbr-thumb src="https://demo.thumbrella.dev/media/stream-barn.mkv"></tbr-thumb>
 
 <!-- Overrides with a self-hosted server -->
 <tbr-thumb
@@ -349,10 +349,10 @@ A responsive grid of thumbnails with hover effects.
 </style>
 
 <div class="gallery">
-  <tbr-thumb src="https://example.com/photo1.jpg"></tbr-thumb>
-  <tbr-thumb src="https://example.com/photo2.jpg"></tbr-thumb>
-  <tbr-thumb src="https://example.com/video.mp4"></tbr-thumb>
-  <tbr-thumb src="https://example.com/document.pdf"></tbr-thumb>
+  <tbr-thumb src="https://demo.thumbrella.dev/media/game-level.png"></tbr-thumb>
+  <tbr-thumb src="https://demo.thumbrella.dev/media/neon-block.png"></tbr-thumb>
+  <tbr-thumb src="https://demo.thumbrella.dev/media/pixel-forest.gif"></tbr-thumb>
+  <tbr-thumb src="https://demo.thumbrella.dev/media/math-codes.jpg"></tbr-thumb>
 </div>
 ```
 
@@ -363,7 +363,7 @@ long pages or infinite scroll layouts.
 
 ```html
 <tbr-thumb
-  src="https://example.com/large-file.zip"
+  src="https://demo.thumbrella.dev/media/golden-gate.exr"
   lazy="true"
   style="width: 200px;">
 </tbr-thumb>

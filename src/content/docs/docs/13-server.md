@@ -32,20 +32,22 @@ cargo run serve
 The Thumbrella executable provides several subcommands beyond the standard
 web server. Any subcommand accepts `--help` for further details.
 
-- `thumbrella version` Shows a quick message describing the version information
-  for the build.
-- `thumbrella help` Shows a quick summary of the various subcommands available.
+- `thumbrella serve` runs the primary server. It includes built-in hints and
+  diagnostics to help with onboarding.
+- `thumbrella thumb <input> <output>` Generates a single thumbnail for an input
+  file or URL and writes the JPEG to the given output path.
+- `thumbrella result <url>...` Thumbnails one or more files or URLs and prints
+  the result metadata as JSON. Add `--raw` to include the full base64 thumbnail.
+- `thumbrella formats` Generates a larger report of all the formats Thumbrella
+  supports. Not all will be available in all environments.
 - `thumbrella check` Runs a lightweight set of diagnostics and settings for the
   server. This will show the primary environment variable settings or their
   defaults. It will also run several checks to determine if the server is ready
   to run with the given environment.
-- `thumbrella formats` Generates a larger report of all the formats Thumbrella
-  supports. Not all will be available in all environments.
 - `thumbrella license` Report license and information about dependencies.
-- `thumbrella thumb` generates a single thumbnail for an input file or url. This
-  requires an output path to save the generated jpeg image.
-- `thumbrella serve` runs the primary server. It includes built-in hints and
-  diagnostics to help with onboarding.
+- `thumbrella version` Shows a quick message describing the version information
+  for the build.
+- `thumbrella help` Shows a quick summary of the various subcommands available.
 
 
 ## Configuration
@@ -63,17 +65,11 @@ server can be further tuned with these.
 | `TBR_TRACE` | <none> | File path to append more detailed logging output. |
 | `TBR_CACHE` | `mem:` (100 MB) | Cache backend definition (`mem:`, `sqlite:`, `none:`). |
 | `TBR_SCRATCH` | `$TMP/thumbrella` | A location on disk to download temporary files into. |
+| `TBR_TIER2` | <none> | Connection string to a separate Thumbrella server for tier2. |
+| `TBR_TIER3` | <none> | Connection string to a separate Thumbrella server for tier3. |
 
 Be aware that some of these settings may not make sense or even break things
 inside the docker environment.
-
-There are several more specialized environment variables that won't be needed for
-most self hosted services.
-
-| Specialized Variable | Default Value | Description |
-|---|---|---|
-| `TBR_TIER2` | <none> | Connection string to a separate Thumbrella server for tier2. |
-| `TBR_TIER3` | <none> | Connection string to a separate Thumbrella server for tier3. |
 
 
 ## Handshake

@@ -250,7 +250,14 @@ Boolean values are represented as numeric `0` or `1`.
 | `duration` | sec | Playback duration. |
 | `lossless` | bool | Inferred from the file extension (flac, wav, aiff). |
 
-**Geometry, Vector, Document, Archive, Text, Binary, Unknown**
+**Document**
+
+| Field | Unit | Description |
+|---|---|---|
+| `pages` | num | Number of pages in document. |
+
+
+**Geometry, Vector, Archive, Text, Binary, Unknown**
 
 These kinds currently have no properties.
 

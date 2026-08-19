@@ -451,8 +451,8 @@ const tbr = await new Client().verify();
 
 const urls = [
   "https://demo.thumbrella.dev/media/harbor-trucks.mp4",
-  "https://demo.thumbrella.dev/media/painting.jpg",
-  "https://demo.thumbrella.dev/media/document.pdf",
+  "https://demo.thumbrella.dev/media/space-colony.jpg",
+  "https://demo.thumbrella.dev/media/city-newsletter.pdf",
 ];
 
 for await (const result of tbr.stream(urls)) {
@@ -471,8 +471,8 @@ import asyncio, thumbrella
 async def main():
     tbr = thumbrella.Client().verify()
     urls = [
-        "https://demo.thumbrella.dev/media/harbor-trucks.mp4",
-        "https://demo.thumbrella.dev/media/painting.jpg",
+        "https://demo.thumbrella.dev/media/miss-library.avif",
+        "https://demo.thumbrella.dev/media/wave-wall.svg",
     ]
     async with tbr:
         async for result in tbr.stream(urls):
@@ -516,7 +516,7 @@ async def main():
         pass
 
     tbr = thumbrella.Client().verify()
-    urls = ["https://demo.thumbrella.dev/media/harbor-trucks.mp4"]
+    urls = ["https://demo.thumbrella.dev/media/padres-stereo.exr"]
 
     async with tbr:
         async for result in tbr.stream(urls):
