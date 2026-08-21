@@ -3,6 +3,8 @@ compatibility_date = "2026-05-04"
 compatibility_flags = ["global_fetch_strictly_public", "nodejs_compat"]
 name = "thumbrella-web"
 main = "@astrojs/cloudflare/entrypoints/server"
+workers_dev = false
+preview_urls = false
 
 [dev]
 ip = "0.0.0.0"
