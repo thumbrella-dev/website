@@ -3,16 +3,15 @@ label: Browser
 ---
 
 The [Javascript client](https://www.npmjs.com/package/@thumbrella/client) 
-provides optional functions and components that integrate into 
-web browsers.
+provides additional functionality to integrate into web browsers.
 
+- Defines custom `<tbr-thumb>` HTML element
 - Zero runtime dependencies, only needs `fetch`
-- Defines custom `<tbr-thumb>` html element
 - Automatic lazy streaming and batch requests through viewport visibility
-- Client and server side caching take full advantage of HTTP cache headers
+- Caching takes full advantage of HTTP header directives
 - No build imports, works directly in simple web pages
-- Always provides placeholder, even when disconnected or misconfigured
-- Thumbrella server supports hundreds of formats
+- Placeholders for failures, even when disconnected or misconfigured
+- Thumbrella supports over one hundred formats
 
 The custom element `<tbr-thumb>` element is defined under the optional
 export `/element`. Use the setup function as the easiest way to register

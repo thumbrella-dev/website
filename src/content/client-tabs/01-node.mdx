@@ -5,14 +5,13 @@ label: Node
 The [Javascript client](https://www.npmjs.com/package/@thumbrella/client) is a 
 great starting point for node, and similar environments. 
 
-- Zero runtime dependencies, only needs `fetch`
 - Stream async results as the server renders thumbnail batches
-- Caching takes full advantage of HTTP cache headers
+- Zero runtime dependencies, only needs `fetch`
+- Caching takes full advantage of HTTP header directives
 - Binary thumbnails load easily into `sharp` and other image libraries
-- Always provides placeholder, even when disconnected or misconfigured
-- Typed results with media classification and metadata
+- Placeholders for failures, even when disconnected or misconfigured
 - Bundled CLI for thumbnailing local files
-- Thumbrella server supports hundreds of formats
+- Thumbrella supports over one hundred formats
 
 ```ts
 //  Install with, `npm install @thumbrella/client`  //
@@ -25,22 +24,19 @@ const result = await tbr.thumb("https://demo.thumbrella.dev/media/pocket-game.we
 console.log(result.status, result.media!.thumbnail.length, "bytes");
 
 // Stream results as they complete
-for await (const r of tbr.stream([
+for await (const result of tbr.stream([
   "https://demo.thumbrella.dev/media/padres-stereo.exr",
   "https://demo.thumbrella.dev/media/golden-gate.exr",
 ])) {
-  console.log(r.url, r.status);
+  console.log(result.url, result.status);
 }
 ```
 
 The source comes with several starting point examples. See the [client
 documentation](https://thumbrella.dev/docs/client/) for more details and
-examples.
+information.
 
-- [examples/basic.js](https://github.com/thumbrella-dev/clients/blob/main/typescript/examples/basic.js) 
-  Download a thumbnail from a single url.
-- [examples/stream.ts](https://github.com/thumbrella-dev/clients/blob/main/typescript/examples/stream.ts) 
-  Stream multiple thumbnails as they render.
-
-The client package also includes optional functions and components to
-be used in a browser environment. See the **Browser** tab for information.
+- [examples/element.html](https://github.com/thumbrella-dev/clients/blob/main/typescript/examples/element.html)
+  Use the `<tbr-thumb>` element in a small, fixed gallery.
+- [examples/browser.html](https://github.com/thumbrella-dev/clients/blob/main/typescript/examples/browser.html) 
+  Stream multiple thumbnails as they render through the Client API.

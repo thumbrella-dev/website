@@ -11,11 +11,15 @@ The code is open source under the
 [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0), making it
 easy to customize, use, and contribute to.
 
+A thumbnail is a lightweight visual representation of something's identity.
+Thumbrella is focused on the generation of small, single images to
+represent the identity of various media and file types.
+
 At the time of creation, there weren't many existing options. Minimal thumbnail
 examples are integrated into file explorer interfaces, but nothing is easy to
 integrate into separate projects.
 
-#### Original Goals
+#### Initial Goals
 
 * Strive for developer experience and flexible open source use cases
 * Browsers can only reliably render a handful of image formats
@@ -26,7 +30,7 @@ integrate into separate projects.
 * Should work on Windows, MacOS, and Linux
 * Create an architecture that allows astonishingly cheap hosting
 * Pass those savings on to customers and make a reliable free tier
-* Simple [HTTP](/docs/client/#http-thumbnail-api) api for the simple cases
+* Simple [HTTP](/docs/client/#http-thumbnail-api) API for the simple cases
 * Provide fantastic [client libraries](/docs/client/) that go even farther
 
 #### How It Compares
@@ -73,9 +77,9 @@ future feature but not part of the initial release.
 | Cropping | Loosely represents the media's aspect ratio |
 | Look     | Lightweight image processing for visual consistency |
 
-Thumbnails are small, 5–10 KB, and optimized for fast loading. The JPEG quality
-is deliberately low. Enough to recognise the content, not for archival
-reproduction.
+Thumbnails are small, typically 5–10 KB, and optimized for fast loading.
+The JPEG compression quality is deliberately low and lossy. Enough to 
+recognise the content, not for archival reproduction.
 
 The resulting thumbnail is always a full edge to edge 5:4. This consistency is
 intended to simplify client uses and help galleries and tools predictable. The
