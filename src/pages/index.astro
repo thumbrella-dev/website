@@ -1,5 +1,7 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { siteSchema } from '../lib/site-schema';
 import FormatChip from '../components/FormatChip.astro';
 import MediaCarousel from '../components/MediaCarousel.astro';
 import { Content as AboutContent } from '../content/home/about.mdx';
@@ -31,6 +33,10 @@ if (carouselItems.length > 0) {
   description="Thumbrella brings fast, beautiful thumbnails to any online gallery, 
         with support for 100+ formats: photos, video, documents, 3D models,
         and other media.">
+
+  <Fragment slot="head">
+    <JsonLd data={siteSchema} />
+  </Fragment>
 
   <!-- HERO -->
   <section class="hero" id="hero">

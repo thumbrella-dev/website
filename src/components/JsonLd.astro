@@ -1,0 +1,9 @@
+---
+// Reusable JSON-LD structured-data tag.
+// Usage: <JsonLd data={{ "@context": "https://schema.org", ... }} />
+interface Props {
+    data: Record<string, unknown>;
+}
+const { data } = Astro.props;
+---
+<script type="application/ld+json" is:inline set:html={JSON.stringify(data)} />

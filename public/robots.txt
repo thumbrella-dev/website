@@ -11,5 +11,6 @@ Allow: /docs/pricing/
 Allow: /docs/project/
 Allow: /docs/server/
 Allow: /docs/sponsor/
+Disallow: /account/
 Sitemap: https://thumbrella.dev/sitemap-0.xml
 Content-Signal: ai-train=yes, search=yes, ai-input=yes
