@@ -203,6 +203,55 @@ curl http://localhost:3114/health
 # {"status": "ok", "thumbrella": 1}
 ```
 
+## Running in Docker
+
+The server is published as a container image. It listens on `3114` and binds
+to `0.0.0.0`, so publish the port to reach it from the host.
+
+```bash
+docker run -p 3114:3114 --rm thumbrella/server
+```
+
+### Base image
+
+The Thumbrella Docker image is built on the excellent [LinuxServer.io
+Ffmpeg](lscr.io/linuxserver/ffmpeg:latest) docker image. This provides a robust
+Linux environment with a features ffmpeg build. Thumbrella will use this to take
+advantage of all the formats that ffmpeg provides. 
+
+Be aware that Thumbrella will look for other tools for other complicated formats
+that are not included in this base image, like `oiiotool`. Thumbrella will run
+fine without these external tools. See options like the [hybrid
+Cloud](#hybrid-cloud) server that allows your server to fallback on Thumbrella
+Cloud to handle these more complicated tools. Or extend your Docker image
+further with the external tools you are needing.
+
+### Configuration options
+
+The thumbrella server will run well in Docker by default. There are several
+useful Docker configurations settings you can consider.
+
+- Persistent cache. The docker image defaults to a simple 100mb in memory
+cache. Consider setting ``TBR_CACHE`` and pointing a sqlite cache to a
+persistent docker volume.
+- Scratch space on tmpfs or shmem. The thumbrella server uses
+temporary disk space for complicated tools. Consider Docker's ``--tmpfs``
+arguments or setting ``TBR_SCRATCH`` to a shmem area in the container.
+- Container health checks. Use the `/health` url endpoint to get a small
+json response with the server status.
+
+All the other server settings are viable with a Docker hosted container.
+Continue with the [hybrid cloud](#hybrid-cloud), [handshake](#handshake),
+and other sections on this page.
+
+### Sponsors
+
+Thumbrella [sponsors](sponsors) get access to a fully functioning and support 
+Docker image. This comes with full support for all Thumbrella tools and
+external renderers. This includes running with virtual framebuffers to support
+output from graphical applications.
+
+
 ## Hybrid Cloud
 
 A standalone server can be connected to a free account on Thumbrella Cloud
@@ -227,43 +276,57 @@ export TBR_CACHE=cloud:tbr_e_3QnzBcWx7KpRmYT2000example
 export TBR_TIER3=tbr_e_3QnzBcWx7KpRmYT2000example
 ```
 
-### Docker troubleshooting
+## External tools
 
-Thumbrella's scratch directory (`TBR_SCRATCH`) should be a mounted volume for
-temporary file storage. If using persistent caching with the `TBR_CACHE`
-variable, also consider keeping this stored on a local volume.
+Many image, video, and vector formats are built into the server and need nothing
+extra. For the rest, Thumbrella runs optional external programs in a restricted
+subprocess. Every tool is optional: the server probes the environment at startup
+and only uses tools that are present. Run `thumbrella check` to see which tools
+are detected and `thumbrella formats` to see the resulting format coverage.
 
-External tools like `oiiotool` and `f3d` are not included in the base Docker
-image. Use the [sponsor edition](/docs/sponsor/) Docker image for a
-pre-configured environment with all optional renderers.
+| Tool | Purpose | Formats enabled |
+|---|---|---|
+| `ffmpeg` | Image and video decode fallback | Additional image and video formats |
+| `ffprobe` | Media metadata (dimensions, duration) | Used alongside `ffmpeg` |
+| `gm` (GraphicsMagick) | Arithmetic-coded JPEG decode and resize | `jpeg` `jpg` |
+| `oiiotool` (OpenImageIO) | Studio and high-dynamic-range image decode | `exr` `sxr` `mxr` `hdr` `rgbe` `dpx` `cin` `dds` `fits` `iff` `pic` `rla` `zfile` `sgi` `rgb` `rgba` `bw` `int` `inta` |
+| `f3d` | 3D geometry rendering | `3ds` `brep` `dae` `dxf` `e` `exo` `ex2` `fbx` `glb` `gltf` `gml` `iges` `igs` `obj` `off` `p21` `ply` `pts` `step` `stl` `stp` `stpnc` `vtk` `vtm` `vti` `vtp` `vtr` `vts` `vtu` `vrml` `wrl` `210` |
+| `python3` + `usd-core` | USD mesh extraction, then rendered by `f3d` | `usdz` `usdc` `usda` |
+| `pdftoppm` (Poppler) | PDF first-page rasterization | `pdf` |
+| `pdfinfo` (Poppler) | PDF page count metadata | Used alongside `pdftoppm` |
+| `xvfb-run` / X display | Headless display server for `f3d` | Required for geometry rendering |
 
+The display server is a runtime requirement rather than a format tool. `f3d`
+will not render without a `DISPLAY` (or `WAYLAND_DISPLAY`) in the environment.
+When no display is available, the server wraps `f3d` with `xvfb-run`, which
+starts a temporary Xvfb server.
 
-## External Formats
+USD support depends on three pieces at once: `python3`, the `usd-core` PyPI
+package, and `f3d`. All three must be detected before `usdz`, `usdc`, or `usda`
+files are handled.
 
-The Thumbrella executable comes with support for a wide range of image, video,
-and other formats. These are built in statically and will work on any system
-in any kind of environment.
+These tools are all completely optional. The Thumbrella server operates without
+any of these tools, gracefully providing fallback images for the formats it
+cannot handle.
 
-Thumbrella also supports using sandboxed external programs to do processing.
-These are used for 3D renders, and even [FFmpeg](https://ffmpeg.org) for some
-of the more advanced video formats.
+### Sandboxed subprocesses
 
-To enable these formats and features the following commands must be available
-in the environment that runs the server. Some of these tools will require
-access to hardware (or software) frame buffers and graphics libraries. The
-server will check for the commands at startup and report which are available.
+When Thumbrella runs an external tool, it treats that process as untrusted and
+applies a basic set of protections rather than giving it free run of the
+machine. The child is never allowed to gain extra privileges: on Linux,
+privilege escalation is disabled and capabilities are dropped before the tool
+starts, and resource limits cap open files and prevent core dumps. Each render
+runs inside its own temporary directory, cleaned up afterward, so the tool only
+has a private, disposable workspace. Protected renderers also carry a
+wall-clock timeout (20 seconds by default) and are killed if they overrun it.
+These restrictions are deliberately lightweight and best-effort: they exist to
+contain accidents and runaway resource use, not to serve as a strong security
+boundary. They are applied only where they do not break the tools themselves,
+and the details will keep evolving as stronger restrictions are added over
+time.
 
-These external tools and libraries are entirely optional. The server will start
-and run without them. Use the `formats` and `check` subcommands to get further
-details.
-
-| Dependency | Type | Tool | Formats |
-|---------|------|--------------|---------------|
-| [FFmpeg](https://ffmpeg.org) | CLI | `ffmpeg` | Additional images and videos |
-| [OpenImageIO](https://openimageio.org) | CLI | `oiiotool` | Extended image formats |
-| [F3D](https://f3d.app) | CLI | `f3d` | 3D geometry formats |
-| [OpenUSD](https://openusd.org) | Python | `usd_core` | 3D USD models |
-
+On Windows subprocess are protected using builtin Windows functionality
+like process time limits, process management, and isolated scratch areas.
 
 ## Build yourself
 
