@@ -6,11 +6,11 @@ The direct HTTP requests are designed to be usable without rich clients. This
 can work from any language with any HTTP library. Also from command line tools
 like `curl` or `wget`.
 
-- Batch requests process in parallel
-- Streamable batch results with `ndjson` or `sse`
+- Efficiently processes multiple thumbnails in parallel
+- Stream batch results with `ndjson` or `sse`
 - Every request results in a valid image or placeholder
 - Server provides advanced HTTP caching support
-- Thumbrella server supports hundreds of formats
+- Thumbrella server supports 100+ formats
 
 ```bash
 curl -OG "http://localhost:3114/thumb.jpeg" \

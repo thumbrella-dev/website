@@ -5,13 +5,16 @@ label: Node
 The [Javascript client](https://www.npmjs.com/package/@thumbrella/client) is a 
 great starting point for node, and similar environments. 
 
-- Stream async results as the server renders thumbnail batches
 - Zero runtime dependencies, only needs `fetch`
-- Caching takes full advantage of HTTP header directives
-- Binary thumbnails load easily into `sharp` and other image libraries
-- Placeholders for failures, even when disconnected or misconfigured
-- Bundled CLI for thumbnailing local files
-- Thumbrella supports over one hundred formats
+- Runs in Node 18+, Deno, Bun, and modern browsers
+- Optional `<tbr-thumb>` element for browser environments
+- Single call efficiently processes multiple thumbnails in parallel
+- Stream async results as the server renders thumbnails
+- Persistent client caching integrates with server and HTTP
+- Placeholders for failures, even if disconnected or misconfigured
+- Load easily into `sharp` and other image libraries
+- Typed results with simple media metadata
+- Thumbrella server supports 100+ formats
 
 ```ts
 //  Install with, `npm install @thumbrella/client`  //

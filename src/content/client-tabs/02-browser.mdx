@@ -8,10 +8,11 @@ provides additional functionality to integrate into web browsers.
 - Defines custom `<tbr-thumb>` HTML element
 - Zero runtime dependencies, only needs `fetch`
 - Automatic lazy streaming and batch requests through viewport visibility
-- Caching takes full advantage of HTTP header directives
+- Persistent client caching integrates with server and HTTP
 - No build imports, works directly in simple web pages
 - Placeholders for failures, even when disconnected or misconfigured
-- Thumbrella supports over one hundred formats
+- Load easily into `<img>` and other the DOM
+- Thumbrella server supports 100+ formats
 
 The custom element `<tbr-thumb>` element is defined under the optional
 export `/element`. Use the setup function as the easiest way to register
