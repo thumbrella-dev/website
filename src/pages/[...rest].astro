@@ -1,6 +1,8 @@
 ---
 export const prerender = false;
 
+Astro.response.status = 404;
+
 import MainLayout from '../layouts/MainLayout.astro';
 import ErrorPageContent from '../components/ErrorPageContent.astro';
 
