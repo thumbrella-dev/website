@@ -153,10 +153,10 @@ const currentPath = Astro.url.pathname;
           return;
         }
         var PUBLISHABLE_KEY = clerkConfig.publishableKey;
-        var FRONTEND_API = clerkConfig.frontendApi;
-        var CK_SCRIPT = FRONTEND_API
-          ? 'https://' + FRONTEND_API + '/npm/@clerk/clerk-js@5/dist/clerk.browser.js'
-          : '';
+                var FRONTEND_API = clerkConfig.frontendApi;
+                        var CK_SCRIPT = FRONTEND_API
+                                  ? 'https://' + FRONTEND_API + '/npm/@clerk/clerk-js@5/dist/clerk.browser.js'
+                                            : '';
 
         if (!CK_SCRIPT) {
           flushCallbacks(new Error('Cannot derive Clerk script URL'));
