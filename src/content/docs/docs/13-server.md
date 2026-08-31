@@ -45,6 +45,9 @@ web server. Any subcommand accepts `--help` for further details.
   defaults. It will also run several checks to determine if the server is ready
   to run with the given environment.
 - `thumbrella license` Report license and information about dependencies.
+- `thumbrella service` Prints deployment config files: a Docker Compose
+  file, a systemd unit, and Windows service instructions. Add an alias to
+  print one, and `--write` to save it to a file.
 - `thumbrella version` Shows a quick message describing the version information
   for the build.
 - `thumbrella help` Shows a quick summary of the various subcommands available.
@@ -70,6 +73,24 @@ server can be further tuned with these.
 
 Be aware that some of these settings may not make sense or even break things
 inside the docker environment.
+
+
+### Internal Variables
+
+The server is built on standard Rust runtime components, and a few of their
+environment variables can be useful in special situations.
+
+| Environment Variable | Description |
+|---|---|
+| `NO_COLOR` | Disable ANSI colour codes in server output. Useful when logs go to journald or a file. Honored directly by the server. |
+| `RUST_BACKTRACE` | Set to `1` to print a stack trace if the server panics. Useful for bug reports. |
+| `SSL_CERT_FILE` | Path to a CA bundle, for fetching sources over HTTPS signed by an internal or corporate CA. |
+| `TOKIO_WORKER_THREADS` | Number of worker threads. Useful inside CPU-limited containers, where the default (one per host core) can oversubscribe. |
+| `RUST_LOG` | Low-level log filter for internal crates. `TBR_LOG` is the supported setting for server output. |
+
+Most of these are inherited from the Rust runtime rather than implemented by
+Thumbrella. They are not part of any stable or promised API and may change or
+be removed in future releases.
 
 
 ## Handshake
