@@ -19,6 +19,7 @@ interface NewsItem {
 }
 
 let cachedPayload: string | null = null;
+let cachedEtag: string | null = null;
 let cacheExpiresAt = 0;
 
 export async function GET(): Promise<Response> {
@@ -33,9 +34,22 @@ export async function GET(): Promise<Response> {
 
   const feedUrl = 'https://github.com/orgs/thumbrella-dev/discussions/categories/news.atom';
   try {
+    const requestHeaders: Record<string, string> = {
+      'User-Agent': 'thumbrella-web',
+    };
+    if (cachedEtag !== null) {
+      requestHeaders['If-None-Match'] = cachedEtag;
+    }
+
     const res = await fetch(feedUrl, {
-      headers: { 'User-Agent': 'thumbrella-web' },
+      headers: requestHeaders,
     });
+    if (res.status === 304 && cachedPayload !== null) {
+      cacheExpiresAt = now + CACHE_TTL_MS;
+      return new Response(cachedPayload, {
+        headers: cacheHeaders(now),
+      });
+    }
     if (!res.ok) {
       // Serve stale cache on fetch failure
       if (cachedPayload !== null) {
@@ -68,6 +82,7 @@ export async function GET(): Promise<Response> {
     }
 
     cachedPayload = JSON.stringify(entries);
+  cachedEtag = res.headers.get('etag');
     cacheExpiresAt = now + CACHE_TTL_MS;
 
     return new Response(cachedPayload, {
