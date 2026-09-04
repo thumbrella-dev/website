@@ -31,7 +31,12 @@ const { items } = Astro.props;
   >Gallery details at demo.thumbrella.dev &rarr;</a>
   <div class="carousel-track-wrap" aria-label="Sample media thumbnails">
     <ul class="carousel-track" id="carousel-track" role="list">
-      {[0, 1, 2].flatMap(() => items).map((item, i) => {
+      {/*
+        One set is rendered server-side here. The carousel script clones two
+        more copies into the track at runtime so the seamless loop has content
+        to scroll into (this keeps the served HTML from tripling the markup).
+      */}
+      {items.map((item, i) => {
         const f = (8 * Math.PI) / items.length;  // four full wave cycles per set
         const rx = (Math.sin(i * f * 1) * 10).toFixed(1);
         const ry = (Math.cos(i * f * 1) * 13).toFixed(1);
@@ -384,8 +389,22 @@ const { items } = Astro.props;
   const track = document.getElementById('carousel-track') as HTMLElement | null;
   const popup = document.getElementById('cpopup') as HTMLElement | null;
   if (track) {
+    // Only one set is rendered server-side; clone two more copies so the
+    // seamless modulo wrap has content to scroll through. The clones mirror
+    // the visible tiles, so hide them from assistive tech to avoid triples.
+    const baseTiles = Array.from(track.children) as HTMLElement[];
+    for (let copy = 0; copy < 2; copy++) {
+      const frag = document.createDocumentFragment();
+      for (const tile of baseTiles) {
+        const clone = tile.cloneNode(true) as HTMLElement;
+        clone.setAttribute('aria-hidden', 'true');
+        frag.appendChild(clone);
+      }
+      track.appendChild(frag);
+    }
+
     const allTiles = Array.from(track.children) as HTMLElement[];
-    // Tiles are rendered 3× server-side - one set width for modulo wrapping
+    // Three total copies now - one set width is used for modulo wrapping.
     const setCount = allTiles.length / 3;
     const oneSetWidth = allTiles.slice(0, setCount).reduce((w, el) => w + el.offsetWidth + 120 /* gap */, 0);
 
