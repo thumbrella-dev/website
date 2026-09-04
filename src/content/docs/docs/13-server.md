@@ -66,7 +66,7 @@ server can be further tuned with these.
 | `TBR_ALLOW_LOCAL` | `0` | Boolean that allows file paths or localhost URLs. (`0` `1` `false` `true`) |
 | `TBR_HANDSHAKE` | <none> | Private token required as a custom HTTP header on every request. |
 | `TBR_TRACE` | <none> | File path to append more detailed logging output. |
-| `TBR_CACHE` | `mem:` (100 MB) | Cache backend definition (`mem:`, `sqlite:`, `none:`). |
+| `TBR_CACHE` | `mem:` (100 MB) | Cache backend spec - chain links with `+` (`none`, `mem:size`, `sqlite:path[,size]`, `cloud:connect`). |
 | `TBR_SCRATCH` | `$TMP/thumbrella` | A location on disk to download temporary files into. |
 | `TBR_TIER2` | <none> | Connection string to a separate Thumbrella server for tier2. |
 | `TBR_TIER3` | <none> | Connection string to a separate Thumbrella server for tier3. |
@@ -130,7 +130,9 @@ within 5 seconds, only one fetches the remote source, the second is
 served from the sticky cache. This is always active.
 
 With default settings the server also enables a 100 MB in-memory LRU
-cache. Set `TBR_CACHE` to customise or disable it.
+cache. Set `TBR_CACHE` to customise or disable it. An empty value behaves
+like an unset one (the default memory cache); use `none` to disable caching
+entirely.
 
 Thumbrella respects upstream HTTP caching:
 - `Cache-Control: no-store` and `private` responses are **not** stored
@@ -140,16 +142,19 @@ Thumbrella respects upstream HTTP caching:
   clients as freshness hints.
 - `ETag` and `Last-Modified` are used for conditional revalidation.
 
-`$TBR_CACHE` selects a single cache backend:
+`$TBR_CACHE` selects the cache backend(s). Chain multiple backends with `+`,
+fastest first — a chain reads each tier in order and writes to every tier, e.g.
+`mem:64mb+sqlite:/var/cache.db,1gb`.
 
 | Backend | Format | Persistence | Examples |
 |---|---|---|---|
 | **Memory** | `mem:` | No | `mem:`, `mem:200mb`, `mem:2gb`, `mem:500` (entries) |
-| **[SQLite](https://sqlite.org)** | `sqlite:` | Yes | `sqlite:cache.db`, `sqlite:/var/cache.db#1gb` |
+| **[SQLite](https://sqlite.org)** | `sqlite:` | Yes | `sqlite:cache.db`, `sqlite:/var/cache.db,1gb` |
 | **Cloud** | `cloud:` | Yes (shared) | `cloud:tbr_e_3QnzBcWx7KpRmYT2000example` (your cloud API token) |
-| **None** | `none:` | — | Disables all caching |
+| **None** | `none` | — | Disables all caching |
 
-Any cache backend can be sized by appending a limit: `mem:500mb`, `sqlite:db#2gb`.
+Backend parameters are positional and separated by `,`. Sizes carry a byte unit
+(`mem:200mb`, `sqlite:db,2gb`) or a bare entry count for memory (`mem:500`).
 Memory cache defaults to 100 MB. SQLite evicts oldest entries when over the byte
 limit and purges expired entries on write, no manual maintenance needed. See
 the [Cloud docs](/docs/cloud/#global-cache) for details on the cloud cache
