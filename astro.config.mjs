@@ -56,6 +56,12 @@ export default defineConfig({
       },
       lastUpdated: true,
       tableOfContents: false,
+      markdown: {
+        // Starlight only runs its remark/rehype plugins on files inside
+        // `src/content/docs`. The docs collection lives in a top-level `docs/`
+        // directory, so it has to be registered here as well.
+        processedDirs: ['./docs'],
+      },
       customCss: ['./src/styles/starlight-custom.css'],
       expressiveCode: {
         themes: ['github-dark'],

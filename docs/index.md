@@ -1,7 +1,7 @@
 ---
 title: Overview
 description: Thumbrella documentation
-
+slug: docs
 ---
 
 Thumbrella is a server for generating online thumbnails from over 100 media

@@ -4,7 +4,7 @@ Primary website and documentation for [Thumbrella](https://thumbrella.dev), the
 fast media thumbnail platform. Built with [Astro](https://astro.build), deployed
 to Cloudflare Workers.
 
-The project documentation lives in `src/content/docs/` and is rendered by
+The project documentation lives in `docs/` and is rendered by
 [Starlight](https://starlight.astro.build).
 
 The Thumbrella platform has a small ecosystem of other sites that make up
@@ -28,7 +28,7 @@ This project is essentially two parts.
 1. The front landing page is a clumsy collection of Astro components. 
 Behind the scenes it is not pretty, but at the end of the day there is
 not that much content, so we can live with it.
-2. The documentation is static markdown files under `src/contents/docs`.
+2. The documentation is static markdown files under `docs`.
 Information is split into about 10 pages that focus on documenting various
 aspects of using and running Thumbrella, as well as describing the project
 itself.
