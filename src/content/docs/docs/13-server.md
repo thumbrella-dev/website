@@ -148,9 +148,9 @@ fastest first — a chain reads each tier in order and writes to every tier, e.g
 
 | Backend | Format | Persistence | Examples |
 |---|---|---|---|
-| **Memory** | `mem:` | No | `mem:`, `mem:200mb`, `mem:2gb`, `mem:500` (entries) |
+| **Memory** | `mem` | No | `mem`, `mem:200mb`, `mem:2gb`, `mem:500` (entries) |
 | **[SQLite](https://sqlite.org)** | `sqlite:` | Yes | `sqlite:cache.db`, `sqlite:/var/cache.db,1gb` |
-| **Cloud** | `cloud:` | Yes (shared) | `cloud:tbr_e_3QnzBcWx7KpRmYT2000example` (your cloud API token) |
+| **Cloud** | `cloud` | Yes (shared) | `cloud:tbr_e_3QnzBcWx7KpRmYT2000example` (your cloud API token) |
 | **None** | `none` | — | Disables all caching |
 
 Backend parameters are positional and separated by `,`. Sizes carry a byte unit
@@ -185,7 +185,8 @@ after.
   thumbnail any time before this value.
 - The second part is a simple encoding of the remaining http headers needed
   for the server to request a new thumbnail. This second part is not intended
-  to be interpreted or parsed in any way. It is internal data to the server.
+  to be interpreted or parsed in any way. It is internal data to the Thumbrella 
+  server.
 
 A few additional notes about this cache string:
 
@@ -272,7 +273,7 @@ and other sections on this page.
 
 ### Sponsors
 
-Thumbrella [sponsors](sponsors) get access to a fully functioning and support 
+Thumbrella [sponsors](sponsors) get access to a fully functioning and supported
 Docker image. This comes with full support for all Thumbrella tools and
 external renderers. This includes running with virtual framebuffers to support
 output from graphical applications.
@@ -353,6 +354,31 @@ time.
 
 On Windows subprocess are protected using builtin Windows functionality
 like process time limits, process management, and isolated scratch areas.
+
+
+## Service Setup
+
+The Thumbrella server comes with a small set of helper commands to prepare
+a configuration for various service management environments. These are intended
+to be basic starting points for these configurations. A full production service
+may want additional directives for load balancing, logging, and other server
+related controls. The service files are fairly commented and contain additional
+options that may be commented out.
+
+- **Docker Compose**
+  Run `thumbrella service compose` to set up a server with `docker-compose`
+- **Systemd**
+  Run `thumbrella service systemd` for a systemd service file that should
+  be installed to the system or user processes.
+- **Windows**
+  Run `thumbrella service windows` to show instructions for installing
+  the server with `NSSM`. This isn't a direct configuration file, just a
+  list of manual steps and recommendations.
+
+All these examples will print configuration information directly to `stdout`.
+Add a `--write <path>` argument to store the configuration in an output file 
+path.
+
 
 ## Build yourself
 
