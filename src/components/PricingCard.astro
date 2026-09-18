@@ -3,12 +3,15 @@ export interface Props {
   title: string;
   price: string;
   period?: string;
+  highlighted?: boolean;
+  badge?: string;
 }
 
-const { title, price, period } = Astro.props;
+const { title, price, period, highlighted = false, badge } = Astro.props;
 ---
 
-<article class:list={['pricing-card']}>
+<article class:list={['pricing-card', { 'pricing-card--highlighted': highlighted }]}>
+  {badge && <span class="pricing-card__badge">{badge}</span>}
   <div class="card-header">
     <h3 class="title">{title}</h3>
     <span class="price"><b>{price}</b>{period}</span>
@@ -20,10 +23,12 @@ const { title, price, period } = Astro.props;
 
 <style>
   .pricing-card {
+    position: relative;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     border: 1px solid rgba(200, 149, 78, 0.5);
-    border-top-style: 3px solid rgba(200, 149, 78, 0.5);
+    border-top: 3px solid rgba(200, 149, 78, 0.5);
     border-radius: 12px;
     background:
       linear-gradient(160deg, rgba(200, 149, 78, 0.08) 0%, rgba(200, 149, 78, 0.02) 40%, transparent 70%),
@@ -39,6 +44,48 @@ const { title, price, period } = Astro.props;
   .pricing-card:hover {
     border-color: rgba(223, 171, 97, 0.648);
     box-shadow: 0 4px 24px rgba(200, 149, 78, 0.08);
+  }
+
+  /* Subtle lift for the recommended plan: warmer border, brighter top edge,
+     a soft inner glow, and a slightly deeper shadow. */
+  .pricing-card--highlighted {
+    border-color: rgba(223, 171, 97, 0.8);
+    border-top-color: rgba(227, 182, 115, 0.9);
+    background:
+      linear-gradient(160deg, rgba(219, 169, 94, 0.18) 0%, rgba(219, 169, 94, 0.05) 45%, transparent 75%),
+      linear-gradient(180deg, #2c2419 0%, #1f1a14 100%);
+    box-shadow:
+      0 0 0 1px rgba(219, 169, 94, 0.16),
+      0 12px 36px -20px rgba(219, 169, 94, 0.45);
+  }
+
+  .pricing-card--highlighted:hover {
+    border-color: rgba(227, 182, 115, 0.95);
+    box-shadow:
+      0 0 0 1px rgba(219, 169, 94, 0.22),
+      0 14px 40px -20px rgba(219, 169, 94, 0.55);
+  }
+
+  /* Diagonal ribbon stamped over the top-right corner. The band is clipped by
+     the card's overflow, so keep the label short enough to sit inside the
+     visible corner wedge (roughly 2x its distance from the corner). */
+  .pricing-card__badge {
+    position: absolute;
+    top: 13px;
+    right: -27px;
+    z-index: 1;
+    width: 108px;
+    padding: 0.1rem 0;
+    text-align: center;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #241d13;
+    background: linear-gradient(135deg, #e3b673 0%, #c8954e 100%);
+    transform: rotate(45deg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
   }
 
   .card-header {

@@ -7,26 +7,21 @@ slug: docs/pricing
 import { Card, CardGrid } from '@astrojs/starlight/components';
 import PricingCard from '../src/components/PricingCard.astro';
 
-:::note
-Thumbrella Cloud is still in prerelease and being deployed. Until systems
-stabilize, only free accounts with reduced limits are available.
-:::
-
 ## Thumbrella Cloud
 
-The <u>free</u> **Thumbrella Cloud** account is <u>recommend for
-most users</u>. This include an amazing worldwide edge cache and supports all
+The <u>free</u> **Thumbrella Cloud** account is <u>recommended for
+most users</u>. It includes an amazing worldwide edge cache and supports all
 formats and features of the Thumbrella server. No infrastructure to manage or
-servers to maintain. The free service provides over 70,000 unique thumbnail 
+servers to maintain. The free service provides over 70,000 unique thumbnail
 renders per month.
 
 Prefer unlimited usage or offline capability? Learn about [self-hosting your own
 server](server/) which is free, open-source, and fully featured.
 
-<a href="https://accounts.thumbrella.dev/sign-up" class="pricing-cta">Sign Up for Free</a>
+<a href="https://accounts.thumbrella.dev/sign-up" class="pricing-cta">Easy Sign Up</a>
 
 <div class="card-grid">
-  <PricingCard title="Cloud Free" price="$0">
+  <PricingCard title="Cloud Free" price="$0" highlighted badge="Best plan">
 
     No payment information needed. Connect your existing developer account
     in two clicks. The ideal plan for most users.
@@ -50,7 +45,7 @@ server](server/) which is free, open-source, and fully featured.
 
   </PricingCard><PricingCard title="Sponsor" price="$50" period="/month">
 
-    A [sponsorship subscription](../sponsor) is a whole different thing. This 
+    A [sponsorship](../sponsor) is a whole different thing. This 
     includes an amazing licensed docker image and Cloud limits into the 
     millions.
     
@@ -59,14 +54,20 @@ server](server/) which is free, open-source, and fully featured.
 </div>
 
 Accounts above their [usage limits](/docs/cloud/#limits) can still use the
-Thumbrella api for cached and simple results. Complicated renders will fallback
-on simpler placeholders in the meantime. The service degrades but contiues to
+Thumbrella API for cached and simple results. Complicated renders will fall back
+on simpler placeholders in the meantime. The service degrades but continues to
 work reasonably.
 
 Every account can create multiple
 [authentication tokens](https://thumbrella.dev/docs/cloud/#auth-tokens) 
 and divide up their quota across each of them. Each token gets custom
 [restrictions and rules](https://thumbrella.dev/docs/cloud/#token-limitations).
+
+:::note
+Thumbrella Cloud is still in prerelease and being deployed. Until systems
+stabilize, only free accounts are available.
+:::
+
 
 ## Comparisons
 
@@ -94,7 +95,7 @@ _(Approximate pricing and features as of July 2026)_
 [3]: https://www.imgix.com/pricing
 [4]: https://developers.cloudflare.com/images/pricing/
 
-<a href="https://accounts.thumbrella.dev/sign-up" class="pricing-cta">Sign Up for Free</a>
+<a href="https://accounts.thumbrella.dev/sign-up" class="pricing-cta">Easy Sign Up</a>
 
 
 ## Free Demo Server

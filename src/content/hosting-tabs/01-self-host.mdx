@@ -6,15 +6,11 @@ Self hosting your own Thumbrella server is designed to be straightforward
 and simple. Find the prepackaged option that best fits your environment.
 
 ```sh
-# Run through packaged npm servers  (uvx package also available)
-npx @thumbrella/server serve
+# Run and manage binaries through node
+npx --yes @thumbrella/server serve
 
 # Docker container
-docker run --name tbr --publish 3114:3114 --rm thumbrella/server
-
-# Download binaries for your platform (statically linked, no difficulties)
-wget http://github.com/thumbrella-dev/thumbrella/releases/latest/thumbrella-win64.exe
-thumbrella-win64 serve
+docker run -it --name tbr --publish 3114:3114 --rm thumbrella/server
 ```
 
 By default the server will listen on port `3114`. This can be override by 
@@ -22,7 +18,10 @@ setting `$TBR_PORT` to a different value. There are several other
 settings also managed by environment variables. These can be validated
 by running `thumbrella check` for a simple report and diagnostics.
 
+Binaries are distributed through 
+[Github Releases](github.com/thumbrella-dev/thumbrella/releases/latest). 
+The attested archives contain the portable and static executable.
+
 See the [Server Documentation](https://thumbrella.dev/docs/server/) 
-for more commands and configurations. Including how different media formats
-are handled. This also has instructions on optionally compiling Thumbrella
-for yourself.
+for more commands and configurations. The server is also quite simple to
+compile for yourself.
