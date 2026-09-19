@@ -120,6 +120,10 @@ target for the future, but there are no immediate plans to support this.
 Thumbrella runs as a standalone server. It cannot be run inside a browser
 environment.
 
+Thumbrella is not a tool to generate compelling marketing and social
+media frames for videos. It merely picks a representative frame from the
+video to help represent its contents.
+
 
 ## GitHub Repositories
 
