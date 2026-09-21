@@ -5,7 +5,21 @@
   <div class="container">
     <h2 class="section-heading">News</h2>
     <div class="caps-panel">
-      <ul class="news-list" id="news-list"></ul>
+      <a class="news-featured" href="https://youtu.be/HVQ6wjGKZCc">
+        <img
+          class="news-featured-thumb"
+          src="https://i.ytimg.com/vi/HVQ6wjGKZCc/mqdefault.jpg"
+          alt=""
+          loading="lazy"
+        />
+        <span class="news-featured-text">
+          <span class="news-featured-title">Quick Developer Intro Video</span>
+          <span class="news-featured-host">youtube.com</span>
+        </span>
+      </a>
+      <ul class="news-list" id="news-list">
+        <li class="news-placeholder">Loading news&hellip;</li>
+      </ul>
       <p class="news-footer">
         <a href="https://github.com/orgs/thumbrella-dev/discussions/categories/news">View all discussions &rarr;</a>
       </p>
@@ -44,7 +58,7 @@
     if (!list) return;
 
     if (items.length === 0) {
-      list.innerHTML = '<li class="news-footer" style="list-style:none">No recent news.</li>';
+      list.innerHTML = '<li class="news-placeholder">No recent news.</li>';
       return;
     }
 
@@ -62,9 +76,16 @@
       .join('');
   }
 
-  fetch('/api/news')
-    .then((res) => res.json())
-    .then((data: NewsItem[]) => renderNews(data))
+  const NEWS_TIMEOUT_MS = 6000;
+
+  fetch('/api/news', { signal: AbortSignal.timeout(NEWS_TIMEOUT_MS) })
+    .then((res) => {
+      // In `astro dev` the route is not served by the worker, so this comes back
+      // as the Vite 404 HTML page rather than JSON.
+      if (!res.ok) throw new Error(`news request failed: ${res.status}`);
+      return res.json();
+    })
+    .then((data: NewsItem[]) => renderNews(Array.isArray(data) ? data : []))
     .catch(() => renderNews([]));
 </script>
 
@@ -96,11 +117,78 @@
     min-height: 8lh;
   }
 
+  .news-placeholder {
+    list-style: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .news-featured {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .news-featured-thumb {
+    flex-shrink: 0;
+    width: 12rem;
+    max-width: 40%;
+    height: 3.8rem;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.22);
+  }
+
+  .news-featured-text {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .news-featured-title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .news-featured-host {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .news-featured-host::before {
+    content: "- ";
+  }
+
+  .news-featured:hover .news-featured-title {
+    color: var(--accent-strong);
+    text-decoration: underline;
+  }
+
   .news-item {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
     padding-top: 0.48rem;
+    padding-left: 1rem;
+  }
+
+  .news-item::before {
+    content: "\2022";
+    position: absolute;
+    top: 0.48rem;
+    left: 0.1rem;
+    font-size: 0.95rem;
+    line-height: 1.35;
+    color: var(--accent-strong);
   }
 
   .news-line1 {
