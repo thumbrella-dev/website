@@ -2,8 +2,10 @@
 label: Python
 ---
 
-The Python client uses `requests` for blocking and optionally `aiohttp` for
-async streaming results.
+For Python applications, start with the
+[Python client](https://pypi.org/project/thumbrella-client/). It uses
+`requests` for blocking calls and optionally `aiohttp` for asynchronous
+streaming results.
 
 - Persistent client caching integrates with server and HTTP
 - Single call efficiently processes multiple thumbnails in parallel
@@ -15,7 +17,7 @@ async streaming results.
 
 
 ```python
-##  Install with,  `uv add thumbrella-client`  ##
+##  Install with: `uv add thumbrella-client`  ##
 
 import thumbrella
 

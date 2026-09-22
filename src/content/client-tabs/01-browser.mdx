@@ -2,8 +2,10 @@
 label: Browser
 ---
 
-The [Javascript client](https://www.npmjs.com/package/@thumbrella/client) 
-provides additional functionality to integrate into web browsers.
+For browser galleries and file browsers, the `<tbr-thumb>` web component is
+the recommended starting point. It is provided by the
+[JavaScript client](https://www.npmjs.com/package/@thumbrella/client) and
+handles loading states, caching, lazy loading, and placeholder images for you.
 
 - Defines custom `<tbr-thumb>` HTML element
 - Zero runtime dependencies, only needs `fetch`
@@ -11,16 +13,17 @@ provides additional functionality to integrate into web browsers.
 - Persistent client caching integrates with server and HTTP
 - No build imports, works directly in simple web pages
 - Placeholders for failures, even when disconnected or misconfigured
-- Load easily into `<img>` and other the DOM
+- Works alongside `<img>` and other DOM elements
 - Thumbrella server supports 100+ formats
 
-The custom element `<tbr-thumb>` element is defined under the optional
-export `/element`. Use the setup function as the easiest way to register
-everything.
+The custom element is available from the `/browser` export in the NPM
+package, `@thumbrella/client`. For simpler HTML, the CDN module below is the 
+quickest way to work, import https://js.thumbrella.dev/1.4/tbr.js, using as
+much or little of the semver as desired.
 
 ```html
 <script type="module">
-  import { tbrSetup } from "https://js.thumbrella.dev/1/tbr.js";
+  import { tbrSetup } from "https://js.thumbrella.dev/1.4/tbr.js";
   tbrSetup("http://localhost:3114");
 </script>
 
@@ -28,9 +31,6 @@ everything.
 <tbr-thumb src="https://demo.thumbrella.dev/media/pocket-game.webp"></tbr-thumb>
 <tbr-thumb src="https://demo.thumbrella.dev/media/padres-stereo.exr"></tbr-thumb>
 ```
-
-A separate export at `/browser` provides a lightwer weight set of functions
-to help integrate Thumbrella client results with dom nodes.
 
 The package source comes with several starting point examples. See the [client
 documentation](https://thumbrella.dev/docs/client/) for more details and

@@ -2,8 +2,10 @@
 label: Node
 ---
 
-The [Javascript client](https://www.npmjs.com/package/@thumbrella/client) is a 
-great starting point for node, and similar environments. 
+For Node.js, Deno, Bun, and other JavaScript runtimes without a DOM, start with
+the [JavaScript client](https://www.npmjs.com/package/@thumbrella/client).
+Use its `Client` API when your application needs to control requests, caching,
+batching, or streaming directly.
 
 - Zero runtime dependencies, only needs `fetch`
 - Runs in Node 18+, Deno, Bun, and modern browsers
@@ -17,14 +19,16 @@ great starting point for node, and similar environments.
 - Thumbrella server supports 100+ formats
 
 ```ts
-//  Install with, `npm install @thumbrella/client`  //
+//  Install with: `npm install @thumbrella/client`  //
 
 import { Client } from "@thumbrella/client";
 
-// Connect and generate a single thumbnail
-const tbr = await new Client();
+// Connect and verify the server. Omit the argument to use TBR_CONNECT.
+const tbr = await new Client("http://localhost:3114").verify();
+
+// Generate a single thumbnail
 const result = await tbr.thumb("https://demo.thumbrella.dev/media/pocket-game.webp");
-console.log(result.status, result.media!.thumbnail.length, "bytes");
+console.log(result.status, result.media?.thumbnail.length ?? 0, "bytes");
 
 // Stream results as they complete
 for await (const result of tbr.stream([

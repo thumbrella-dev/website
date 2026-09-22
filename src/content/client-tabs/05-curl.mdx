@@ -7,7 +7,7 @@ can work from any language with any HTTP library. Also from command line tools
 like `curl` or `wget`.
 
 - Efficiently processes multiple thumbnails in parallel
-- Stream batch results with `ndjson` or `sse`
+- Stream batch results with newline-delimited JSON (`ndjson`)
 - Every request results in a valid image or placeholder
 - Server provides advanced HTTP caching support
 - Thumbrella server supports 100+ formats
@@ -26,5 +26,10 @@ curl -OG "https://cloud.thumbrella.dev/thumb.jpeg" \
   --header "Authorization: Bearer tbr_e_3QnzBcWx7KpRmYT2000example"
 ```
 
-See the [client API documentation](https://thumbrella.dev/docs/client/) for more details how 
-these calls can be used.
+For most applications, prefer one of the language client libraries. They
+provide caching, result handling, and convenient batching or streaming APIs.
+
+See the [HTTP API documentation](https://thumbrella.dev/docs/http-api/) for
+batch requests, streaming, authentication, and result formats. See the
+[client API documentation](https://thumbrella.dev/docs/client/) for the
+higher-level alternatives.

@@ -2,10 +2,11 @@
 label: Rust
 ---
 
-The Rust client provides easy, high level functionality for caching, error
-control, and other conveniences. By default it provides async calls using
-`reqwests` and `tokio`. Using the `blocking` feature provides a blocking
-interface for simpler environments.
+For Rust applications, start with the
+[Rust client](https://crates.io/crates/thumbrella-client). It provides
+high-level caching, error control, and typed results. By default it uses
+asynchronous calls with `reqwest` and `tokio`; the `blocking` feature provides
+a blocking interface for simpler environments.
 
 - Async-first with [reqwest](https://crates.io/crates/reqwest) _(rustls TLS)_
 - Minimal dependencies, `reqwest`, `serde`, `base64`, `thiserror`
@@ -17,7 +18,7 @@ interface for simpler environments.
 - Thumbrella server supports 100+ formats
 
 ```rust
-//  Install with, `cargo add thumbrella-client`  //
+//  Install with: `cargo add thumbrella-client`  //
 
 use thumbrella_client as thumbrella;
 
