@@ -23,12 +23,8 @@ batching, or streaming directly.
 
 import { Client } from "@thumbrella/client";
 
-// Connect and verify the server. Omit the argument to use TBR_CONNECT.
+// Connect to server, defaults to $TBR_CONNECT with no argument.
 const tbr = await new Client("http://localhost:3114").verify();
-
-// Generate a single thumbnail
-const result = await tbr.thumb("https://demo.thumbrella.dev/media/pocket-game.webp");
-console.log(result.status, result.media?.thumbnail.length ?? 0, "bytes");
 
 // Stream results as they complete
 for await (const result of tbr.stream([
