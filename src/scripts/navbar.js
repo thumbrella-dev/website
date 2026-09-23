@@ -115,7 +115,7 @@ onReady(() => {
       var PUBLISHABLE_KEY = clerkConfig.publishableKey;
       var FRONTEND_API = clerkConfig.frontendApi;
       var CK_SCRIPT = FRONTEND_API
-        ? 'https://' + FRONTEND_API + '/npm/@clerk/clerk-js@5/dist/clerk.browser.js'
+        ? 'https://' + FRONTEND_API + '/npm/@clerk/clerk-js@6/dist/clerk.browser.js'
         : '';
 
       if (!CK_SCRIPT) {
@@ -124,47 +124,56 @@ onReady(() => {
       }
       clerkLoading = true;
 
-      var ckScript = document.createElement('script');
-      ckScript.async = true;
-      ckScript.setAttribute('data-clerk-publishable-key', PUBLISHABLE_KEY);
-      ckScript.crossOrigin = 'anonymous';
-      ckScript.src = CK_SCRIPT;
-      ckScript.onload = function () {
-        window.Clerk.load({
-          appearance: {
-            variables: {
-              colorBackground: '#212126',
-              colorNeutral: 'white',
-              colorPrimary: '#ffffff',
-              colorPrimaryForeground: 'black',
-              colorForeground: 'white',
-              colorInputForeground: 'white',
-              colorInput: '#26262B'
-            },
-            elements: {
-              providerIcon__apple: { filter: 'invert(1)' },
-              providerIcon__github: { filter: 'invert(1)' }
-            }
-          }
-        })
-          .then(function () {
-            clerkReady = true;
-            clerkLoading = false;
-            btnLoading(false);
-            flushCallbacks();
-          })
-          .catch(function (err) {
-            clerkLoading = false;
-            btnLoading(false);
-            flushCallbacks(err);
+      function loadScript(src, configure) {
+        return new Promise(function (resolve, reject) {
+          var script = document.createElement('script');
+          script.async = true;
+          script.crossOrigin = 'anonymous';
+          script.src = src;
+          if (configure) configure(script);
+          script.onload = resolve;
+          script.onerror = function () { reject(new Error('Failed to load Clerk bundle: ' + src)); };
+          document.head.appendChild(script);
+        });
+      }
+
+      loadScript('https://' + FRONTEND_API + '/npm/@clerk/ui@1/dist/ui.browser.js')
+        .then(function () {
+          return loadScript(CK_SCRIPT, function (script) {
+            script.setAttribute('data-clerk-publishable-key', PUBLISHABLE_KEY);
           });
-      };
-      ckScript.onerror = function () {
-        clerkLoading = false;
-        btnLoading(false);
-        flushCallbacks(new Error('Failed to load Clerk JS'));
-      };
-      document.head.appendChild(ckScript);
+        })
+        .then(function () {
+          return window.Clerk.load({
+            ui: { ClerkUI: window.__internal_ClerkUICtor },
+            appearance: {
+              variables: {
+                colorBackground: '#212126',
+                colorNeutral: 'white',
+                colorPrimary: '#ffffff',
+                colorPrimaryForeground: 'black',
+                colorForeground: 'white',
+                colorInputForeground: 'white',
+                colorInput: '#26262B'
+              },
+              elements: {
+                providerIcon__apple: { filter: 'invert(1)' },
+                providerIcon__github: { filter: 'invert(1)' }
+              }
+            }
+          });
+        })
+        .then(function () {
+          clerkReady = true;
+          clerkLoading = false;
+          btnLoading(false);
+          flushCallbacks();
+        })
+        .catch(function (err) {
+          clerkLoading = false;
+          btnLoading(false);
+          flushCallbacks(err);
+        });
     });
   }
 
@@ -283,14 +292,10 @@ onReady(() => {
     if (window.Clerk.user) {
       openDashboard();
     } else {
-      var opened = window.Clerk.openSignIn({ redirectUrl: '/account/' });
-      if (opened && typeof opened.then === 'function') {
-        opened.then(function () {
-          if (window.Clerk && window.Clerk.user) {
-            openDashboard();
-          }
-        });
-      }
+      window.Clerk.openSignIn({
+        forceRedirectUrl: '/account/',
+        signUpForceRedirectUrl: '/account/'
+      });
     }
   }
 
