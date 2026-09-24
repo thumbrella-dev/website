@@ -34,7 +34,7 @@ see which formats are available in your environment.
 available file formats and includes a globally distributed edge cache that
 improves performance for users worldwide. The architecture is efficient and
 lean, making it economic and viable for free use cases. Paid subscriptions are
-available for more resources.
+available if further usage is needed.
 
 A [self-hosted server](/docs/server/) has other advantages. It can run in
 offline environments and handle private resource, are not publicly available.
@@ -49,24 +49,23 @@ packaged in several formats that make running it straightforward, even without
 installing anything.
 
 ```sh
-npx @thumbrella/server thumb my_cool_video.mp4 my_cool_thumbnail.jpeg
+npx @thumbrella/server thumb my_video.mp4 my_thumbnail.jpeg
 ```
 
 ### Is caching supported?
 
 The HTTP protocol has excellent standards for cache control. Thumbrella takes
-advantage of all of these. Both servers and client libraries can optionally
-store thumbnail results in persistent caches.
+advantage of these. Both servers and client libraries can optionally store
+thumbnail results in persistent caches. Caching at both levels is the primary
+way Thumbrella is fast and efficient. 
 
 The server handles HTTP headers like `Cache-Control`, `ETag`, and
-Last-Modified`.
+`Last-Modified`. The returned [Result](/docs/client/#result) structure contains
+a `cache` value that encodes everything the server needs to know about caching.
+See more details in the [server caching](/docs/server/#caching) section.
 
-Caching at both levels is the primary way Thumbrella is fast and efficient. When
-using Thumbrella Cloud, cached results do not count against quota and usage.
+When using Thumbrella Cloud, cached results do not count against quota and usage.
 
-The returned [Result](/docs/client/#result) structure contains a `cache` value
-when encodes everything the server needs to know about caching. See more details
-in the [server caching](/docs/server/#caching) section.
 
 ### Do I need a client library, or can I use HTTP directly?
 
@@ -87,7 +86,7 @@ but the core API works with any HTTP tool.
 
 Thumbnails are JPEG images, typically **5 KB to 10 KB** each with a fixed
 resolution of 250x200. Quality is tuned for fast loading and visual
-recognizability, they are low quality.
+recognizability, they are low quality. Each thumbnail is approximately 5-10 kb.
 
 You cannot customize the resolution, format, or compression level. The output is
 opinionated and consistent by design. The 
@@ -96,11 +95,12 @@ resulting thumbnail image.
 
 ### How fast is it?
 
-For cached results: **instant** (no network round-trip needed if the client
-cache is warm). For fresh renders on Thumbrella Cloud: typically under **500
-ms** for images, most videos thumbnail in under one second. Complex 3D renders
-can take longer. The [demo gallery](https://demo.thumbrella.dev) shows render
-times and performance for a variety of files.
+For cached results the thumbnails can be **instant** (no network round-trip
+needed if the client cache is warm). For fresh renders on Thumbrella Cloud:
+typically under **500 ms** for images, most videos thumbnail in under one
+second. Complex 3D renders can take longer. The [demo
+gallery](https://demo.thumbrella.dev) shows render times and performance for a
+variety of files.
 
 ### Can I use Thumbrella in a commercial product?
 
@@ -111,34 +111,41 @@ server, fork the code, or use Thumbrella Cloud in a paid product.
 
 ### Does Thumbrella support authentication for private servers?
 
-Yes. Set a [handshake secret](/docs/server/#handshake) on your self-hosted
-server, and clients must include it in every request. For Thumbrella Cloud, your
-[auth token](/docs/cloud/#auth-tokens) authenticates you. The server itself
-fetches remote URLs, if your media requires HTTP authentication, include
-credentials in the URL.
+When running your own server, set a [handshake secret](/docs/server/#handshake),
+to restrict your server to known clients. For Thumbrella Cloud, your [auth
+token](/docs/cloud/#auth-tokens) authenticates each request. 
 
-### What happens when I hit my rate limit?
+The Thumbrella server will make regular HTTP requests using the media urls
+provided. There is no way to provide custom HTTP headers or authentication
+in the requested media URLs.
+
+### What happens when I hit my Cloud rate limit?
 
 When a [Cloud account](/docs/cloud/#limits) reaches its daily or hourly
-limit, the server continues to return results, but thumbnails are replaced
-with placeholder images instead of rendered content. Cached results continue
-to work normally. The `status` field in the result will indicate the state.
-Your application does not need special failure handling; the shape of every
-response is the same.
+limit, the server continues to return valid results. Thumbnails are limited
+to placeholder images instead of rendered content. Cached results continue
+to work normally. 
+
+The `status` and `message` fields can help identify requests that are restricted
+by the account limits. Your application does not need special failure handling;
+the shape of every response is the same, whether limited or not.
+
+At a further point, extensive use beyond these limits will result in 
+status `429 Too Many Requests`.
 
 ### Can I run Thumbrella behind a reverse proxy?
 
 Yes. The server binds to a single port (default `3114`) and works well behind
 [nginx](https://nginx.org), [Caddy](https://caddyserver.com), or any HTTP
 reverse proxy. Set `TBR_PORT` to change the listen port. There are no
-WebSocket or long-poll requirements, it's plain HTTP.
+WebSocket or long-poll requirements, it uses only plain HTTP.
 
 ### Does Thumbrella handle animated images?
 
-Thumbnails are always single, still JPEGs. Thumbrella does handle animated GIFs, 
-video files, and other animated formats like APNG. When handling video formats
-Thumbrella will select a single representative frame. Thumbrella is a thumbnail 
-service, not a media transcoder or optimizer.
+Thumbrella's results are always single, still JPEGs. Thumbrella does handle
+animated GIFs, video files, and other animated formats like APNG. When handling
+video formats Thumbrella will select a single representative frame. Thumbrella
+is a thumbnail service, not a media transcoder or optimizer.
 
 ### Where do I report bugs or request features?
 
@@ -158,6 +165,6 @@ Use the url as a connect string for any client:
 
 ```bash
 export TBR_CONNECT=https://demo.thumbrella.dev
-npx @thumbrella/server thumb https://demo.thumbrella.dev/media/neon-block.png out.jpg
+npx tsx typescript/examples/basic.ts https://demo.thumbrella.dev/media/neon-block.png
 ```
 
