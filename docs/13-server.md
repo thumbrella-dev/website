@@ -63,16 +63,41 @@ server can be further tuned with these.
 |---|---|---|
 | `TBR_PORT` | `3114` | The port the server will listen on. |
 | `TBR_LOG` | `standard` | A level of stdout reporting the server makes. (`standard` `minimal` `full`) |
-| `TBR_ALLOW_LOCAL` | `0` | Boolean that allows file paths or localhost URLs. (`0` `1` `false` `true`) |
+| `TBR_LOCAL` | `0` | Boolean that allows file paths or localhost URLs. (`0` `1` `false` `true`) |
+| `TBR_CACHE` | `mem:100mb` | Cache backend spec - chain links with `+` (`none`, `mem:size`, `sqlite:path[,size]`, `cloud:token`). |
+| `TBR_PIN` | `604800` | (7 days) The TTL for pin urls, or `0` to disable.
 | `TBR_HANDSHAKE` | <none> | Private token required as a custom HTTP header on every request. |
-| `TBR_TRACE` | <none> | File path to append more detailed logging output. |
-| `TBR_CACHE` | `mem:` (100 MB) | Cache backend spec - chain links with `+` (`none`, `mem:size`, `sqlite:path[,size]`, `cloud:connect`). |
+| `TBR_TRACE` | <none> | Trace sink `ndjson:<path>` to append more detailed logging output. |
 | `TBR_SCRATCH` | `$TMP/thumbrella` | A location on disk to download temporary files into. |
 | `TBR_TIER2` | <none> | Connection string to a separate Thumbrella server for tier2. |
 | `TBR_TIER3` | <none> | Connection string to a separate Thumbrella server for tier3. |
 
 Be aware that some of these settings may not make sense or even break things
 inside the docker environment.
+
+### Filesystem Paths
+
+Paths in `TBR_SCRATCH`, `TBR_TRACE=ndjson:<path>`, and
+`TBR_CACHE=sqlite:<path>[,size]` support `~` and `~/...` for the current
+user's home, plus `$VAR` and `${VAR}` for environment variables. Windows
+also supports `%VAR%` and `~\...`. Unset variables, malformed `${VAR}`
+references, and empty expanded paths produce configuration errors instead
+of silently creating files with literal variable names.
+
+Use `$$` for a literal dollar sign, and `%%` for a literal percent sign on
+Windows. Expansion is single-pass, without shell execution or recursive
+substitution. Relative paths stay relative, and expansion does not require
+the file to exist. Cloud tokens, handoff URLs, and media request URLs are
+not expanded. Expanded values containing `+` or `,` remain part of the
+SQLite filename, not additional cache directives.
+
+For example, quote values to keep your shell from expanding them first:
+
+```sh
+export TBR_SCRATCH='${DATA_DIR}/thumbrella'
+export TBR_TRACE='ndjson:~/trace.ndjson'
+export TBR_CACHE='mem:100mb+sqlite:${DATA_DIR}/cache.db,1gb'
+```
 
 
 ### Internal Variables
@@ -203,6 +228,39 @@ It is possible for this cache value to be `null` when the remote server provides
 no caching information.
 
 
+## Pins
+
+Pins are temporary, shareable thumbnail URLs for HTML images, rich-text previews,
+or generated reports, not permanent image hosting. Results return the path in
+the `pin` field, typically `pin/<opaque-id>.jpeg`; resolve it against the server's
+base URL. The field can be `null` if pinning is disabled or no thumbnail is available.
+
+A pin serves only the thumbnail JPEG, without a token or handshake. Anyone with
+the URL can view it, so it is a shareable link, not an access-controlled resource.
+It does not expose your API token, source URL, original file, or result metadata.
+
+Pins share data with the thumbnail cache and extend retention beyond normal cache
+expiration. Viewing a pin neither fetches the source nor regenerates the thumbnail.
+If a media URL changes content, its pinned image is updated when a new thumbnail
+is generated for that media. A pin is not an immutable snapshot.
+
+The server attempts to reuse the same pin URL for repeated thumbnail requests,
+which can extend its lifetime. Viewing the pin does not renew it. On self-hosted
+servers, `TBR_PIN` sets retention; `0` disables pinning. In-memory pins are lost on
+restart; a persistent cache can retain both thumbnails and their pin URLs.
+
+Pins can expire or disappear when cache data is evicted or cleared. A recognized
+pin without a thumbnail redirects to a placeholder image. Placeholder results
+can also have pins, so a pin does not guarantee a real thumbnail. Keep your own
+copy if you need a durable image.
+
+Pin requests have a small minimum response time to discourage scraping and URL
+guessing. Use the regular API for thumbnail generation, batches, and metadata.
+
+Cloud pin lifetime follows the account's maximum cache TTL. The **Disable pins**
+token limit prevents creating or refreshing pins. Disabling pinning or rotating
+a token does not delete existing pins; they remain usable while retained.
+
 ## Troubleshooting
 
 If the server fails to start or behaves unexpectedly, run the `check`
@@ -221,7 +279,7 @@ Common issues and solutions:
 | Rejected requests | Missing [handshake](#handshake) | Include handshake in client connect string |
 | Missing formats | External tools not installed | Install `ffmpeg`, `f3d`, etc.; run `thumbrella formats` |
 | Repeated rerendering | Default cache is small | Set `TBR_CACHE=mem:200mb` for a larger memory cache. Also consider `sqlite:` to make the cache persistent. |
-| File paths blocked | Configuration not allowed by default | Set `TBR_ALLOW_LOCAL=1` to allow `file://` URLs |
+| File paths blocked | Configuration not allowed by default | Set `TBR_LOCAL=1` to allow `file://` URLs |
 
 A running server can be checked by testing the `/health` endpoint:
 
@@ -391,4 +449,3 @@ git clone https://github.com/thumbrella-dev/thumbrella && cd thumbrella
 bash ffs/build-linux.sh  (or `powershell -File ffs/build-windows.ps1` on Win)
 cargo run --release
 ```
-

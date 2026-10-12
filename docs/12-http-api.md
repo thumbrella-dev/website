@@ -38,9 +38,9 @@ curl http://localhost:3114/thumb.jpeg \
 
 **Response**
 
-- `200 OK` — JPEG thumbnail in the response body
-- `4XX` — Invalid request (missing URL, bad handshake, etc.)
-- `5XX` — Server error
+- `200 OK` - JPEG thumbnail in the response body
+- `4XX` - Invalid request (missing URL, bad handshake, etc.)
+- `5XX` - Server error
 
 This endpoint is useful for testing and simple integrations. It does not
 support client-side caching or batch requests. For those features, use
@@ -51,10 +51,9 @@ support client-side caching or batch requests. For those features, use
 If the server requires a handshake token, pass it as a header:
 
 ```bash
-curl http://localhost:3114/thumb.jpeg \
+curl -OG http://localhost:3114/thumb.jpeg \
   --data-urlencode "url=https://demo.thumbrella.dev/media/game-level.png" \
-  -H "x-tbr-handshake: wafflecones" \
-  --output thumb.jpg
+  --header "x-tbr-handshake: wafflecones"
 ```
 
 ### `POST /batch`
@@ -64,16 +63,15 @@ multiple URLs and returns thumbnails for each. Supports both batch and
 streaming response modes.
 
 The server accepts at most **12 items** per request. Items beyond the
-limit are returned with `status: "batchlimit"` — clients should split
+limit are returned with `status: "batchlimit"` - clients should split
 larger batches across multiple requests. The request body is also capped
 at **256 KB**; oversized payloads receive an immediate `413`.
 
 **Request**
 
 ```bash
-curl -s http://localhost:3114/batch \
-     -H "Content-Type: application/json" \
-     -d '{"items": [{"url": "https://demo.thumbrella.dev/media/golden-gate.exr"}]}'
+curl --silent http://localhost:3114/batch \
+     --json '{"items": [{"url": "https://demo.thumbrella.dev/media/golden-gate.exr"}]}'
 ```
 
 **Request body**
@@ -103,10 +101,8 @@ and returns them as a single JSON array after every thumbnail has completed.
 Results are returned in the same order as the requested URLs.
 
 ```bash
-curl -s http://localhost:3114/batch \
-     -H "Content-Type: application/json" \
-     -H "Accept: application/json" \
-     -d '{"items": [{"url": "https://demo.thumbrella.dev/media/photo.jpg"}]}'
+curl --silent http://localhost:3114/batch \
+     --json '{"items": [{"url": "https://demo.thumbrella.dev/media/photo.jpg"}]}'
 ```
 
 ```json
@@ -134,10 +130,9 @@ newline-delimited JSON. Each line is a complete result object. Results arrive
 as soon as they are ready, in arbitrary order.
 
 ```bash
-curl -s http://localhost:3114/batch \
-     -H "Content-Type: application/json" \
-     -H "Accept: application/x-ndjson" \
-     -d '{"items": [{"url": "https://demo.thumbrella.dev/media/video.mp4"}]}'
+curl --silent --no-buffer http://localhost:3114/batch \
+     --header "Accept: application/x-ndjson" \
+     --json '{"items": [{"url": "https://demo.thumbrella.dev/media/video.mp4"}]}'
 ```
 
 ```
@@ -147,9 +142,9 @@ curl -s http://localhost:3114/batch \
 
 Streaming mode provides two additional features:
 
-1. **Immediate results** — Each thumbnail is returned the moment it completes,
+1. **Immediate results** - Each thumbnail is returned the moment it completes,
    rather than waiting for all thumbnails to finish.
-2. **Intermediate results** — The server may send intermediate results with
+2. **Intermediate results** - The server may send intermediate results with
    `status: "intermediate"` before the final thumbnail is ready. These contain
    placeholder images or quick previews.
 
@@ -177,23 +172,27 @@ itself. An inner `media` field describes the thumbnail and its metadata.
 | `duration` | number | Wall-clock seconds to produce this result (fractional, e.g. `0.15`). |
 | `downloadSize` | number | Bytes fetched from the upstream source. |
 | `httpStatus` | number | HTTP status returned by the upstream source, if fetched. |
+| `pin` | url | Optional relative url for a semi persistent reference to the thumbnail. |
 | `media` | object | The thumbnail and its metadata. `null` on total failure. |
 
 The `source` field describes how the thumbnail was produced:
 
-- `render` — A fresh thumbnail was generated.
-- `shortcut` — An embedded thumbnail inside the source file was used (common for video and audio).
-- `cache` — The response came from a cache without re-rendering.
-- `not_modified` — The client provided a cache token and the server confirmed the cached result is still valid.
-- `fallback` — A fallback icon was used because the source could not be processed.
-- `placeholder` — A generic placeholder icon was used.
+- `render` - A fresh thumbnail was generated.
+- `shortcut` - An embedded thumbnail inside the source file was used (common for video and audio).
+- `cache` - The response came from a cache without re-rendering.
+- `not_modified` - The client provided a cache token and the server confirmed the cached result is still valid.
+- `fallback` - A fallback icon was used because the source could not be processed.
+- `placeholder` - A generic placeholder icon was used.
 
+The `pin` url is a relative url, when defined by the server. Be aware that all
+client libraries will attach this to the url of the thumbnail request, making
+it a valid, absolute url. See the [pin](../server/#pins) section for details on
+how to use these urls.
 
 ### Media fields
 
 The `media` object carries the stable, cacheable payload. Two results for the
 same file share the same `media`, so clients can compare fields to deduplicate.
-
 
 | Field | Type | Description |
 |---|---|---|
@@ -298,22 +297,22 @@ returns a 4XX status when the handshake is invalid.
 
 The API uses standard HTTP status codes:
 
-- `200 OK` — Request succeeded. The response body contains the thumbnail or result object.
-- `400 Bad Request` — Invalid request (missing URL, malformed JSON, etc.).
-- `401 Unauthorized` — Invalid or missing authentication token (Thumbrella Cloud).
-- `403 Forbidden` — Invalid handshake token.
-- `413 Payload Too Large` — Request body exceeds the 256 KB limit.
-- `429 Too Many Requests` — Rate limit exceeded.
-- `500 Internal Server Error` — Server error.
-- `503 Service Unavailable` — Server is temporarily overloaded.
+- `200 OK` - Request succeeded. The response body contains the thumbnail or result object.
+- `400 Bad Request` - Invalid request (missing URL, malformed JSON, etc.).
+- `401 Unauthorized` - Invalid or missing authentication token (Thumbrella Cloud).
+- `403 Forbidden` - Invalid handshake token.
+- `413 Payload Too Large` - Request body exceeds the 256 KB limit.
+- `429 Too Many Requests` - Rate limit exceeded.
+- `500 Internal Server Error` - Server error.
+- `503 Service Unavailable` - Server is temporarily overloaded.
 
 Every result object includes a `status` field that provides more detail:
 
-- `success` — Thumbnail generated successfully.
-- `failed` — The request failed (bad URL, unsupported format, etc.).
-- `overloaded` — The server is temporarily overloaded.
-- `intermediate` — An intermediate result (streaming mode only).
-- `batchlimit` — The batch exceeded the per-request limit of 12 items; resend in smaller batches.
+- `success` - Thumbnail generated successfully.
+- `failed` - The request failed (bad URL, unsupported format, etc.).
+- `overloaded` - The server is temporarily overloaded.
+- `intermediate` - An intermediate result (streaming mode only).
+- `batchlimit` - The batch exceeded the per-request limit of 12 items; resend in smaller batches.
 
 The `message` field contains a human-readable description of the failure, if
 any.
@@ -332,9 +331,8 @@ curl http://localhost:3114/thumb.jpeg \
 ### Batch request with curl
 
 ```bash
-curl -s http://localhost:3114/batch \
-     -H "Content-Type: application/json" \
-     -d '{
+curl --silent http://localhost:3114/batch \
+     --json '{
        "items": [
          {"url": "https://demo.thumbrella.dev/media/photo.jpg"},
          {"url": "https://demo.thumbrella.dev/media/video.mp4"}
@@ -345,10 +343,9 @@ curl -s http://localhost:3114/batch \
 ### Streaming with curl
 
 ```bash
-curl -s http://localhost:3114/batch \
-     -H "Content-Type: application/json" \
+curl --silent --no-buffer http://localhost:3114/batch \
      -H "Accept: application/x-ndjson" \
-     -d '{
+     --json '{
        "items": [
          {"url": "https://demo.thumbrella.dev/media/photo.jpg"},
          {"url": "https://demo.thumbrella.dev/media/video.mp4"}
@@ -391,6 +388,6 @@ console.log(result.status, result.media.kind);
 
 ## See Also
 
-- [Client Libraries](../client/) — Convenient wrappers with caching, streaming, and error handling
-- [Web Component](../components/) — Zero-config `<tbr-thumb>` custom element for browsers
-- [Server](../server/) — Server configuration, caching, and deployment
+- [Client Libraries](../client/) - Convenient wrappers with caching, streaming, and error handling
+- [Web Component](../components/) - Zero-config `<tbr-thumb>` custom element for browsers
+- [Server](../server/) - Server configuration, caching, and deployment

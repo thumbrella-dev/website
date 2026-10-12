@@ -338,6 +338,9 @@ The Result structure is split into two levels. The outer top level describes the
 operation itself. An inner `media` field describes data that comes from the
 remote media itself and the thumbnail. 
 
+Most of the result fields are optionally, and can be `null` values. This most
+likely happens when requests have failed or server features are disabled.
+
 | Field | Type | Description |
 |---|---|---|
 | `url` | string | The original URL that was requested. |
@@ -347,12 +350,16 @@ remote media itself and the thumbnail.
 | `duration` | number | Wall-clock seconds to produce this result (fractional, e.g. `0.15`). |
 | `downloadSize` | number | Bytes fetched from the upstream source. |
 | `httpStatus` | number | HTTP status returned by the upstream source, if fetched. |
+| `pin` | url | Optional url for a semi persistent reference to the thumbnail. |
 | `media` | object | The thumbnail and its metadata. `null` on total failure. |
 
 ## Media
 
 The `media` object carries the stable, cacheable payload. Two results for the
 same file share the same `media`, clients can compare fields to deduplicate.
+
+Fields in the media structure are not optional. If a result has a valid media
+in its result, then all fields will be populated.
 
 | Field | Type | Description |
 |---|---|---|

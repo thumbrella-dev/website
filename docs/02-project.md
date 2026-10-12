@@ -22,15 +22,15 @@ integrate into separate projects.
 #### Initial Goals
 
 * Strive for developer experience and flexible open source use cases
-* Browsers can only reliably render a handful of image formats
-* HTTP streams don't provide the random access needed by most thumbnail tools
-* Take advantage of the excellent caching definitions from HTTP
-* Create a standalone, static executable with as much functioanlity as possible
+* Support a wide and growing range of formats and media
+* Provide efficient random file access to decoders over HTTP requests
+* Take full advantage of HTTP caching headers
+* Create a standalone, static executable with as much functionality as possible
 * Configuration free, just run for quality results
-* Should work on Windows, MacOS, and Linux
+* Should work on Windows, MacOS, and Linux  __(MacOS still MIA)__
 * Create an architecture that allows astonishingly cheap hosting
 * Pass those savings on to customers and make a reliable free tier
-* Simple [HTTP](/docs/client/#http-thumbnail-api) API for the simple cases
+* Simple [HTTP](/docs/client/#http-thumbnail-api) API for all cases
 * Provide fantastic [client libraries](/docs/client/) that go even farther
 
 #### How It Compares
@@ -41,7 +41,7 @@ common alternatives:
 | Approach | Example | Thumbrella difference |
 |----------|---------|-----------------------|
 | Browser-only `<img>` | Standard HTML | Only supports ~5 image formats. No video, documents, or camera photos. |
-| Cloud image services | Imgix, Cloudinary | These are focused on images and producing high slow results, and generally 100x more expensive. |
+| Cloud image services | Imgix, Cloudinary | These are focused on images and producing high slow results, and generally 50x more expensive. |
 | Server-side `ffmpeg` scripts | Custom bash/python | Challenges to distribute, deploy, and integrate into hosted environments. |
 | Image libraries | Sharp, libvips, ImageMagick | Images only and inefficient on remote media. |
 | **Thumbrella** | | **Open source server + clients. One binary, 100+ formats, CDN-ready.** |
@@ -122,7 +122,7 @@ environment.
 
 Thumbrella is not a tool to generate compelling marketing and social
 media frames for videos. It merely picks a representative frame from the
-video to help represent its contents.
+video.
 
 
 ## GitHub Repositories

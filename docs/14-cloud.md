@@ -45,54 +45,49 @@ token is sent as a bearer authentication HTTP Header. With
 `curl` that will look like this.
 
 ```bash
-curl -G "https://cloud.thumbrella.dev/thumb.jpeg" \
+curl -OG "https://cloud.thumbrella.dev/thumb.jpeg" \
   --data-urlencode "url=https://demo.thumbrella.dev/media/golden-gate.exr" \
-  --header "Authorization: Bearer tbr_e_3QnzBcWx7KpRmYT2000example" \
-  --output thumb.jpeg
+  --header "Authorization: Bearer tbr_e_3QnzBcWx7KpRmYT2000example"
 ```
 
 ### Token Limitations
 
-Each token has a set of limitations that can be edited at any time on the
-user dashboard. These limitations restrict how the token can be used, making
-it less risky to put into publishable locations, like an interactive 
-web application.
+Token limits restrict how a token can be used, helping reduce the risk of
+publishing it in an interactive web application. The dashboard also breaks down
+usage by token so you can see which tokens are active.
 
-On the dashboard, the usage and quota information is divided into each token,
-to allow simpler tracking of which tokens are being actively used.
+Manage limits on the [user dashboard](/account). Choose **Add limit** next to a
+token to add an editable panel. Only active limits are shown; use a panel's close
+icon to remove it. Choose **Save** to apply your changes or **Cancel** to discard
+them. Clearing a text field leaves its panel visible until you save; an empty
+field disables that filter or setting.
 
-These are editable on the [user dashboard](/account). Each token has a 
-limitations dropdown that allows editing and committeng each of these fields.
-
-- **Origin Regex** When set, this is a regular expression that requires 
-  matching the http header `Origin`. This is reliably set by web browsers,
-  but be aware can be easily spoofed by direct http clients. Examples would
-  be string like `mydomain\.com$`. The regular expression is matched
-  case insensitively.
-- **Cors** This is the header value used for thumbnail requests. This is
-  respected by well behaved browsers to prevent using Thumbrella resources
-  from websites not allowed. Be aware this is easy to ignore for direct
-  HTTP clients. If empty this is equivalent to `*` which allows any browser
-  to generate thumbnails from any website.
-- **Media Url Regex Include** and **Media Url Regex Include**. This restricts
-  the media urls that can be used to generate thumbnails. There is a separate
-  *include* and *exclude* regular expression. If either is unset they will not
-  prevent any urls from used. These two fields can be set indenpendently, or
-  both combined. Examples would be like `mydomain\.com` or `/gallery`.
-  The regular expression is matched case insensitive.
-- **Quota** restricts the token to use only a percentage of the accounts
-  quota limits. Each token defaults to 100. Be aware that the account quota
-  is based on the combined usage of all tokens. But this setting allows a
-  single token to use no more than a fixed percentage of the account's total
-  data.
-- **Expires** allows a token to automatically expire after a given date.
-  This value can be set, cleared, or changed at any time. If the expiration
-  date passes, the token can reenabled and a new expiration set.
-- **Throttle** all accounts start to throttle requests when there are surges
-  of activity within a short period. Slowing down these requests assists
-  runaway clients from absorbing all the quota in a short period of time.
-  Enabling this value will start to throttle requests using this token at
-  a more aggressive level than regular free account limits.
+- **Origin Filter** requires the HTTP `Origin` header to match a
+  case-insensitive regular expression, such as `mydomain\.com$`. Browsers set
+  this header, but direct HTTP clients can spoof it.
+- **CORS** sets the `Access-Control-Allow-Origin` response header to an origin,
+  such as `https://example.com`, or `*` to allow any origin. Browsers enforce
+  CORS; direct HTTP clients do not. Removing this limit or leaving it empty
+  restores the default `*`.
+- **Media URL Filter** has **Include** and **Exclude** fields in one panel.
+  URLs must match the include pattern and must not match the exclude pattern.
+  Both use case-insensitive regular expressions, such as `mydomain\.com` or
+  `/gallery`. Either field can be left empty; exclusions take priority.
+  Removing the panel clears both filters.
+- **Quota** caps the token at a percentage of the account's quota limits.
+  Account usage still combines all tokens; this does not reserve quota for
+  one token. Removing this limit restores 100%.
+- **Expires** automatically disables the token on a chosen date. Use the
+  calendar or a relative-date shortcut to set it. To stop expiration, remove
+  the limit. An expired token can be used again by changing or removing its
+  expiration date.
+- **Disable pins** prevents the token from creating or refreshing pinned cache
+  entries. New tokens allow pins by default. Removing this limit allows pinning
+  again; disabling pinning does not delete existing pins. Pin lifetime is
+  controlled by the account's maximum cache TTL, not the token.
+- **Throttle requests** applies stricter throttling than the regular free
+  account limits, helping slow runaway clients before they consume the quota.
+  Add or remove this panel to enable or disable the stricter throttling.
 
 
 ## Usage

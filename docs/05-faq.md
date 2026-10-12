@@ -136,16 +136,16 @@ status `429 Too Many Requests`.
 ### Can I run Thumbrella behind a reverse proxy?
 
 Yes. The server binds to a single port (default `3114`) and works well behind
-[nginx](https://nginx.org), [Caddy](https://caddyserver.com), or any HTTP
+[nginx](https://nginx.org), [caddy](https://caddyserver.com), or any HTTP
 reverse proxy. Set `TBR_PORT` to change the listen port. There are no
 WebSocket or long-poll requirements, it uses only plain HTTP.
 
 ### Does Thumbrella handle animated images?
 
 Thumbrella's results are always single, still JPEGs. Thumbrella does handle
-animated GIFs, video files, and other animated formats like APNG. When handling
-video formats Thumbrella will select a single representative frame. Thumbrella
-is a thumbnail service, not a media transcoder or optimizer.
+animated GIFs, video files, and other animated formats. When handling video
+formats Thumbrella will select a single representative frame. Thumbrella is a
+thumbnail service, not a media transcoder or optimizer.
 
 ### Where do I report bugs or request features?
 
