@@ -10,7 +10,7 @@ and simple. Find the prepackaged option that best fits your environment.
 npx --yes @thumbrella/server serve
 
 # Docker container
-docker run -it --name tbr --publish 3114:3114 --rm thumbrella/server
+docker run --name tbr --publish 3114:3114 --rm thumbrella/server
 ```
 
 By default the server will listen on port `3114`. This can be override by 
@@ -19,9 +19,9 @@ settings also managed by environment variables. These can be validated
 by running `thumbrella check` for a simple report and diagnostics.
 
 Binaries are distributed through 
-[Github Releases](github.com/thumbrella-dev/thumbrella/releases/latest). 
+[Github Releases](https://github.com/thumbrella-dev/thumbrella/releases/latest). 
 The attested archives contain the portable and static executable.
 
-See the [Server Documentation](https://thumbrella.dev/docs/server/) 
-for more commands and configurations. The server is also quite simple to
-compile for yourself.
+See the [Server Installation](/docs/server/#install) for managing with `winget`,
+`cargo`, and other package managers. The server is also quite simple to compile
+for yourself.

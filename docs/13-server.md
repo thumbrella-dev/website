@@ -4,27 +4,15 @@ description: Self hosting Thumbrella servers
 slug: docs/server
 ---
 
-The Thumbrella executable is the server. It can be downloaded directly from
-[releases](https://github.com/thumbrella-dev/thumbrella/releases) or built from
-source. For most users, the easiest path is to run it through a prebuilt
-package. The server runs on Windows, macOS, and Linux, or anywhere
-[Rust](https://rust-lang.org) can produce a runnable binary.
+The Thumbrella is a self contained executable binary. It is built for Windows
+and Linux machines and published through a variety of packaging systems. The
+[Docker section](#docker) provides an excellent way to run the server
+on even more platforms.
 
-```bash
-# Run with npx (Node)
-npx @thumbrella/server serve
-
-# Run with uvx (Python)
-uvx thumbrella-server serve
-
-# Run with Docker
-docker run -p 3114:3114 -it --rm thumbrella/server
-
-# Run from source (Rust)
-git clone https://github.com/thumbrella-dev/thumbrella
-cd thumbrella
-cargo run serve
-```
+The server can be downloaded directly from [Github
+Releases](https://github.com/thumbrella-dev/thumbrella/releases) or built from
+source. Read the [installers section](#installation) to learn how to manage your
+own installation. 
 
 
 ## Command Line
@@ -51,6 +39,83 @@ web server. Any subcommand accepts `--help` for further details.
 - `thumbrella version` Shows a quick message describing the version information
   for the build.
 - `thumbrella help` Shows a quick summary of the various subcommands available.
+
+
+## Installation
+
+There are a handful of ways to install and maintain the server for each
+platform. This simplest is downloading an archive directly from the [Github
+Releases](https://github.com/thumbrella-dev/thumbrella/releases). These will
+always be the most up to date, but may not be convenient to install and 
+maintain.
+
+Currently only Windows and Linux builds are provided for `x64` cpus. The 
+[Docker](#docker) image is an excellent way to run and manage
+Thumbrella on more platforms.
+
+See the [Attestation section](#attestation) for details on how to validate
+the authenticity of your executables.
+
+
+### Winget
+
+Windows includes an excellent packaging system through 
+[winget](https://learn.microsoft.com/en-us/windows/package-manager/). The 
+Thumbrella version through `winget` may lag slightly behind other releases, 
+as it goes through additional validation steps.
+
+```sh
+winget install Thumbrella.Server
+thumbrella version
+thumbrella serve
+```
+
+### Npm
+
+The packaged server binaries are also distributed through 
+[Npmjs](https://npmjs.com). This makes running a server trivial on Windows and 
+Linux where any version of Node is ready.
+
+```sh
+npx --yes @thumbrella/server version
+npx @thumbrella/server serve
+```
+
+### Cargo binstall
+
+The excellent [binstall](https://github.com/cargo-bins/cargo-binstall) plugin
+for Rust's Cargo allows managing packages through Cargo without the time 
+consuming builds.
+
+The Thumbrella server is not listed on [crates.io](https://crates.io), but
+can be installed directly through it's git repository. This works on both
+Windows and Linux.
+
+```sh
+cargo binstall thumbrella --git https://github.com/thumbrella-dev/thumbrella
+thumbrella version
+thumbrella serve
+```
+
+### Build yourself
+
+The Rust server is designed to be simple to build from source. 
+
+The process isn't quite automatic because a static build of parts of ffmpeg is 
+included in the process, and will not be built automatically. A user can refer
+to an existing build of ffmpeg by setting the `$FFMPEG_DIR` directory. 
+Otherwise, the Thumbrella build process will guide the user through creating
+the needed code. Be aware that building static ffmpeg code can take 10-20
+minutes depending on computer.
+
+```sh
+git clone https://github.com/thumbrella-dev/thumbrella
+cd thumbrella
+bash ffs/build-linux.sh                  # on Linux
+powershell -File ffs/build-windows.ps1`  # on Windows
+cargo run version                        
+cargo run serve                          # Optionally `run --release`
+```
 
 
 ## Configuration
@@ -288,19 +353,19 @@ curl http://localhost:3114/health
 # {"status": "ok", "thumbrella": 1}
 ```
 
-## Running in Docker
+## Docker
 
 The server is published as a container image. It listens on `3114` and binds
 to `0.0.0.0`, so publish the port to reach it from the host.
 
 ```bash
-docker run -p 3114:3114 --rm thumbrella/server
+docker run --publish 3114:3114 --rm --name tbr thumbrella/server
 ```
 
 ### Base image
 
 The Thumbrella Docker image is built on the excellent [LinuxServer.io
-Ffmpeg](lscr.io/linuxserver/ffmpeg:latest) docker image. This provides a robust
+Ffmpeg](https://docs.linuxserver.io/images/docker-ffmpeg/) docker image. This provides a robust
 Linux environment with a features ffmpeg build. Thumbrella will use this to take
 advantage of all the formats that ffmpeg provides. 
 
@@ -329,7 +394,11 @@ All the other server settings are viable with a Docker hosted container.
 Continue with the [hybrid cloud](#hybrid-cloud), [handshake](#handshake),
 and other sections on this page.
 
-### Sponsors
+See the output from `thumbrella service compose` for a helpful configuration
+file with these options, helpful comments and more.
+
+
+### Sponsors Docker Image
 
 Thumbrella [sponsors](sponsors) get access to a fully functioning and supported
 Docker image. This comes with full support for all Thumbrella tools and
@@ -438,14 +507,19 @@ Add a `--write <path>` argument to store the configuration in an output file
 path.
 
 
-## Build yourself
+## Attestation
 
-The Rust server is designed to be simple to build from source. The user will
-need to either set `$FFMPEG_DIR` to an ffmpeg build path, or use one of the
-provided ffmpeg build scripts for your platform.
+Wherever you get your Thumbrella binaries from, you can always validate if
+an executable authentically comes from the Thumbrella project. This ensures
+nothing has been tampered with by a third party.
+
+The Github cli tool, `gh` can be used for this. Potentially use your platform's
+`which` or `where` tool to locate the thumbrella executable.
 
 ```sh
-git clone https://github.com/thumbrella-dev/thumbrella && cd thumbrella
-bash ffs/build-linux.sh  (or `powershell -File ffs/build-windows.ps1` on Win)
-cargo run --release
+gh attestation verify $HOME/.cargo/bin/thumbrella --owner thumbrella-dev
 ```
+
+Look for the highlighted `✓ Verification succeeded!` message, along with
+details about why Github believes it generated this binary specifically for
+the Thumbrella project.
