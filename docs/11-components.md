@@ -12,7 +12,7 @@ you would use an `<img>`.
 
 ```html
 <script type="module">
-  import { tbrSetup } from "https://js.thumbrella.dev/1/tbr.js";
+  import { tbrSetup } from "https://js.thumbrella.dev/2/tbr.js";
   tbrSetup("tbr_e_3QnzBcWx7KpRmYT2000example");
 </script>
 
@@ -36,7 +36,7 @@ standard modern approach and works in all current browsers.
 
 ```html
 <script type="module">
-  import { tbrSetup } from "https://js.thumbrella.dev/1/tbr.js";
+  import { tbrSetup } from "https://js.thumbrella.dev/2/tbr.js";
   tbrSetup("tbr_e_3QnzBcWx7KpRmYT2000example");
 </script>
 
