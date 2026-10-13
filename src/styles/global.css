@@ -263,9 +263,38 @@ pre {
     image-rendering: crisp-edges;
 }
 
+.hero__headings {
+    min-width: 0;
+}
+
+.hero h1,
+.hero h2 {
+    font-family: inherit;
+    text-shadow: 0 -1px 0 #fffef9;
+}
+
+h1 .hero__hash {
+    margin-right: -0.2em;
+}
+
+.hero__hash {
+    font-weight: 100;
+    opacity: 70%;
+    letter-spacing: 0;
+}
+
 .hero h1 {
-    font-size: clamp(1.8rem, 4vw, 3.2rem);
-    margin: 0;
+    font-size: clamp(2.16rem, 4.8vw, 3.84rem);
+    color: #c8bfaa;
+    letter-spacing: 0.09em;
+}
+
+.hero h2 {
+    margin-top: 0.35rem;
+    font-size: clamp(1.2rem, 3vw, 2.4rem);
+    color: #aba18b;
+    letter-spacing: 0.05em;
+    text-shadow: 0 -1px 0 #e1ded1;
 }
 
 .button {
@@ -316,14 +345,6 @@ pre {
 .footer__inner a:hover {
     color: rgb(208, 142, 239);
     text-decoration: underline;
-}
-
-/* HERO gradient text */
-.hero__any {
-    background: linear-gradient(90deg, var(--accent-strong), #c8c0ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
 
 /*  CAPS GRID (homepage what-section) */
