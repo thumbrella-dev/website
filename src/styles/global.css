@@ -1,5 +1,6 @@
 :root {
     --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
     --sl-nav-height: 6rem;
     --bg: #252028;
     --bg-elevated: #302a38;
@@ -36,7 +37,7 @@ body {
         radial-gradient(ellipse at 90% 95%,  rgba(200, 149, 78, 0.13) 0%, transparent 28%),
         linear-gradient(175deg, #20192e 0%, #252028 40%, #1e1c22 100%);
     color: var(--text);
-    font-family: 'IBM Plex Mono', 'JetBrains Mono', 'Fira Code', monospace;
+    font-family: var(--font-mono);
     line-height: 1.6;
 }
 
@@ -293,7 +294,7 @@ h1 .hero__hash {
     font-size: clamp(1.2rem, 3vw, 2.4rem);
     color: #aba18b;
     letter-spacing: 0.05em;
-    text-shadow: 0 -1px 0 #e1ded1;
+    text-shadow: 0 -1px 0 #d6d3c3;
 }
 
 .button {
@@ -429,7 +430,7 @@ h1 .hero__hash {
     border: 1px solid rgba(124, 92, 191, 0.3);
     border-radius: 4px;
     /* font-size: 0.72em; */
-    font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+    font-family: var(--font-mono);
     font-weight: 600;
     color: #a98cd6;
     vertical-align: middle;
@@ -728,7 +729,7 @@ h1 .hero__hash {
     padding: 0.85rem 1rem;
     margin: 0 0 0.6rem;
     overflow-x: auto;
-    font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+    font-family: var(--font-mono);
     font-size: 0.82rem;
     line-height: 1.65;
 }

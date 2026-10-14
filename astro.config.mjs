@@ -27,6 +27,15 @@ export default defineConfig({
       logo: { src: './public/thumbrella.png', alt: 'thumbrella.dev' },
       head: [
         { tag: 'link', attrs: { rel: 'icon', href: '/favicon.png'} },
+        { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
+        { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' } },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'stylesheet',
+            href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap',
+          },
+        },
       ],
       components: {
         Header: './src/components/starlight/Header.astro',

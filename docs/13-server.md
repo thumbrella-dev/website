@@ -425,6 +425,9 @@ on Thumbrella Cloud to handle only these more complicated and optional
 formats. This is done by setting the `TBR_TIER3` environment variable to a
 private token for your account. 
 
+Bare tokens use `https://cloud.thumbrella.dev`, just like setting `TBR_CONNECT`
+on clients. Run `thumbrella check` to validate these connections. 
+
 ```bash
 export TBR_CACHE=cloud:tbr_e_3QnzBcWx7KpRmYT2000example
 export TBR_TIER3=tbr_e_3QnzBcWx7KpRmYT2000example
@@ -449,6 +452,9 @@ are detected and `thumbrella formats` to see the resulting format coverage.
 | `pdftoppm` (Poppler) | PDF first-page rasterization | `pdf` |
 | `pdfinfo` (Poppler) | PDF page count metadata | Used alongside `pdftoppm` |
 | `xvfb-run` / X display | Headless display server for `f3d` | Required for geometry rendering |
+
+Arithmetic-coded JPEGs need `gm` or a configured handoff; FFmpeg's JPEG
+decoder does not support this variant, even when ordinary JPEGs work locally.
 
 The display server is a runtime requirement rather than a format tool. `f3d`
 will not render without a `DISPLAY` (or `WAYLAND_DISPLAY`) in the environment.
