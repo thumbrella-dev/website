@@ -1,6 +1,6 @@
 {
   "name": "thumbrella-web",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Project website and documentation for Thumbrella thumbnail platform.",
   "homepage": "https://thumbrella.dev",
   "repository": {
@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "astro dev",
     "dev:wrangler": "astro build && wrangler dev --no-bundle",
+    "build": "astro build --logLevel warn",
     "deploy": "astro build --logLevel warn && wrangler deploy"
   },
   "engines": {
