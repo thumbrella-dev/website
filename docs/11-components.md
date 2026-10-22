@@ -40,12 +40,13 @@ standard modern approach and works in all current browsers.
   tbrSetup("tbr_e_3QnzBcWx7KpRmYT2000example");
 </script>
 
-<tbr-thumb src="https://demo.thumbrella.dev/media/blue-scooter.fbx""></tbr-thumb>
+<tbr-thumb src="https://demo.thumbrella.dev/media/blue-scooter.fbx"></tbr-thumb>
 ```
 
-The `import` statement fetches the module, which registers the `<tbr-thumb>`
-custom element and exports `tbrSetup`. Call it once at the top of your page or
-app. Subsequent calls are no-ops.
+The `import` statement fetches the module and exports `tbrSetup`. Calling
+`tbrSetup` registers the `<tbr-thumb>` custom element. Call it at startup with
+your connect string; calling it again can change the connect string or cache
+stack.
 
 For projects that use a bundler, install the package and import from it:
 
@@ -77,7 +78,8 @@ tbrSetup({
 | Option | Type | Description |
 |---|---|---|
 | `connect` | string | Thumbrella connect string. A Cloud token, a server URL, or a full connect string with headers. |
-| `persist` | number \| boolean | Enable IndexedDB persistent cache. The value is the maximum size in MB (default 5 if `true`). Omit to disable. |
+| `caches` | `ClientCache[]` | Replace the global cache stack. Cache objects are shared by every client the page creates. |
+| `persist` | number \| boolean | Enable IndexedDB persistent cache. The value is the maximum size in MB (default 5 if `true`). Omit to leave persistence unchanged. |
 
 See the [connect string](../client/#connect) section in the client docs for the
 full connect string syntax.
@@ -93,48 +95,34 @@ except `src`.
 | Attribute | Description |
 |---|---|
 | `src` | The URL of the media to thumbnail. Works like `<img src>`. |
-| `connect` | Per-element connect string override. Use when a single page talks to multiple Thumbrella servers. |
-| `lazy` | Set to `"true"` to defer loading until the element scrolls into the viewport. |
 | `alt` | Accessible label. Shown during loading and used as the `alt` text on the internal `<img>`. |
 
 ```html
 <tbr-thumb
   src="https://demo.thumbrella.dev/media/apollo-exterior.glb"
   alt="3D model of a spaceship"
-  lazy="true"
   style="width: 300px;">
 </tbr-thumb>
 ```
 
-Changing the `src` attribute at any time cancels the in-flight request and
+Changing the `src` attribute at any time abandons the current request and
 starts a new one. The element returns to its loading state and the new
 thumbnail fades in when ready.
 
-### Connect resolution
+### Connect configuration
 
-Each element resolves its connect string in this order:
-
-1. Its own `connect` attribute, if present.
-2. The global connect string set by `tbrSetup()`.
-3. The `TBR_CONNECT` environment variable (if set on `window`).
-
-This makes it easy to set a global default and override it for specific
-elements that need a different server or authentication context.
+All `<tbr-thumb>` elements use the single page-wide client configured by
+`tbrSetup()`. There is no per-element connect attribute. To change servers,
+call `tbrSetup()` again; existing elements keep their current image and new
+requests use the updated client.
 
 ```html
 <script type="module">
-  import { tbrSetup } from "@thumbrella/client/element";
+  import { tbrSetup } from "https://js.thumbrella.dev/2/tbr.js";
   tbrSetup("tbr_e_3QnzBcWx7KpRmYT2000example");
 </script>
 
-<!-- Uses the global connect string -->
 <tbr-thumb src="https://demo.thumbrella.dev/media/stream-barn.mkv"></tbr-thumb>
-
-<!-- Overrides with a self-hosted server -->
-<tbr-thumb
-  src="https://internal.company.com/secret.pdf"
-  connect="https://tbr.internal.company.net,x-tbr-handshake=internal-secret">
-</tbr-thumb>
 ```
 
 
@@ -261,8 +249,10 @@ network call.
 
 ### Memory cache (default)
 
-By default, the component uses an in-memory cache that holds up to 500 entries
-with a 5-minute TTL. This is sufficient for most pages and requires no
+By default, the component uses an in-memory result cache that holds up to 256
+thumbnail results. Entries are evicted by the LRU limit; freshness comes from
+the server-provided cache token, so stale entries are revalidated rather than
+fetched blindly. This is sufficient for most pages and requires no
 configuration.
 
 ### Persistent cache (IndexedDB)
@@ -283,8 +273,8 @@ you pass `true` instead of a number.
 
 The persistent cache works alongside the memory cache. Lookups check the
 memory cache first, then fall back to IndexedDB. Both caches are keyed by the
-server-provided cache token, so they stay in sync with server-side caching
-automatically.
+canonical source URL; the server-provided cache token is used to revalidate
+stale entries.
 
 
 ## Error handling
@@ -301,28 +291,15 @@ displays a generic placeholder icon and applies the appropriate failure class.
 | Server is temporarily overloaded | `tbr-overloaded` | Placeholder icon |
 | Server is unreachable (network error, CORS, DNS) | `tbr-unavailable` | Placeholder icon |
 
-The placeholder icon is a small inline SVG embedded in the component. It is
-the same placeholder the server generates for unknown file types, so the
-visual experience is consistent whether the failure is client-side or
-server-side.
+The loading placeholder is a small inline SVG. Failed results fall back to the
+unavailable-placeholder image embedded in the client, or the server's own
+placeholder when one is returned.
 
 ### Retry on failure
 
-The component does not automatically retry failed requests. If you want to
-retry, listen for the `tbr:loaded` event and re-set the `src` attribute after
-a delay.
-
-```ts
-document.addEventListener("tbr:loaded", (e) => {
-  const { result } = e.detail;
-  if (result.status === "failed" || result.status === "overloaded") {
-    const el = e.target;
-    setTimeout(() => {
-      el.setAttribute("src", el.getAttribute("src")!);
-    }, 5000);
-  }
-});
-```
+The component does not automatically retry failed requests. Assigning a new
+`src` starts a fresh request; assigning the same value again does not, because
+the attribute has not changed.
 
 
 ## Examples
@@ -356,23 +333,10 @@ A responsive grid of thumbnails with hover effects.
 </div>
 ```
 
-### Lazy loading
-
-Defer thumbnail generation until the user scrolls near the element. Useful for
-long pages or infinite scroll layouts.
-
-```html
-<tbr-thumb
-  src="https://demo.thumbrella.dev/media/golden-gate.exr"
-  lazy="true"
-  style="width: 200px;">
-</tbr-thumb>
-```
-
 ### Dynamic source
 
 Change the `src` attribute at runtime to thumbnail a different URL. The
-component cancels the in-flight request and starts a new one.
+component abandons the current request and starts a new one.
 
 ```html
 <tbr-thumb id="preview" style="width: 300px;"></tbr-thumb>
@@ -409,15 +373,15 @@ document.addEventListener("tbr:loaded", (e) => {
 ## Comparison with client libraries
 
 The `<tbr-thumb>` component is a thin wrapper around the
-[TypeScript client library](../client/). It uses the same `Client` class
-internally, the same connect string format, and the same caching layer. The
-component adds:
+[TypeScript client library](../client/). It uses a page-wide `Client` and a
+shared request manager internally, the same connect string format, and the
+same caching layer. The component adds:
 
 - **Simple setup** — a single ES module import and `tbrSetup()` call
 - **Visual loading states** — shimmer, spinner, and fade-in transitions
 - **Automatic error handling** — placeholder icons for every failure mode
 - **Shadow DOM encapsulation** — styles don't leak in or out
-- **Lazy loading** — defer requests until the element is visible
+- **Shared batching** — requests from every element are coalesced into server batches
 
 If you need more control over the request lifecycle, batch multiple URLs, or
 use streaming responses, use the
