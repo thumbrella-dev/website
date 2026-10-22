@@ -201,7 +201,7 @@ same file share the same `media`, so clients can compare fields to deduplicate.
 | `kind` | string | Media category: `image`, `video`, `audio`, `document`, `vector`, `geometry`, `archive`, `text`, `binary`, or `unknown`. |
 | `extension` | string | Canonical file extension, no dot (e.g. `jpeg`, `png`, `pdf`). |
 | `mime` | string | Sniffed MIME type (e.g. `image/jpeg`). |
-| `fileSize` | number | `Content-Length` from the upstream server, or 0. |
+| `fileSize` | number | Size of the full media file, or 0. |
 | `placeholder` | string | Non-empty when the thumbnail is a fallback icon. Clients can compare this to deduplicate placeholder images. |
 | `cache` | string | Cache token for round-tripping in an encoded format. Empty means do not cache. |
 | `properties` | object | Format-specific metadata. See below. |

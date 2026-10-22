@@ -271,7 +271,6 @@ pre {
 .hero h1,
 .hero h2 {
     font-family: inherit;
-    text-shadow: 0 -1px 0 #fffef9;
 }
 
 h1 .hero__hash {
@@ -288,13 +287,13 @@ h1 .hero__hash {
     font-size: clamp(2.16rem, 4.8vw, 3.84rem);
     color: #c8bfaa;
     letter-spacing: 0.09em;
+    text-shadow: 0 -1px 0 #fffdf0;
 }
 
 .hero h2 {
     font-size: clamp(1.2rem, 3vw, 2.4rem);
-    color: #aba18b;
+    color: #bab09b;
     letter-spacing: 0.05em;
-    text-shadow: 0 -1px 0 #d6d3c3;
 }
 
 .button {

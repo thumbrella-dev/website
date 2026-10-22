@@ -255,6 +255,9 @@ Every cache entry has an expiration timestamp. By default upstream
 (`TBR_CACHE_MAX_TTL`). When the upstream provides no hints, entries
 default to 1 hour (`TBR_CACHE_DEFAULT_TTL`).
 
+Server cache lookups use a canonical source URL, independently of the returned
+top-level `url`. HTTP(S) cache identities lowercase the scheme and host and
+strip query parameters and fragments.
 
 ### Cache String
 
