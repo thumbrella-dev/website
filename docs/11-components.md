@@ -139,6 +139,11 @@ style them from your own stylesheet.
     ▼
  tbr-requested          ← shimmer + spinner visible
     │
+    │ stale cached image available (optional)
+    ▼
+ tbr-intermediate       ← cached image shown immediately, spinner stays
+ tbr-has-intermediate
+    │
     │ intermediate result arrives (optional)
     ▼
  tbr-intermediate       ← placeholder shown, shimmer stops
@@ -150,13 +155,21 @@ style them from your own stylesheet.
  tbr-success            ← or tbr-failed, tbr-overloaded, tbr-unavailable
 ```
 
+When a stale thumbnail is already cached, the browser shows it right away as
+an intermediate image while the request still goes to the server. A server
+placeholder frame will not replace that cached image.
+
+When a *fresh* thumbnail is cached, the element is seeded directly from the
+cache: no request is made, no loading state is entered, and the image appears
+without the fade-in transition.
+
 ### CSS classes
 
 | Class | When applied | Meaning |
 |---|---|---|
 | `tbr-requested` | Immediately after the thumbnail request starts | The element is waiting for a response. Shimmer and spinner are visible. |
-| `tbr-intermediate` | An intermediate result arrives before the final thumbnail | The server has identified the file and sent a placeholder, but the full render is still in progress. |
-| `tbr-has-intermediate` | After an intermediate result is displayed | The shimmer stops; the intermediate placeholder is shown statically. |
+| `tbr-intermediate` | An intermediate image arrives before the final thumbnail | Either a stale cached thumbnail (browser only) or a server placeholder while the render is in progress. The element keeps its image and shows the spinner. |
+| `tbr-has-intermediate` | After an intermediate image is displayed | The shimmer stops; the intermediate image is shown statically. |
 | `tbr-loaded` | The final result arrives (success or failure) | The final image is displayed. Shimmer and spinner fade out. |
 | `tbr-success` | The thumbnail was generated successfully | The final thumbnail is visible. |
 | `tbr-failed` | The request failed (bad URL, unsupported format, server error) | A fallback placeholder icon is shown. |

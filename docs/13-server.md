@@ -252,12 +252,35 @@ backend.
 
 Every cache entry has an expiration timestamp. By default upstream
 `Cache-Control: max-age` / `s-maxage` sets the TTL, capped at 7 days
-(`TBR_CACHE_MAX_TTL`). When the upstream provides no hints, entries
-default to 1 hour (`TBR_CACHE_DEFAULT_TTL`).
+(`TBR_CACHE_MAX_TTL`). When the upstream provides no `Cache-Control`
+freshness directive, entries default to 5 minutes. Upstream `ETag` /
+`Last-Modified` validators do not override this default; they only enable
+conditional revalidation once it lapses.
 
 Server cache lookups use a canonical source URL, independently of the returned
 top-level `url`. HTTP(S) cache identities lowercase the scheme and host and
 strip query parameters and fragments.
+
+### Revalidation
+
+A cache string carries an absolute freshness timestamp, so it is reissued
+rather than reused. When a client sends back a cache string that has expired,
+the server makes a conditional request to the origin using the stored `ETag`
+or `Last-Modified` validator.
+
+If the origin answers `304 Not Modified`, the content is still current and the
+freshness clock restarts:
+
+- The origin's original `max-age` / `s-maxage` lifetime is reused, so a long
+  cached lifetime is not shortened by revalidation.
+- When no lifetime was recorded, the 5 minute default applies.
+- A `Cache-Control` header on the `304` response itself takes precedence.
+- `no-cache` still requires revalidation on every request, and `no-store` /
+  `private` responses are still not stored.
+
+The response carries the renewed cache string, and the server updates its own
+cache entry with it. The next request can then be served from cache instead of
+revalidating again.
 
 ### Cache String
 
