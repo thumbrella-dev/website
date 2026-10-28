@@ -9,16 +9,16 @@ tableOfContents:
 
 ### What media types are supported?
 
-Thumbrella supports over 100 media formats across several categories:
+Thumbrella recognizes 108 canonical formats across several categories. Rendering
+availability depends on the server configuration:
 
 | Kind | Count | Examples |
 |---|---|---|
-| Image | 19 | JPEG, PNG, WebP, AVIF, GIF, TIFF, BMP, HEIC, JP2, JXL, ICO, PSD, PPM, TGA |
-| Photograph | 27 | RAW, DNG, EXR, HDR, CR2, NEF, ARW, ORF, RW2, PEF, SRW, RAF, 3FR, MEF |
-| Video | 14 | MP4, MOV, MKV, AVI, FLV, TS, M4V, 3GP, OGV, WMV, MPEG, WebM |
+| Image | 51 | JPEG, PNG, WebP, AVIF, GIF, TIFF, HEIC, EXR, DDS, ICNS, ORA, OTB, PCX, SGI, WBMP, XBM, XPM, DNG, RAW |
+| Video | 14 | MP4, MOV, MKV, AVI, FLV, TS, M2TS, MXF, AV1, 3GP, OGV, WMV, MPEG, WebM |
 | 3D Geometry | 26 | OBJ, GLTF, GLB, STL, FBX, USDZ, IGES, DAE, PLY, 3DS, VRML |
-| Document | 6 | DOCX, PPTX, ODT, XLSX, ODS, ODP |
-| Audio | 6 | MP3, FLAC, OGG, M4A, AAC, WAV |
+| Document | 7 | PDF, DOCX, PPTX, ODT, XLSX, ODS, ODP |
+| Audio | 9 | MP3, FLAC, OGG, M4A, AAC, WAV, AIFF, OPUS, WMA |
 | Vector | 1 | SVG |
 
 Thumbrella classifies every format into a `kind` and canonical `extension` and

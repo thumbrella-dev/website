@@ -467,12 +467,18 @@ subprocess. Every tool is optional: the server probes the environment at startup
 and only uses tools that are present. Run `thumbrella check` to see which tools
 are detected and `thumbrella formats` to see the resulting format coverage.
 
+EXR, DDS, ICNS, OpenRaster, OTB, PCX, SGI, WBMP, XBM, and XPM are decoded
+in-process when supported. EXR files the built-in decoder cannot handle do not
+fall back to tier 3. Other formats may use external tools as a fallback.
+OpenRaster uses the merged image; ICNS entries encoded as JPEG 2000 require a
+fallback.
+
 | Tool | Purpose | Formats enabled |
 |---|---|---|
 | `ffmpeg` | Image and video decode fallback | Additional image and video formats |
 | `ffprobe` | Media metadata (dimensions, duration) | Used alongside `ffmpeg` |
 | `gm` (GraphicsMagick) | Arithmetic-coded JPEG decode and resize | `jpeg` `jpg` |
-| `oiiotool` (OpenImageIO) | Studio and high-dynamic-range image decode | `exr` `sxr` `mxr` `hdr` `rgbe` `dpx` `cin` `dds` `fits` `iff` `pic` `rla` `zfile` `sgi` `rgb` `rgba` `bw` `int` `inta` |
+| `oiiotool` (OpenImageIO) | Studio and high-dynamic-range image decode | `hdr` `rgbe` `dpx` `cin` `fits` `iff` `pic` `rla` `zfile` |
 | `f3d` | 3D geometry rendering | `3ds` `brep` `dae` `dxf` `e` `exo` `ex2` `fbx` `glb` `gltf` `gml` `iges` `igs` `obj` `off` `p21` `ply` `pts` `step` `stl` `stp` `stpnc` `vtk` `vtm` `vti` `vtp` `vtr` `vts` `vtu` `vrml` `wrl` `210` |
 | `python3` + `usd-core` | USD mesh extraction, then rendered by `f3d` | `usdz` `usdc` `usda` |
 | `pdftoppm` (Poppler) | PDF first-page rasterization | `pdf` |

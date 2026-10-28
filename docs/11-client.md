@@ -386,9 +386,9 @@ The internal media information is what gets cached by the client.
 
 ### Properties
 
-The media `properties` object holds format-specific metadata. Many of the fields
-are common across kinds where they have the same meaning. If a value cannot be
-determined reliably it is omitted.
+The media `properties` object holds source metadata. Fields are optional and
+shared across kinds where they have the same meaning. Availability depends on
+the format and the information the server can read; uncertain values are omitted.
 
 The values are always numbers. Some properties like "lossless" represent a
 boolean value with a numeric `0` or `1`.
@@ -417,11 +417,24 @@ boolean value with a numeric `0` or `1`.
 
 | Field | Unit | Description |
 |-------|------|-------------|
-| `channels` | num | Audio channel count. 0 if silent. |
+| `channels` | num | Audio channel count, such as 1 for mono or 2 for stereo. |
 | `duration` | sec | Playback duration. |
-| `lossless` | bool | Inferred from the file extension (flac, wav, aiff). |
+| `lossless` | bool | Whether the audio is lossless, when known from the format. |
 
-**Geometry, Vector, Document, Archive, Text, Binary, Unknown**
+**Document**
+
+| Field | Unit | Description |
+|-------|------|-------------|
+| `pages` | num | Page count, or slide count for presentations, when available. Office files may contain a saved count from the last edit. |
+
+**Vector**
+
+| Field | Unit | Description |
+|-------|------|-------------|
+| `width` | px | Intrinsic width in pixels, when available. |
+| `height` | px | Intrinsic height in pixels, when available. |
+
+**Geometry, Archive, Text, Binary, Unknown**
 
 These kinds currently have no properties.
 
