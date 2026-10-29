@@ -1,8 +1,9 @@
 /**
- * Extract the Clerk user ID from the __session cookie JWT.
- * Does NOT verify the signature - the admin worker re-verifies on its end.
+ * Extract the Clerk user id (`sub`) and session id (`sid`) from the __session
+ * cookie JWT. The signature is not verified here; the admin worker re-verifies
+ * both values with the Clerk Backend API on every dashboard request.
  */
-function getUserIdFromCookie(cookieHeader: string | null): string | null {
+function getSessionFromCookie(cookieHeader: string | null): { userId: string; sessionId: string } | null {
   if (!cookieHeader) return null;
   const cookies = cookieHeader.split(';').map((c) => c.trim());
   const sessionCookie = cookies.find((c) => c.startsWith('__session='));
@@ -12,8 +13,12 @@ function getUserIdFromCookie(cookieHeader: string | null): string | null {
   try {
     const payload = token.split('.')[1];
     if (!payload) return null;
-    const decoded = JSON.parse(atob(payload));
-    return decoded.sub || null;
+    // JWTs use base64url; atob only accepts standard base64.
+    const b64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4);
+    const decoded = JSON.parse(atob(padded)) as { sub?: string; sid?: string };
+    if (!decoded.sub || !decoded.sid) return null;
+    return { userId: decoded.sub, sessionId: decoded.sid };
   } catch {
     return null;
   }
@@ -42,9 +47,9 @@ export const onRequest: import('astro').MiddlewareHandler = async (context, next
   // --- /admin/* proxy to admin worker via service binding ---
   if (context.url.pathname.startsWith('/admin/')) {
     const cookieHeader = context.request.headers.get('cookie');
-    const userId = getUserIdFromCookie(cookieHeader);
+    const session = getSessionFromCookie(cookieHeader);
 
-    if (!userId) {
+    if (!session) {
       return Response.json({ ok: false, error: 'Authentication required.' }, { status: 401 });
     }
 
@@ -61,16 +66,26 @@ export const onRequest: import('astro').MiddlewareHandler = async (context, next
 
     const upstreamUrl = new URL(`/api/user/${route}`, 'http://admin.internal');
     for (const [key, value] of new URL(context.request.url).searchParams) {
-      if (key !== 'clerkUserId') upstreamUrl.searchParams.set(key, value);
+      if (key !== 'clerkUserId' && key !== 'clerkSessionId') upstreamUrl.searchParams.set(key, value);
     }
-    upstreamUrl.searchParams.set('clerkUserId', userId);
+    upstreamUrl.searchParams.set('clerkUserId', session.userId);
+    upstreamUrl.searchParams.set('clerkSessionId', session.sessionId);
 
     const method = context.request.method.toUpperCase();
     const hasBody = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
 
+    const upstreamHeaders = new Headers();
+    if (hasBody) {
+      upstreamHeaders.set('content-type', context.request.headers.get('content-type') ?? 'application/json');
+    }
+    // Signed dashboard capability: minted by the admin worker when the panel
+    // was rendered, echoed back on every panel operation.
+    const dashboardToken = context.request.headers.get('x-tbr-dashboard-token');
+    if (dashboardToken) upstreamHeaders.set('x-tbr-dashboard-token', dashboardToken);
+
     const upstream = new Request(upstreamUrl.toString(), {
       method,
-      headers: hasBody ? { 'content-type': context.request.headers.get('content-type') ?? 'application/json' } : {},
+      headers: upstreamHeaders,
       body: hasBody ? context.request.body : null,
     });
 

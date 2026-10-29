@@ -52,6 +52,34 @@ onReady(() => {
   var clerkLoading = false;    // script in-flight or Clerk.load() in-flight
   var pendingCallbacks = [];   // queue while Clerk is loading/initialising
   var btnOriginalHtml = '';    // saved button content for load/restore
+  var activeDashboardSid = null; // Clerk session that opened the open panel
+  var sessionWatcherInstalled = false;
+
+  // If the browser's Clerk session changes while a dashboard panel is open
+  // (sign-out, sign-in, multi-session switch), the panel is no longer valid.
+  // Close it immediately; the server will also reject any late operations.
+  function installSessionWatcher() {
+    if (sessionWatcherInstalled || !window.Clerk || typeof window.Clerk.addListener !== 'function') return;
+    sessionWatcherInstalled = true;
+    window.Clerk.addListener(function (resources) {
+      var sid = resources && resources.session ? resources.session.id : null;
+      if (activeDashboardSid && sid !== activeDashboardSid) {
+        document.dispatchEvent(new CustomEvent('tbr-session-changed'));
+      }
+    });
+  }
+
+  document.addEventListener('tbr-session-changed', function () {
+    activeDashboardSid = null;
+    accountBtn.disabled = false;
+    btnLoading(false);
+    if (window.Clerk) {
+      var close = window.Clerk.closeUserProfile || window.Clerk.closeUserProfileModal;
+      if (typeof close === 'function') {
+        try { close.call(window.Clerk); } catch (err) { /* already closed */ }
+      }
+    }
+  });
 
   function btnLoading(on) {
     if (on) {
@@ -167,6 +195,7 @@ onReady(() => {
           clerkReady = true;
           clerkLoading = false;
           btnLoading(false);
+          installSessionWatcher();
           flushCallbacks();
         })
         .catch(function (err) {
@@ -253,7 +282,8 @@ onReady(() => {
     }]);
   }
 
-  function openDashboard() {
+  function openDashboard(attempt) {
+    attempt = attempt || 0;
     accountBtn.disabled = true;
     fetch('/admin/dashboard')
       .then(function (r) { return r.ok ? r.json() : null; })
@@ -265,10 +295,22 @@ onReady(() => {
           return;
         }
 
-        var signOutHtml = '<button data-manage-account-sign-out class="tbr-btn tbr-signout" onclick="window.Clerk.signOut({redirectUrl:\'/\'})">Sign out</button>';
+        // The panel was resolved from the server-side session cookie. If the
+        // Clerk client has already moved to another session, the two disagree:
+        // retry once, then refuse to show a mismatched panel at all.
+        var clientSid = window.Clerk && window.Clerk.session ? window.Clerk.session.id : null;
+        if (data.session && data.session.sid && clientSid && data.session.sid !== clientSid) {
+          if (attempt < 1) {
+            setTimeout(function () { openDashboard(attempt + 1); }, 250);
+            return;
+          }
+          openFallbackProfile();
+          return;
+        }
+        activeDashboardSid = data.session ? data.session.sid : null;
 
         var customPages = data.tabs.map(function (tab) {
-          var html = tab.html.replace(/\{\{SIGNOUT\}\}/g, signOutHtml);
+          var html = tab.html;
           return {
             label: tab.label,
             url: tab.url,
@@ -289,7 +331,7 @@ onReady(() => {
   }
 
   function openClerkPanel() {
-    if (window.Clerk.user) {
+    if (window.Clerk.session) {
       openDashboard();
     } else {
       window.Clerk.openSignIn({
