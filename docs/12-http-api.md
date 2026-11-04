@@ -78,17 +78,31 @@ curl --silent http://localhost:3114/batch \
 
 The request body must be a JSON object with an `items` field containing an
 array of objects. Each object must have a `url` field and can optionally
-include a `cache` string for client-side caching.
+include a `cache` string for client-side caching and a `key` string to
+override the cache identity.
 
 ```json
 {
   "items": [
     {"url": "https://demo.thumbrella.dev/media/golden-gate.exr"},
     {"url": "https://demo.thumbrella.dev/media/game-level.png", "cache": "beef:AAA"},
-    {"url": "https://demo.thumbrella.dev/media/miss-library.avif"}
+    {"url": "https://demo.thumbrella.dev/media/miss-library.avif", "key": "avatar/user-123"}
   ]
 }
 ```
+
+When `key` is present it is used verbatim as the cache identity for that item
+instead of the canonical form of `url`. This lets one URL be cached under
+multiple independent identities, and lets a client pin a stable identity for a
+URL whose query string changes between requests (for example signed storage
+URLs). The effective identity is echoed back in the result's `key` field.
+
+A cache token normally has the encoded shape `<hex-epoch>:<base64>`, passed
+back unchanged from a prior result. Sending the literal string `"uncached"`
+instead disables caching for that item: the server performs no cache lookup,
+sends no conditional request, stores nothing, and returns an empty `media.cache`
+token. This is mainly useful for benchmarking, but it is part of the standard
+request contract.
 
 **Response modes**
 
@@ -109,6 +123,7 @@ curl --silent http://localhost:3114/batch \
 {
   "items": [
     {
+      "key": "https://demo.thumbrella.dev/media/photo.jpg",
       "url": "https://demo.thumbrella.dev/media/photo.jpg",
       "status": "success",
       "source": "render",
@@ -136,8 +151,8 @@ curl --silent --no-buffer http://localhost:3114/batch \
 ```
 
 ```
-{"url":"https://demo.thumbrella.dev/media/video.mp4","status":"intermediate",...}
-{"url":"https://demo.thumbrella.dev/media/video.mp4","status":"success",...}
+{"key":"https://demo.thumbrella.dev/media/video.mp4","url":"https://demo.thumbrella.dev/media/video.mp4","status":"intermediate",...}
+{"key":"https://demo.thumbrella.dev/media/video.mp4","url":"https://demo.thumbrella.dev/media/video.mp4","status":"success",...}
 ```
 
 Streaming mode provides two additional features:
@@ -165,6 +180,7 @@ itself. An inner `media` field describes the thumbnail and its metadata.
 
 | Field | Type | Description |
 |---|---|---|
+| `key` | string | Canonical, cleaned URL used as the internal cache lookup key. Scheme and host are lowercased and query/fragment are stripped. |
 | `url` | string | The original URL that was requested. |
 | `status` | string | Outcome of this request: `success`, `failed`, `overloaded`, `intermediate`, or `batchlimit`. |
 | `source` | string | How the thumbnail was produced: `render`, `shortcut`, `cache`, `not_modified`, `fallback`, or `placeholder`. |
@@ -203,7 +219,7 @@ same file share the same `media`, so clients can compare fields to deduplicate.
 | `mime` | string | Sniffed MIME type (e.g. `image/jpeg`). |
 | `fileSize` | number | Size of the full media file, or 0. |
 | `placeholder` | string | Non-empty when the thumbnail is a fallback icon. Clients can compare this to deduplicate placeholder images. |
-| `cache` | string | Cache token for round-tripping in an encoded format. Empty means do not cache. |
+| `cache` | string | Cache token for round-tripping in an encoded format. Empty means do not cache. Send `"uncached"` to bypass the server cache entirely. |
 | `properties` | object | Format-specific metadata. See below. |
 
 Client libraries typically decode the base64 `thumbnail` into a binary or bytes

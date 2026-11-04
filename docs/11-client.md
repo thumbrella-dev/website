@@ -343,6 +343,7 @@ likely happens when requests have failed or server features are disabled.
 
 | Field | Type | Description |
 |---|---|---|
+| `key` | string | Effective cache identity: the request `key` when supplied, otherwise the canonical URL. |
 | `url` | string | The original URL that was requested. |
 | `status` | string | Outcome of this request. (`success` `failed` `overloaded` `intermediate`) |
 | `source` | string | How the thumbnail was produced. (`render` `shortcut` `cache` `not_modified` `fallback` `placeholder`) |
@@ -377,6 +378,11 @@ in its result, then all fields will be populated.
 thumbnail was generated. `shortcut` means an embedded thumbnail inside the
 source file was used (common for video and audio). `cache` and `not_modified`
 mean the response came from a cache without re-rendering.
+
+When sending a request directly, passing the literal cache value `"uncached"`
+disables caching for that item: the server performs no cache lookup and stores
+nothing, and the returned `media.cache` is empty. The client libraries handle
+this automatically.
 
 Client libraries will convert the `thumbnail` base64 information into a binary
 or bytes representation appropriate for that language. The contents are usually

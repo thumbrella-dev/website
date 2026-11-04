@@ -318,6 +318,11 @@ Server results store this cache value in the nested "media", "cache" field.
 It is possible for this cache value to be `null` when the remote server provides
 no caching information.
 
+A client may send the literal string `"uncached"` in place of a cache token to
+disable caching for that request. The server then skips every cache read,
+sends no conditional request, and stores nothing for the result; the returned
+`media.cache` token is empty.
+
 
 ## Pins
 

@@ -86,17 +86,17 @@ intended to simplify client uses and help galleries and tools predictable. The
 thumbnail is still cropped to represent the aspect ratio used by the source
 media.
 
-<img src="https://demo.thumbrella.dev/thumb/neon-block.png.jpg" alt="Transparent PNG rendered with background overlay" style="display:inline-block;max-width:100%;aspect-ratio:4/3;width:160px;">
-<img src="https://demo.thumbrella.dev/thumb/packing-boxes.avi.jpg" alt="Wider video thumbnail" style="display:inline-block;max-width:100%;aspect-ratio:4/3;width:160px;">
-<img src="https://demo.thumbrella.dev/thumb/math-guide.odt.jpg" alt="Portrait document thumbnail" style="display:inline-block;max-width:100%;aspect-ratio:4/3;width:160px;">
+<img src="https://demo.thumbrella.dev/thumb/neon-block.png.jpg" style="display:inline-block;aspect-ratio:4/3;width:160px;">
+<img src="https://demo.thumbrella.dev/thumb/packing-boxes.avi.jpg" style="display:inline-block;aspect-ratio:4/3;width:160px;">
+<img src="https://demo.thumbrella.dev/thumb/math-guide.odt.jpg" style="display:inline-block;aspect-ratio:4/3;width:160px;">
 
 Every request comes with a resulting image. For formats Thumbrella does not
 understand it will still classify the media type and provide a simple
 placeholder for that media. Applications don't need special error-handling code
 paths for missing or failed thumbnails.
 
-<img src="https://cloud.thumbrella.dev/placeholder/audio.jpeg" alt="Audio placeholder" style="display:inline-block;max-width:100%;aspect-ratio:4/3;width:160px;">
-<img src="https://cloud.thumbrella.dev/placeholder/document.jpeg" alt="Document placeholder" style="display:inline-block;max-width:100%;aspect-ratio:4/3;width:160px;">
+<img src="https://cloud.thumbrella.dev/placeholder/audio.jpeg" alt="Audio placeholder" style="display:inline-block;aspect-ratio:4/3;width:160px;">
+<img src="https://cloud.thumbrella.dev/placeholder/document.jpeg" alt="Document placeholder" style="display:inline-block;aspect-ratio:4/3;width:160px;">
 
 Each thumbnail result also contains [lightweight metadata](/docs/client/#result)
 from the source media. This describes the resolutions for images, lengths of
