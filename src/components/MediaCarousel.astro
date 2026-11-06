@@ -20,6 +20,12 @@ interface Props {
 }
 
 const { items } = Astro.props;
+
+// Preload the first tiles in the server-rendered HTML so their thumbnails are
+// fetched during parse and appear on first paint. This avoids the row of empty
+// frames on initial load. Four covers a typical desktop line at the 190px tile
+// + 60px gap pitch; the client script preloads more for wider viewports.
+const INITIAL_PRELOAD = 4;
 ---
 
 <section class="carousel-section">
@@ -37,6 +43,7 @@ const { items } = Astro.props;
         to scroll into (this keeps the served HTML from tripling the markup).
       */}
       {items.map((item, i) => {
+        const preload = i < INITIAL_PRELOAD;
         const f = (8 * Math.PI) / items.length;  // four full wave cycles per set
         const rx = (Math.sin(i * f * 1) * 10).toFixed(1);
         const ry = (Math.cos(i * f * 1) * 13).toFixed(1);
@@ -44,7 +51,7 @@ const { items } = Astro.props;
         const placeholderSrc = `https://cloud.thumbrella.dev/placeholder/${item.kind || 'unknown'}.jpeg`;
         return (
           <li
-            class="ctile"
+            class={`ctile${preload ? ' is-loaded' : ''}`}
             style={`--ctile-rx: ${rx}deg; --ctile-ry: ${ry}deg; --ctile-tx: 0rem; --ctile-ty: ${ty}rem`}
             data-thumb-src={item.src}
             data-name={item.name}
@@ -66,7 +73,7 @@ const { items } = Astro.props;
                 <img class="ctile__ph-img" src={placeholderSrc} alt="" draggable="false" />
                 <span class="ctile__spinner"></span>
               </div>
-              <img class="ctile__img" alt={item.name} draggable="false" />
+              <img class="ctile__img" alt={item.name} draggable="false" src={preload ? item.src : undefined} />
               <div class="ctile__badges" aria-hidden="true">
                 <span class={`ctile__badge ctile__badge--${item.type}`}>{item.codec}</span>
                 {item.duration && <span class="ctile__badge ctile__badge--dur">{item.duration}</span>}
@@ -407,6 +414,33 @@ const { items } = Astro.props;
     // Three total copies now - one set width is used for modulo wrapping.
     const setCount = allTiles.length / 3;
     const oneSetWidth = allTiles.slice(0, setCount).reduce((w, el) => w + el.offsetWidth + 120 /* gap */, 0);
+
+    // Preload the tiles that are visible on first paint so the page does not
+    // open with a row of empty frames. These skip the simulated load delay
+    // entirely; only tiles that scroll in later run the load animation.
+    //
+    // The count is derived from the viewport width and the fixed tile pitch
+    // (190px tile + 60px gap) instead of reading each tile's layout. Reading
+    // getBoundingClientRect() in a loop while mutating the DOM forces a reflow
+    // on every iteration, which stalls startup and can prevent the scroll
+    // animation from beginning. Always cover at least the first three tiles.
+    const preloadTile = (el: HTMLElement) => {
+      const src = el.dataset.thumbSrc ?? '';
+      const img = el.querySelector<HTMLImageElement>('.ctile__img');
+      if (!img || !src) return;
+      // Mark loaded up front: the real image fades in when it decodes, with no
+      // artificial pause and no spinner. The observer's is-loaded guard keeps
+      // these from re-triggering the animation while they remain on screen.
+      el.classList.add('is-loaded');
+      img.addEventListener('error', () => el.classList.add('is-error'), { once: true });
+      img.src = src;
+    };
+    const TILE_PITCH_PX = 190 + 60; // .ctile width + .carousel-track gap
+    const preloadCount = Math.max(
+      4,
+      Math.ceil(document.documentElement.clientWidth / TILE_PITCH_PX) + 1,
+    );
+    allTiles.slice(0, preloadCount).forEach(preloadTile);
 
     // Observe ALL tiles so each clone restarts its animation when fully on screen.
     // Reset only when fully off screen so tiles stay loaded during scroll-out.
