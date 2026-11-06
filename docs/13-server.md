@@ -62,7 +62,7 @@ the authenticity of your executables.
 Windows includes an excellent packaging system through 
 [winget](https://learn.microsoft.com/en-us/windows/package-manager/). The 
 Thumbrella version through `winget` may lag slightly behind other releases, 
-as it goes through additional validation steps.
+as it goes through external validation and release processes.
 
 ```sh
 winget install Thumbrella.Server
@@ -105,8 +105,8 @@ The process isn't quite automatic because a static build of parts of ffmpeg is
 included in the process, and will not be built automatically. A user can refer
 to an existing build of ffmpeg by setting the `$FFMPEG_DIR` directory. 
 Otherwise, the Thumbrella build process will guide the user through creating
-the needed code. Be aware that building static ffmpeg code can take 10-20
-minutes depending on computer.
+the needed code. Be aware that static ffmpeg build can take 10-20
+minutes, depending on computer.
 
 ```sh
 git clone https://github.com/thumbrella-dev/thumbrella

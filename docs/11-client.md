@@ -102,8 +102,8 @@ provides its own caches. The cache can also be disabled.
 - Batching requests is a key to efficiency. Group multiple thumbnails into a
 single request. Batch requests can also be streamed, so results are immediately
 available. This is the best design for interactive applications and use cases.
- Streaming requests also provide intermediate updates for thumbnails in-flight
-for even better interactivity.
+Streaming requests also provide intermediate updates for thumbnails in-flight
+for improved interactivity.
 
 ## Languages
 
@@ -322,6 +322,23 @@ and returning matching `Result` objects for each request.
 | `batch(urls)` | Fetch multiple thumbnails. Returns all results after every request completes. |
 | `stream(urls)` | Fetch multiple thumbnails as a stream. Results arrive as soon as they are ready. |
 
+These methods all take a list of requests. Each request can be a simple url
+of the media to lookup. They can also be a small object (dictionary) of fields
+for more control over each request.
+
+Each request object can have the following fields.
+
+- `url` (required) Media url to fetch.
+- `key` (optional) Simplified, hashed, or custom value the client and server
+use to track cached results for this url. If not provided, the server will 
+use the provided url with all the query parameters stripped away.
+- `cache` (optional) Encoded cache string from a previous request. The clients
+will provide this automatically by using values from their internal caches.
+If an application wants to control the caching themselves, this can be provided
+from the `result.media.cache` string, which encodes several values that control
+server and client caching behavior. The cache can also be a specially recognized
+string, `"uncached"` which disables all server and client caching for this
+url.
 
 ## Result
 
@@ -329,14 +346,14 @@ Every thumbnail request returns a `Result`. Results are returned for every URL,
 including failures. A placeholder image will always be returned for every request,
 even if the server is unreachable or the file format is completely unknown.
 
+The Result structure is split into two levels. The outer top level describes the
+operation itself. An inner `media` field describes data that comes from the
+remote media itself and the thumbnail. 
+
 :::note
 In Rust the Thumbrella result object is named `ResultData` and does not
 conflict with the language's standard `Result` for possibly failed values.
 :::
-
-The Result structure is split into two levels. The outer top level describes the
-operation itself. An inner `media` field describes data that comes from the
-remote media itself and the thumbnail. 
 
 Most of the result fields are optionally, and can be `null` values. This most
 likely happens when requests have failed or server features are disabled.
@@ -353,6 +370,20 @@ likely happens when requests have failed or server features are disabled.
 | `httpStatus` | number | HTTP status returned by the upstream source, if fetched. |
 | `pin` | url | Optional url for a semi persistent reference to the thumbnail. |
 | `media` | object | The thumbnail and its metadata. `null` on total failure. |
+
+`source` describes how the thumbnail was produced. `render` means a fresh
+thumbnail was generated. `shortcut` means an embedded thumbnail inside the
+source file was used (common for video and audio). `cache` and `not_modified`
+mean the response came from a cache without re-rendering.
+
+The result object also provides several quick convenient methods.
+
+- `isSuccess()` (or `is_success()`) A boolean that reports if `status` was one
+of the successful statuses. When unsuccessful the `message` field contains
+a short description.
+- `verify()` Return the same Result object, or raise an exception with a
+short description. (Not available in Rust)
+
 
 ## Media
 
@@ -374,21 +405,19 @@ in its result, then all fields will be populated.
 | `cache` | string | Cache token for round-tripping in an encoded format, empty means do not cache. |
 | `properties` | object | Format-specific metadata. See below. |
 
-`source` describes how the thumbnail was produced. `render` means a fresh
-thumbnail was generated. `shortcut` means an embedded thumbnail inside the
-source file was used (common for video and audio). `cache` and `not_modified`
-mean the response came from a cache without re-rendering.
-
-When sending a request directly, passing the literal cache value `"uncached"`
-disables caching for that item: the server performs no cache lookup and stores
-nothing, and the returned `media.cache` is empty. The client libraries handle
-this automatically.
-
 Client libraries will convert the `thumbnail` base64 information into a binary
 or bytes representation appropriate for that language. The contents are usually
 around 5kb to 10kb in size.
 
-The internal media information is what gets cached by the client.
+This nested collection of media fields is what gets cached by the server
+and clients.
+
+The media object has simple helper methods of its own.
+
+- `isFresh()` (or `is_fresh()`) A boolean that reports the cache can
+still be considered up to date. This means the media and thumbnail can be reused 
+without checking with the remote server that it is up to date. The client avoids 
+remote requests for media still considered fresh.
 
 ### Properties
 
