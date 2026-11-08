@@ -488,6 +488,8 @@ fallback.
 | `python3` + `usd-core` | USD mesh extraction, then rendered by `f3d` | `usdz` `usdc` `usda` |
 | `pdftoppm` (Poppler) | PDF first-page rasterization | `pdf` |
 | `pdfinfo` (Poppler) | PDF page count metadata | Used alongside `pdftoppm` |
+| `soffice` (LibreOffice) | Office document first-page rendering and EMF/WMF vector rendering, including embedded previews | `odt` `ods` `odp` `odg` `docx` `xlsx` `pptx` `doc` `xls` `ppt` `rtf` `pages` `numbers` `key` `xlsm` `xlsb` `xltx` `xltm` `xlt` `xlm` `xlw` `emf` `wmf` |
+| `playwright-cli` (Playwright) | Html and website renderer | 'html' 'xhtml' 'mhtml' |
 | `xvfb-run` / X display | Headless display server for `f3d` | Required for geometry rendering |
 
 Arithmetic-coded JPEGs need `gm` or a configured handoff; FFmpeg's JPEG

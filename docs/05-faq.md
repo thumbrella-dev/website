@@ -17,9 +17,9 @@ availability depends on the server configuration:
 | Image | 51 | JPEG, PNG, WebP, AVIF, GIF, TIFF, HEIC, EXR, DDS, ICNS, ORA, OTB, PCX, SGI, WBMP, XBM, XPM, DNG, RAW |
 | Video | 14 | MP4, MOV, MKV, AVI, FLV, TS, M2TS, MXF, AV1, 3GP, OGV, WMV, MPEG, WebM |
 | 3D Geometry | 28 | OBJ, GLTF, GLB, STL, FBX, ABC, USDZ, IGES, DAE, PLY, 3DS, VRML, BLEND |
-| Document | 7 | PDF, DOCX, PPTX, ODT, XLSX, ODS, ODP |
+| Document | 11 | PDF, HTML, DOCX, PPTX, XLSX, ODT, ODS, ODP, PAGES, NUMBERS, KEY |
 | Audio | 9 | MP3, FLAC, OGG, M4A, AAC, WAV, AIFF, OPUS, WMA |
-| Vector | 1 | SVG |
+| Vector | 4 | SVG, EMF, WMF, ODG |
 
 Thumbrella classifies every format into a `kind` and canonical `extension` and
 generates a standard `mime` type for each thumbnail.
