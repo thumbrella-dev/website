@@ -32,6 +32,11 @@ web server. Any subcommand accepts `--help` for further details.
   server. This will show the primary environment variable settings or their
   defaults. It will also run several checks to determine if the server is ready
   to run with the given environment.
+- `thumbrella probe` Prints the `TBR_PROBE` value for the external tools found
+  in the current environment. Set that variable to skip the startup probe and
+  trust the list, which makes startup faster on fixed environments like a
+  container image. This only works with a tier3 build of Thumbrella, otherwise
+  warns and fails.
 - `thumbrella license` Report license and information about dependencies.
 - `thumbrella service` Prints deployment config files: a Docker Compose
   file, a systemd unit, and Windows service instructions. Add an alias to
@@ -134,6 +139,7 @@ server can be further tuned with these.
 | `TBR_HANDSHAKE` | <none> | Private token required as a custom HTTP header on every request. |
 | `TBR_TRACE` | <none> | Trace sink `ndjson:<path>` to append more detailed logging output. |
 | `TBR_SCRATCH` | `$TMP/thumbrella` | A location on disk to download temporary files into. |
+| `TBR_PROBE` | <none> | Comma-separated list of available external tools. When set, startup skips probing them and trusts the list (unlisted tools are treated as unavailable). Generate it with `thumbrella probe`. |
 | `TBR_TIER2` | <none> | Connection string to a separate Thumbrella server for tier2. |
 | `TBR_TIER3` | <none> | Connection string to a separate Thumbrella server for tier3. |
 
@@ -239,7 +245,7 @@ fastest first — a chain reads each tier in order and writes to every tier, e.g
 | Backend | Format | Persistence | Examples |
 |---|---|---|---|
 | **Memory** | `mem` | No | `mem`, `mem:200mb`, `mem:2gb`, `mem:500` (entries) |
-| **[SQLite](https://sqlite.org)** | `sqlite:` | Yes | `sqlite:cache.db`, `sqlite:/var/cache.db,1gb` |
+| **[SQLite](https://sqlite.org)** | `sqlite` | Yes | `sqlite:cache.db`, `sqlite:/var/cache.db,1gb` |
 | **Cloud** | `cloud` | Yes (shared) | `cloud:tbr_e_3QnzBcWx7KpRmYT2000example` (your cloud API token) |
 | **None** | `none` | — | Disables all caching |
 
@@ -472,6 +478,11 @@ subprocess. Every tool is optional: the server probes the environment at startup
 and only uses tools that are present. Run `thumbrella check` to see which tools
 are detected and `thumbrella formats` to see the resulting format coverage.
 
+On a fixed environment like a container image, the probe results can be cached
+so startup does not run the tools. Run `thumbrella probe` to get the
+`TBR_PROBE` value for the current environment and set it for the server; see
+the [configuration](#configuration) table above.
+
 EXR, DDS, ICNS, OpenRaster, OTB, PCX, SGI, WBMP, XBM, and XPM are decoded
 in-process when supported. EXR files the built-in decoder cannot handle do not
 fall back to tier 3. Other formats may use external tools as a fallback.
@@ -485,24 +496,60 @@ fallback.
 | `gm` (GraphicsMagick) | Arithmetic-coded JPEG decode and resize | `jpeg` `jpg` |
 | `oiiotool` (OpenImageIO) | Studio and high-dynamic-range image decode | `hdr` `rgbe` `dpx` `cin` `fits` `iff` `pic` `rla` `zfile` |
 | `f3d` | 3D geometry rendering | `3ds` `brep` `dae` `dxf` `e` `exo` `ex2` `fbx` `glb` `gltf` `gml` `iges` `igs` `obj` `off` `p21` `ply` `pts` `step` `stl` `stp` `stpnc` `vtk` `vtm` `vti` `vtp` `vtr` `vts` `vtu` `vrml` `wrl` `210` |
-| `python3` + `usd-core` | USD mesh extraction, then rendered by `f3d` | `usdz` `usdc` `usda` |
+| `python3` + `usd-core` | USD mesh extraction, then rendered by `f3d` when better tools are unavailable | `usdz` `usdc` `usda` |
 | `pdftoppm` (Poppler) | PDF first-page rasterization | `pdf` |
 | `pdfinfo` (Poppler) | PDF page count metadata | Used alongside `pdftoppm` |
-| `soffice` (LibreOffice) | Office document first-page rendering and EMF/WMF vector rendering, including embedded previews | `odt` `ods` `odp` `odg` `docx` `xlsx` `pptx` `doc` `xls` `ppt` `rtf` `pages` `numbers` `key` `xlsm` `xlsb` `xltx` `xltm` `xlt` `xlm` `xlw` `emf` `wmf` |
-| `playwright-cli` (Playwright) | Html and website renderer | 'html' 'xhtml' 'mhtml' |
-| `xvfb-run` / X display | Headless display server for `f3d` | Required for geometry rendering |
+| `soffice` (LibreOffice) | Office document first-page rendering and EMF/WMF metafile rendering, including embedded previews | `odt` `ods` `odp` `odg` `docx` `xlsx` `pptx` `doc` `xls` `ppt` `rtf` `pages` `numbers` `key` `xlsm` `xlsb` `xltx` `xltm` `xlt` `xlm` `xlw` `emf` `wmf` |
+| `playwright-cli` (Playwright) | Headless browser snapshots of live HTML pages and MHTML archives | `html` `xhtml` `mhtml` |
+| `xvfb-run` / X display | Virtual display for headful renderers when no real one is set | Used for geometry rendering when no display is available |
 
 Arithmetic-coded JPEGs need `gm` or a configured handoff; FFmpeg's JPEG
 decoder does not support this variant, even when ordinary JPEGs work locally.
 
 The display server is a runtime requirement rather than a format tool. `f3d`
 will not render without a `DISPLAY` (or `WAYLAND_DISPLAY`) in the environment.
-When no display is available, the server wraps `f3d` with `xvfb-run`, which
-starts a temporary Xvfb server.
+When no display is set and `xvfb-run` is available, the server wraps geometry
+renderers in it, which starts a temporary Xvfb server; if `xvfb-run` is not
+available they are run directly.
 
 USD support depends on three pieces at once: `python3`, the `usd-core` PyPI
 package, and `f3d`. All three must be detected before `usdz`, `usdc`, or `usda`
 files are handled.
+
+`soffice` must be a genuine LibreOffice build. At startup the server rejects the
+`soffice` wrappers shipped by Apache OpenOffice and StarOffice, which do not
+implement the `--convert-to` pipeline the renderer needs, as well as LibreOffice
+builds older than the supported minimum (currently 6.0) that lack the required
+`--headless`/`--convert-to` arguments. When available it renders the first page
+of Office documents and converts EMF/WMF previews extracted from Office files
+into images. If `thumbrella check` reports it unavailable, install or upgrade
+LibreOffice.
+
+HTML snapshots need more than the CLI: a browser engine must be installed too.
+Thumbrella runs `playwright-cli` as-is and never installs, configures, or
+selects a browser, so it works with whatever Playwright setup the host
+provides. Provide the CLI on `$PATH` with a downloaded browser:
+
+```text
+npm install -g @playwright/cli
+playwright-cli install-browser chromium
+```
+
+`playwright-cli` defaults to the branded `chrome` channel (a system-installed
+Google Chrome). To use a Playwright-managed browser instead, set it in
+Playwright's own configuration, for example `~/.playwright/cli.config.json`:
+
+```json
+{ "browser": { "browserName": "chromium" } }
+```
+
+At startup the server opens and closes a blank page through `playwright-cli`
+to confirm the CLI and its configured browser actually work; it never installs
+anything and leaves engine selection to Playwright's own configuration. If the
+launch fails the renderer is reported unavailable and HTML falls back to the
+document placeholder. Pages are loaded by their original URL so relative
+assets resolve as they would in a browser, and MHTML archives load as
+self-contained pages.
 
 These tools are all completely optional. The Thumbrella server operates without
 any of these tools, gracefully providing fallback images for the formats it

@@ -9,3 +9,5 @@ npm-debug.log*
 .wrangler
 .dev.vars*
 .env*
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
