@@ -10,11 +10,9 @@ a blocking interface for simpler environments.
 
 - Async-first with [reqwest](https://crates.io/crates/reqwest) _(rustls TLS)_
 - Minimal dependencies, `reqwest`, `serde`, `base64`, `thiserror`
-- Stream async results as the server renders thumbnails
-- Single call efficiently processes multiple thumbnails in parallel
-- Persistent client caching integrates with server and HTTP
+- Batched streaming requests with intermediate results
+- Optional persistent cached results
 - Placeholders for failures, even if disconnected or misconfigured
-- Typed results with simple media metadata
 - Thumbrella server supports 100+ formats
 
 ```rust

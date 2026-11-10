@@ -7,15 +7,12 @@ the [JavaScript client](https://www.npmjs.com/package/@thumbrella/client).
 Use its `Client` API when your application needs to control requests, caching,
 batching, or streaming directly.
 
-- Zero runtime dependencies, only needs `fetch`
 - Runs in Node 18+, Deno, Bun, and modern browsers
-- Optional `<tbr-thumb>` element for browser environments
-- Single call efficiently processes multiple thumbnails in parallel
-- Stream async results as the server renders thumbnails
-- Persistent client caching integrates with server and HTTP
+- Zero runtime dependencies, only needs `fetch`
+- Batched streaming requests with intermediate results
+- Optional persistent cached results
 - Placeholders for failures, even if disconnected or misconfigured
-- Load easily into `sharp` and other image libraries
-- Typed results with simple media metadata
+- Integrates with `sharp` or other image libraries
 - Thumbrella server supports 100+ formats
 
 ```ts
