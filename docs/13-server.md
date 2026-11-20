@@ -390,6 +390,17 @@ curl http://localhost:3114/health
 # {"status": "ok", "thumbrella": 1}
 ```
 
+When `TBR_TIER2` or `TBR_TIER3` is set, the server uses `/health` for a second
+purpose: a speculative wakeup. Before fetching a source file it previews the
+URL extension, and if that file could plausibly need a higher tier it sends a
+fire-and-forget `GET /health` to that handoff server. A cold tier-2/3 container
+then has the connect and inspect time (tens of milliseconds) to start booting
+before the real handoff arrives. The response is discarded and the request is
+always optional - it is fine for the wakeup to be wasted because the file
+turned out to be a format this tier could handle. Each handoff server is woken
+at most once every five minutes, and a real handoff resets that timer, so the
+extra traffic is one request per server per five minutes.
+
 ## Docker
 
 The server is published as a container image. It listens on `3114` and binds

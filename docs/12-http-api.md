@@ -308,6 +308,14 @@ endpoint works even without a valid authentication token.
 When running a custom server with `TBR_HANDSHAKE` defined, this endpoint
 returns a 4XX status when the handshake is invalid.
 
+**Aliases**
+
+`GET /wake` and `GET /check` are identical to `GET /health` in every way -
+same response, same authentication rules. Higher tiers may use them for
+speculative "warm up, a handoff might be coming" pings, so those requests are
+easy to tell apart from liveness probes in server logs. Servers older than
+these aliases answer `404`, which the sender ignores.
+
 
 ## Error Handling
 
